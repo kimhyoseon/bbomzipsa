@@ -1,6 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/App';
+import css from './app.css';
 
-const rootElement = document.getElementById('root');
-ReactDOM.render(<App />, rootElement);
+ReactDOM.render(
+  <h1>Hello, world!!!!!!!!!</h1>,
+  document.getElementById('root')
+);
+
+
+//document.write("Hello world!!");

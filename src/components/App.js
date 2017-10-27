@@ -1,10 +1,9 @@
 import React from 'react';
 
 class App extends React.Component {
-    render(){
-
+    render() { 
         return (
-                <h1>Hello khs7515 react</h1>
+            <h1>Hello khs7515 react</h1>
         );
     }
 }
