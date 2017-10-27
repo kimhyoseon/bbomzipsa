@@ -1,4 +1,3 @@
-
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
@@ -41,8 +40,8 @@ module.exports = {
 
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'src/index.html',
-            filename: '../index.html',
+            template: 'src/index.html', // 가져올 템플릿 경로
+            //filename: '../index.html', // 최종 생성 경로
             /*minify: {
                 collapseWhitespace: true
             }, // minify html*/
