@@ -1,8 +1,9 @@
 # Webpack & React Helloworld Skeleton
 
 
-[Demo](https://kimhyoseon.github.io/" target="_blank)
+[Demo](https://kimhyoseon.github.io/)
 
+[Google](https://google.com" target="_blank)
 
 ## version
 <pre><code>
