@@ -1,8 +1,8 @@
-[Demo](https://kimhyoseon.github.io/)
-
-
 # Webpack & React Helloworld Skeleton
 
+## [Demo](https://kimhyoseon.github.io/){:target="_blank"}
+
+## version
 <pre><code>
 "webpack": "^3.8.1"
 "react": "^16.0.0"
