@@ -1,6 +1,12 @@
 $primary-color: blue;
 
 body {
+    padding-top: 60px;
     color: $primary-color;   
     //background: url(../images/sample.png) no-repeat; 
+}
+
+.starter-template {
+    padding: 40px 15px;
+    text-align: center;
 }

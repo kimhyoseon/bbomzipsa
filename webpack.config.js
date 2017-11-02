@@ -87,12 +87,12 @@ module.exports = env => {
                 template: __dirname + '/src/template/index.html', // 가져올 템플릿 경로
                 filename: htmlPath + "index.html", // 최종 생성 경로
                 minify: {
-                    collapseWhitespace: isProd
+                    collapseWhitespace: false //isProd
                 }, // minify html
                 hash: true // auto increase script version 
             }),
             new ExtractTextPlugin({
-                filename: "/css/[name].css",
+                filename: "css/[name].css",
                 allChunks: true,
                 publicPath: __dirname + "/dist/",
                 disable: !isProd 
