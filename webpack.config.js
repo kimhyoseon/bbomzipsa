@@ -9,10 +9,10 @@ module.exports = env => {
     const isProd = ENV.production;    
     const htmlPath = isProd ? __dirname + "/" : __dirname + "/dist/";    
     const cssUse = {
-        dev: ['style-loader', 'css-loader'],
+        dev: ['style-loader', 'css-loader', 'sass-loader'],
         prod: ExtractTextPlugin.extract({
             fallback: "style-loader",
-            use: "css-loader"        
+            use: ['css-loader', 'sass-loader']
         })
     }                
 
@@ -48,14 +48,24 @@ module.exports = env => {
                     }
                 },
                 {
-                    test: /\.css$/,
+                    test: /\.scss$/,
                     use: isProd ? cssUse.prod : cssUse.dev
-                }               
+                },                
+                {
+                    test: /\.(png|jpg|gif)$/,
+                    use: {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[path][name].[ext]?[hash]'
+                        }  
+                    }                    
+                }
             ]        
         },
 
         plugins: [
             new HtmlWebpackPlugin({
+                title: "helloworld",
                 template: __dirname + '/src/template/index.html', // 가져올 템플릿 경로
                 filename: htmlPath + "index.html", // 최종 생성 경로
                 minify: {
