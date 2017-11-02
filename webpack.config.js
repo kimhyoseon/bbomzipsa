@@ -1,6 +1,10 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const bootstrapEntryPoints = require("./webpack.bootstrap.config");
+const path = require('path');
+const glob = require('glob');
+const PurifyCSSPlugin = require('purifycss-webpack');
 
 module.exports = env => {
     
@@ -9,22 +13,24 @@ module.exports = env => {
     const isProd = ENV.production;    
     const htmlPath = isProd ? __dirname + "/" : __dirname + "/dist/";    
     const cssUse = {
-        dev: ['style-loader', 'css-loader', 'sass-loader'],
+        dev: ['style-loader', 'css-loader?soruceMap', 'sass-loader'],
         prod: ExtractTextPlugin.extract({
             fallback: "style-loader",
             use: ['css-loader', 'sass-loader']
         })
     }                
+    const bootstrapConfig = isProd ? bootstrapEntryPoints.prod : bootstrapEntryPoints.dev;
 
     /* config */
     return {
         entry: {
-            app: __dirname + '/src/app.js'
+            app: __dirname + '/src/app.js',
+            bootstrap: bootstrapConfig
         },    
 
         output: {
             path: __dirname + '/dist/',
-            filename: 'bundle.js'
+            filename: '[name].bundle.js'
         },
 
         devServer: {
@@ -59,7 +65,19 @@ module.exports = env => {
                             name: '[path][name].[ext]?[hash]'
                         }  
                     }                    
-                }
+                },
+                { 
+                    test: /\.(woff2?|svg)$/, 
+                    loader: 'url-loader?limit=10000&name=fonts/[name].[ext]' 
+                },
+                { 
+                    test: /\.(ttf|eot)$/, 
+                    loader: 'file-loader?name=fonts/[name].[ext]' 
+                },
+                { 
+                    test: /bootstrap-sass[\/\\]assets[\/\\]javascripts[\/\\]/, 
+                    loader: 'imports-loader?jQuery=jquery' 
+                },
             ]        
         },
 
@@ -74,13 +92,17 @@ module.exports = env => {
                 hash: true // auto increase script version 
             }),
             new ExtractTextPlugin({
-                filename: "app.css",
+                filename: "/css/[name].css",
                 allChunks: true,
                 publicPath: __dirname + "/dist/",
                 disable: !isProd 
-            }),        
+            }),                    
             new webpack.HotModuleReplacementPlugin(),
-            new webpack.NamedModulesPlugin()
+            new webpack.NamedModulesPlugin(),
+            new PurifyCSSPlugin({                
+                //paths: glob.sync(path.join(__dirname, 'src/*.html')),
+                paths: glob.sync(path.join(__dirname, 'src/*.html')),
+            })
         ]
     }
 };

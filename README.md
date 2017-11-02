@@ -5,8 +5,7 @@
 
 
 ## version
-<pre><code>
-"webpack": "^3.8.1"
+<pre><code>"webpack": "^3.8.1"
 "react": "^16.0.0"
 </code></pre>
 
