@@ -2,3 +2,8 @@ body {
   padding-top: 60px;
   color: blue;
 }
+
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}

@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const bootstrapEntryPoints = require("./webpack.bootstrap.config");
 const path = require('path');
-const glob = require('glob');
+const glob = require('glob-all');
 const PurifyCSSPlugin = require('purifycss-webpack');
 
 module.exports = env => {
@@ -99,9 +99,11 @@ module.exports = env => {
             }),                    
             new webpack.HotModuleReplacementPlugin(),
             new webpack.NamedModulesPlugin(),
-            new PurifyCSSPlugin({                
-                //paths: glob.sync(path.join(__dirname, 'src/*.html')),
-                paths: glob.sync(path.join(__dirname, 'src/*.html')),
+            new PurifyCSSPlugin({
+                paths: glob.sync([
+                    path.join(__dirname, 'src/template/*.html'),
+                    path.join(__dirname, 'src/*.js')
+                ])
             })
         ]
     }

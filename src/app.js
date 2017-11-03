@@ -5,11 +5,11 @@ import ReactDOM from 'react-dom';
 const html = (
   <div className="container">
     
-    <div class="starter-template">
-      <h1>Hello, world!</h1>          
+    <div className="starter-template">
+      <h1>Hello, world</h1>          
 
       <button type="button" className="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-        demo modal
+        modal
       </button>    
 
       <div className="modal fade" id="myModal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -20,7 +20,7 @@ const html = (
               <h4 className="modal-title" id="myModalLabel">Modal title</h4>
             </div>
             <div className="modal-body">
-              ...
+              Modal success~!
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
