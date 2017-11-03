@@ -59,12 +59,17 @@ module.exports = env => {
                 },                
                 {
                     test: /\.(png|jpg|gif)$/,
-                    use: {
-                        loader: 'file-loader',
-                        options: {
-                            name: '[path][name].[ext]?[hash]'
-                        }  
-                    }                    
+                    use: [
+                        {
+                            loader: 'file-loader',
+                            options: {
+                                name: '[name].[ext]?[hash]',
+                                outputPath: 'images/',
+                                publicPath: 'images/'
+                            }  
+                        },
+                        // 'image-webpack-loader' install이 안됨.....   
+                    ]                 
                 },
                 { 
                     test: /\.(woff2?|svg)$/, 
