@@ -9,7 +9,7 @@ const html = (
       <h1>Hello, world</h1>          
 
       <button type="button" className="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-        modal
+        modal button
       </button>    
 
       <div className="modal fade" id="myModal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
