@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 const html = (
   <div className="container">    
     <div className="starter-template">
-      <h1>뽐집사 Project</h1>          
+      <h1>뽐집사</h1>
     </div>
   </div>
 );

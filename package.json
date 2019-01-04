@@ -1,7 +1,7 @@
 {
-  "name": "kimhyoseon.github.io",
+  "name": "ppomzipsa",
   "version": "1.0.0",
-  "description": "blog",
+  "description": "ppomzipsa website",
   "main": "index.js",
   "scripts": {
     "devserver": "webpack-dev-server --host 0.0.0.0",
