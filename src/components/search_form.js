@@ -38,7 +38,8 @@ class SearchForm extends React.Component {
   
       $.ajax({
         type: "POST",
-        url: "//localhost/api/keyword.php",
+        //url: "//localhost/api/keyword.php",
+        url: "//ppomzipsa.com/api/keyword.php",
         data: {
           keyword: keyword
         },
