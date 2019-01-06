@@ -1,0 +1,95 @@
+[https://api.naver.com/keywordstool]
+
+Array
+(
+    [keywordList] => Array
+        (
+            [0] => Array
+                (
+                    [relKeyword] => 바지
+                    [monthlyPcQcCnt] => 5170
+                    [monthlyMobileQcCnt] => 22500
+                    [monthlyAvePcClkCnt] => 15.6
+                    [monthlyAveMobileClkCnt] => 172.7
+                    [monthlyAvePcCtr] => 0.33
+                    [monthlyAveMobileCtr] => 0.83
+                    [plAvgDepth] => 15
+                    [compIdx] => 높음
+                )
+
+            [1] => Array
+                (
+                    [relKeyword] => 남자바지
+                    [monthlyPcQcCnt] => 8600
+                    [monthlyMobileQcCnt] => 38600
+                    [monthlyAvePcClkCnt] => 136.6
+                    [monthlyAveMobileClkCnt] => 905.7
+                    [monthlyAvePcCtr] => 1.72
+                    [monthlyAveMobileCtr] => 2.51
+                    [plAvgDepth] => 15
+                    [compIdx] => 높음
+                )
+
+            [2] => Array
+                (
+                    [relKeyword] => 남자청바지
+                    [monthlyPcQcCnt] => 9340
+                    [monthlyMobileQcCnt] => 39800
+                    [monthlyAvePcClkCnt] => 141.7
+                    [monthlyAveMobileClkCnt] => 850.1
+                    [monthlyAvePcCtr] => 1.63
+                    [monthlyAveMobileCtr] => 2.28
+                    [plAvgDepth] => 15
+                    [compIdx] => 높음
+                )
+
+            [3] => Array
+                (
+                    [relKeyword] => 남자카고바지
+                    [monthlyPcQcCnt] => 2740
+                    [monthlyMobileQcCnt] => 16100
+                    [monthlyAvePcClkCnt] => 31.1
+                    [monthlyAveMobileClkCnt] => 213.6
+                    [monthlyAvePcCtr] => 1.23
+                    [monthlyAveMobileCtr] => 1.42
+                    [plAvgDepth] => 15
+                    [compIdx] => 높음
+                )
+        )
+)
+
+[https://openapi.naver.com/v1/search/shop.json]
+
+Array
+(
+    [lastBuildDate] => Sun, 06 Jan 2019 11:19:12 +0900
+    [total] => 15596570
+    [start] => 1
+    [display] => 40
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [title] => 여성 기모 조거<b>팬츠</b>
+                    [link] => http://search.shopping.naver.com/gate.nhn?id=16745873087
+                    [image] => https://shopping-phinf.pstatic.net/main_1674587/16745873087.20181224165404.jpg
+                    [lprice] => 24790
+                    [hprice] => 24900
+                    [mallName] => 네이버
+                    [productId] => 16745873087
+                    [productType] => 1
+                )
+
+            [1] => Array
+                (
+                    [title] => 골덴 밴딩 배기 <b>팬츠</b>
+                    [link] => http://search.shopping.naver.com/gate.nhn?id=15951686636
+                    [image] => https://shopping-phinf.pstatic.net/main_1595168/15951686636.20181116031100.jpg
+                    [lprice] => 13300
+                    [hprice] => 19800
+                    [mallName] => 네이버
+                    [productId] => 15951686636
+                    [productType] => 1
+                )
+        )
+)

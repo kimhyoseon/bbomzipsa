@@ -88,7 +88,7 @@ module.exports = env => {
 
         plugins: [
             new HtmlWebpackPlugin({
-                title: "helloworld",
+                title: "뽐집사",
                 template: __dirname + '/src/template/index.html', // 가져올 템플릿 경로
                 filename: htmlPath + "index.html", // 최종 생성 경로
                 minify: {
