@@ -1,25 +1,28 @@
-import $ from 'jquery';
 import React from 'react';
 import SearchResult from './search_result';
+import Common from './common';
 
 class SearchForm extends React.Component {
     constructor() {
       super();
-      this.state = { 
-        isSearching: false,               
+      this.state = {
+        isSearching: false,
         keywords: [],
         items: [],
         relkeyword: null
-      };  
-      
+      };
+
       this.handleSubmit = this.handleSubmit.bind(this);
     }
-  
-    handleSubmit(event) {     
-      if (this.state.isSearching) return false;      
-      
+
+    handleSubmit(event) {
+      if (this.state.isSearching) {
+        event.preventDefault();
+        return false;
+      }
+
       let keyword = this.keywordInput.value;
-      if (!keyword) {      
+      if (!keyword) {
         this.keywordInput.focus();
         event.preventDefault();
         return false;
@@ -31,11 +34,11 @@ class SearchForm extends React.Component {
         event.preventDefault();
         return false;
       }
-      
+
       this.keywordInput.value = keyword.replace(/\s/g, '');
-      
+
       $('#btn-search-submit').addClass('disabled');
-  
+
       $.ajax({
         type: "POST",
         //url: "//localhost/api/keyword.php",
@@ -43,52 +46,55 @@ class SearchForm extends React.Component {
         data: {
           keyword: keyword
         },
-        success: $.proxy(function (result) {
-          if (result) {            
-            this.state.items.push({
-              'keywordstool': result.keywordstool,
-              'shopping': result.shopping,
-            });
-            this.state.relkeyword = result.relkeyword;
-            this.state.keywords.push(keyword);
-            this.setState({
-              items: this.state.items,
-              relkeyword: this.state.relkeyword,
-              keywords: this.state.keywords
-            });
-            
-            this.keywordInput.value = '';
-            console.log(this.state);
-          }          
+        success: $.proxy(function (result, textStatus) {
+          console.log(result);
+          if (!result || textStatus != 'success') {
+            Layer.toast(textStatus);
+          }
+
+          this.state.items.push(result);
+          this.state.keywords.push(keyword);
+          if (result.relKeywords && result.relKeywords.length > 0) this.state.relkeyword = result.relKeywords;
+          this.setState({
+            items: this.state.items,
+            relkeyword: this.state.relkeyword,
+            keywords: this.state.keywords
+          });
+
+          this.keywordInput.value = '';
+        }, this),
+        error: $.proxy(function(result, textStatus, jqXHR) {
+          Layer.toast('통신 오류입니다. 잠시 후 다시 시도해주세요.');
         }, this),
         complete: $.proxy(function() {
           $('#btn-search-submit').removeClass('disabled');
           this.state.isSearching = false;
         }, this)
-      });    
+      });
       event.preventDefault();
-    }  
-  
+    }
+
     render() {
       return (
         <div>
           <div>
             <form onSubmit={this.handleSubmit}>
-              <div className="form-group row">
-                <label htmlFor="keyword" className="col-sm-2 col-form-label" >쇼핑키워드</label>
-                <div className="col-sm-10">
-                  <input type="text" className="form-control" id="keyword" placeholder="키워드를 입력해주세요." ref={(input) => { this.keywordInput = input; }} value={this.state.value} onChange={this.handleChange}/>          
-                </div>        
-              </div>      
-              <div className="form-group row">
-                <div className="text-center">
-                  <button id="btn-search-submit" type="submit" className="btn btn-primary">
-                      <span className="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
-                    검색
-                  </button>
-                </div>        
+              <div className="form-group row justify-content-md-center">
+                <div className="col-md-6">
+                  <div id="custom-search-input">
+                    <div className="input-group">
+                        <input type="text" id="keyword" ref={(input) => { this.keywordInput = input; }} value={this.state.value} className="form-control input-lg" placeholder="키워드를 입력해주세요." />
+                        <span className="input-group-btn">
+                          <button id="btn-search-submit" type="submit" className="btn btn-info btn-lg">
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <i className="fas fa-search"></i>
+                          </button>
+                        </span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </form>          
+            </form>
           </div>
           <div>
             <SearchResult result={this.state} submit={this.handleSubmit.bind(this)}/>

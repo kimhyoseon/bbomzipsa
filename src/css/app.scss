@@ -1,51 +1,92 @@
-.starter-template{
-    margin-top: 50px;
+html {
+	font-size: 14px;
 }
 
-.rel-keywords-list h5{        
-    font-weight: bold;
+footer{
+	background-color: #f5f5f5;
 }
 
-.rel-keywords-list .breadcrumb > li + li:before{
-    display:none;
+.navbar-brand{
+	font-size:1.5rem;
 }
 
-.rel-keywords-list .breadcrumb > li:after{
-    padding: 0 5px;    
-    content:'';
+.header-logo{margin-right: 10px;}
+
+#custom-search-input{
+    padding: 3px;
+    border: solid 1px #E4E4E4;
+    border-radius: 6px;
+    background-color: #fff;
 }
 
-.rel-keywords-list .breadcrumb > li{
-    padding:3px 0;
+#custom-search-input input{
+    border: 0;
+    box-shadow: none;
 }
 
-.rel-keywords-list .breadcrumb > li > a{
-    padding:3px;
-    color: #202022;
+#custom-search-input button{
+    margin: 2px 0 0 0;
+    background: none;
+    box-shadow: none;
+    border: 0;
+    color: #666666;
+    padding: 0 8px 0 10px;
+    border-left: solid 1px #ccc;
+}
+
+#custom-search-input button:hover{
+    border: 0;
+    box-shadow: none;
+    border-left: solid 1px #ccc;
+}
+
+#custom-search-input .spinner-border{
+	display:none;
+}
+
+#custom-search-input .spinner-border,
+#custom-search-input .fa-search{
+	width:23px;
+	height:23px;
+	font-size: 23px;
+	vertical-align: middle;
+}
+
+#custom-search-input .disabled .fa-search{
+	display: none;
+}
+
+#custom-search-input .disabled .spinner-border {
+	display: inline-block;
+}
+
+.rel-keywords-list h5 {
+	font-weight: bold;
+}
+
+.rel-keywords-list .breadcrumb>li+li:before {
+	display: none;
+}
+
+.rel-keywords-list .breadcrumb>li:after {
+	padding: 0 5px;
+	content: '';
+}
+
+.rel-keywords-list .breadcrumb>li {
+	padding: 3px 0;
+}
+
+.rel-keywords-list .breadcrumb>li>a {
+	padding: 3px;
+	color: #202022;
+}
+
+.fa-question-circle{
+	margin-left: 3px;
 }
 
 /* common */
-.glyphicon-refresh-animate {
-    display: none;
-    margin-right: 5px;
-    -animation: spin .9s infinite linear;
-    -webkit-animation: spin2 .9s infinite linear;
-}
-
-.disabled .glyphicon-refresh-animate{
-    display:inline-block;
-}
-
-@-webkit-keyframes spin2 {
-    from { -webkit-transform: rotate(0deg);}
-    to { -webkit-transform: rotate(360deg);}
-}
-
-@keyframes spin {
-    from { transform: scale(1) rotate(0deg);}
-    to { transform: scale(1) rotate(360deg);}
-}
-
 th[role=columnheader]:not(.no-sort) {
 	cursor: pointer;
 }

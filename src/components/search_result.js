@@ -1,49 +1,58 @@
 import $ from 'jquery';
 import React from 'react';
 import tablesort from 'tablesort';
+import icoNShopping from '../images/ico-navershopping.png';
 
 class SearchResult extends React.Component {
 	constructor(props) {
-    super(props);		
-    
-    this.handleSubmit = this.handleSubmit.bind(this);    
+    super(props);
+
+    this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
-	keywordRow() {							
-		const listItems = this.props.result.items.map((item) => {            
-      let keywordstool = item.keywordstool;
-      let shopping = item.shopping;
-      let qc = Math.ceil(keywordstool.monthlyMobileQcCnt + keywordstool.monthlyPcQcCnt) || 0;
-      let clk = Math.ceil(keywordstool.monthlyAveMobileClkCnt + keywordstool.monthlyAvePcClkCnt) || 0;
-      let sale = (qc == 0 || clk == 0) ? 0 : (qc / shopping.total).toFixed(5);      
-      let clkr = (qc == 0 || clk == 0) ? 0 : (qc / clk / 100).toFixed(2);
+	keywordRow() {
+		const listItems = this.props.result.items.map((item) => {
+      let searchAmount = Math.ceil(item.monthlyMobileQcCnt + item.monthlyPcQcCnt) || 0;
+      let raceIndex = (searchAmount == 0 || item.totalItems == 0) ? 0 : (searchAmount / item.totalItems).toFixed(5);
+      let ttipReview = '최저:' + this.numberWithCommas(item.lowReview) + '건, 최대:'+ this.numberWithCommas(item.highReview) + '건';
+      let ttipPrice = '최저:' + this.numberWithCommas(item.lowPrice) + '원, 최대:'+ this.numberWithCommas(item.highPrice) + '원';
+      let ttipSell = '최저:' + this.numberWithCommas(item.lowSell) + '건, 최대:'+ this.numberWithCommas(item.highSell) + '건';
+      let hotKeyword = [];
+      let hotKeywordFull = Object.keys(item.hotKeywords).map(function(k, i){
+        if (i < 3) hotKeyword.push(k + '('+item.hotKeywords[k]+')');
+        return k + '('+item.hotKeywords[k]+')'
+      }).join(", ");
+      let linkNaverShopping = 'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=' + item.relKeyword;
 
       this.tableSort.refresh();
 
-      return (<tr key={keywordstool.relKeyword}>
-				<td className="text-center">{keywordstool.relKeyword}</td>
-        <td className="text-right">{this.numberWithCommas(shopping.total)}</td>
-				<td className="text-right">{this.numberWithCommas(qc)}</td>
-        <td className="text-right">{sale}</td>
-				<td className="text-right">{this.numberWithCommas(clk)}</td>
-				<td className="text-right">{clkr}%</td>
-        <td className="text-right">{this.numberWithCommas(shopping.lprice)}원</td>
-        <td className="text-right">{this.numberWithCommas(shopping.hprice)}원</td>
-				<td className="text-center">{keywordstool.compIdx}</td>
-				<td className="text-right">{keywordstool.plAvgDepth}</td>
-        <td>{Object.keys(shopping.hotkeyword).map(function(k){return k + '('+shopping.hotkeyword[k]+')'}).join(", ")}</td>
+      return (
+        <tr key={item.relKeyword}>
+				<td className="text-center">{item.relKeyword}</td>
+        <td className="text-right">{this.numberWithCommas(item.totalItems)}개</td>
+				<td className="text-right">{this.numberWithCommas(searchAmount)}건</td>
+        <td className="text-right">{raceIndex}</td>
+				<td className="text-right">{this.numberWithCommas(item.avgSellPrice)}원</td>
+        <td className="text-right" data-toggle="tooltip" data-placement="right" title={ttipSell}>{this.numberWithCommas(item.avgSell)}건</td>
+        <td className="text-right" data-toggle="tooltip" data-placement="right" title={ttipReview}>{this.numberWithCommas(item.avgReview)}건</td>
+        <td className="text-right" data-toggle="tooltip" data-placement="right" title={ttipPrice}>{this.numberWithCommas(item.avgPrice)}원</td>
+        <td data-toggle="tooltip" data-placement="right" title={hotKeywordFull}><small>{hotKeyword.join(', ')}</small></td>
+        <td>
+          <a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={icoNShopping} width="20" height="20" className="d-inline-block align-middle"/></a>
+        </td>
 			</tr>);
       }
-		);
+    );
+
 		return (
 			<tbody>{listItems}</tbody>
 		);
   }
 
-  relKeywordList() {	        
-    if (!this.props.result.relkeyword) return false;    
+  relKeywordList() {
+    if (!this.props.result.relkeyword) return false;
 		const listRelKeyword = this.props.result.relkeyword.map((item) => {
-      return (<li key={item}  className="breadcrumb-item">				
+      return (<li key={item}  className="breadcrumb-item">
         <a href="#" onClick={this.handleSubmit}>{item}</a>
 			</li>);
       }
@@ -60,29 +69,35 @@ class SearchResult extends React.Component {
 		);
   }
 
-  handleSubmit(event) {        
-    document.getElementById('keyword').value = event.target.textContent;        
+  handleSubmit(event) {
+    document.getElementById('keyword').value = event.target.textContent;
     this.props.submit(event);
     event.preventDefault();
-  }  
-  
+  }
+
   numberWithCommas(num) {
       return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
-  componentDidMount() {        
-    tablesort.extend('number', function(item) {      
+  componentDidUpdate() {
+    $('[data-toggle="tooltip"]').tooltip();
+  }
+
+  componentDidMount() {
+    $('[data-toggle="tooltip"]').tooltip();
+
+    tablesort.extend('number', function(item) {
       return item.match(/^[-+]?[£\x24Û¢´€]?\d+\s*([,\.]\d{0,2})/) || // Prefixed currency
         item.match(/^[-+]?\d+\s*([,\.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
         item.match(/^[-+]?(\d)*-?([,\.]){0,1}-?(\d)+([E,e][\-+][\d]+)?%?$/); // Number
-    }, $.proxy(function(a, b) {      
+    }, $.proxy(function(a, b) {
       a = a.replace(/[^\-?0-9.]/g, '');
       b = b.replace(/[^\-?0-9.]/g, '');
 
       return this.compareNumber(b, a);
     }, this));
 
-    this.tableSort = tablesort(this.tableSearch);    
+    this.tableSort = tablesort(this.tableSearch);
   }
 
   compareNumber(a, b) {
@@ -95,29 +110,53 @@ class SearchResult extends React.Component {
     return a - b;
   }
 
-	render() {    
+	render() {
 		return (
       <div>
         <div className="rel-keywords-list">
           {this.relKeywordList()}
         </div>
         <div className="table-responsive">
-          <table id="table-search-keyword" className="table table-sm" ref={(elem) => { this.tableSearch = elem; }}>
-            <thead>
+          <table id="table-search-keyword" className="table" ref={(elem) => { this.tableSearch = elem; }}>
+            <thead className="thead-light">
                 <tr>
                   <th scope="col" className="text-center">키워드</th>
-                  <th scope="col" className="text-center" data-sort-method='number'>총 상품수</th>              
-                  <th scope="col" className="text-center" data-sort-method='number'>월간 검색</th>
-                  <th scope="col" className="text-center" data-sort-method='number'>판매지수</th>
-                  <th scope="col" className="text-center" data-sort-method='number'>월간 클릭</th>
-                  <th scope="col" className="text-center" data-sort-method='number'>월간 클릭율</th>
-                  <th scope="col" className="text-center" data-sort-method='number'>최저가격</th>
-                  <th scope="col" className="text-center" data-sort-method='number'>최고가격</th>              
-                  <th scope="col" className="text-center">경쟁정도</th>
-                  <th scope="col" className="text-center">월평균광고</th>
-                  <th scope="col" className="text-center">인기키워드</th>
-                </tr>	
-            </thead>				
+                  <th scope="col" className="text-center" data-sort-method='number'>
+                    등록상품수
+                  </th>
+                  <th scope="col" className="text-center" data-sort-method='number'>
+                    월검색수
+                    <i data-toggle="tooltip" data-placement="right" title="최근 1달간 네이버에서 키워드를 검색한 숫자" className="fas fa-question-circle"></i>
+                  </th>
+                  <th scope="col" className="text-center" data-sort-method='number'>
+                    경쟁지수
+                    <i data-toggle="tooltip" data-placement="right" title="월검색수/등록상품수" className="fas fa-question-circle"></i>
+                  </th>
+                  <th scope="col" className="text-center" data-sort-method='number'>
+                    평균매출액
+                    <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 1개 소셜판매자 매출추정액" className="fas fa-question-circle"></i>
+                  </th>
+                  <th scope="col" className="text-center" data-sort-method='number'>
+                    평균구매
+                    <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 1개 스토어당 등록된 평균 구매 수" className="fas fa-question-circle"></i>
+                  </th>
+                  <th scope="col" className="text-center" data-sort-method='number'>
+                    평균리뷰
+                    <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 1개 스토어당 등록된 평균 리뷰 수" className="fas fa-question-circle"></i>
+                  </th>
+                  <th scope="col" className="text-center" data-sort-method='number'>
+                    평균가격
+                    <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 평균 상품가격" className="fas fa-question-circle"></i>
+                  </th>
+                  <th scope="col" className="text-center">
+                    인기키워드
+                    <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 상품명에 많이 언급된 단어 (횟수)" className="fas fa-question-circle"></i>
+                  </th>
+                  <th scope="col" className="text-center">
+                    기타정보
+                  </th>
+                </tr>
+            </thead>
             {this.keywordRow()}
           </table>
         </div>

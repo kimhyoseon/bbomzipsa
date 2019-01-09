@@ -1,15 +1,17 @@
 <?php
-try {            
+try {
     ini_set("display_errors", 1);
     ini_set("default_socket_timeout", 30);
     header("Access-Control-Allow-Origin: *");
-    header('Content-Type: application/json');            
+    header('Content-Type: application/json');
 
-    define('KEYWORD', (filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING)));    
+    define('KEYWORD', (filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING)));
+    //define('KEYWORD', '바지');
 
-    if (!KEYWORD) throw new Exception(null, 400);    
+    if (!KEYWORD) throw new Exception(null, 400);
 
     require_once './naver/restapi.php';
+    require_once './naver/NaverShoppingCrawling.php';
 
     $config = parse_ini_file("./naver/sample.ini");
 
@@ -17,65 +19,28 @@ try {
 
     $result = array();
 
-    // 키워드 검색 api
+    // 키워드광고 api
     $keywordstool = $api->GET("https://api.naver.com/keywordstool", array(
-        'hintKeywords' => KEYWORD,        
+        'hintKeywords' => KEYWORD,
         'showDetail' => 1
-    ));    
-    
-    if (!empty($keywordstool) && !empty($keywordstool['keywordList'])) {
-        $result['keywordstool'] = $keywordstool['keywordList'][0];
+    ));
+
+    if (empty($keywordstool) || empty($keywordstool['keywordList']) || $keywordstool['keywordList'][0]['monthlyMobileQcCnt'] < 1) {
+        throw new Exception(null, 204);
     }
 
-    // 네이버쇼핑 검색 api    
-    $shopping = $api->GET("https://openapi.naver.com/v1/search/shop.json", array(
-        'query' => KEYWORD,        
-        'display' => 40,
-    ));    
+    $result = $keywordstool['keywordList'][0];
 
-    if (!empty($shopping) && !empty($shopping['items'])) {
-        $result['shopping']['total'] = $shopping['total'];
-        $result['shopping']['lprice'] = 10000000000;
-        $result['shopping']['hprice'] = 0;
-        $result['shopping']['hotkeyword'] = array();
+    // 네이버쇼핑 크롤링
+    $oNaverShoppingCrawling = new NaverShoppingCrawling();
 
-        foreach ($shopping['items'] as $value) {
-            if ($result['shopping']['lprice'] > $value['lprice']) $result['shopping']['lprice'] = $value['lprice'];  
-            if ($result['shopping']['hprice'] < $value['hprice']) $result['shopping']['hprice'] = $value['hprice'];  
-            
-            if (!empty($value['title'])) {
-                $value['title'] = strip_tags($value['title']);
-                $value['title'] = str_replace(array('_', ',', '/', '(', ')', '[', ']'), ' ', $value['title']);                
-                $titles = explode(' ', $value['title']);
-                
-                if (!empty($titles)) {
-                    $result['shopping']['hotkeyword'] = array_merge($result['shopping']['hotkeyword'], $titles);                    
-                }
-            }
-        }
+    $dataNaverShopping = $oNaverShoppingCrawling->collectByKeyword(KEYWORD);
 
-        $result['shopping']['hotkeyword'] = array_count_values($result['shopping']['hotkeyword']);
-        unset($result['shopping']['hotkeyword']['']);
-        arsort($result['shopping']['hotkeyword']);
-        $result['shopping']['hotkeyword'] = array_slice($result['shopping']['hotkeyword'], 0, 10);
-    }    
-
-    # 연관 검색어
-    require_once './class/parser.php';
-    
-    $parser = new Parser();    
-    $xpath = $parser->load("https://search.shopping.naver.com/search/all.nhn?query=".KEYWORD."&cat_id=&frm=NVSHATC");    
-    $relKeywords = $xpath->query("//div[@class='co_relation_srh']/ul/li/a");
-
-    if (!empty($relKeywords)) {
-        $result['relkeyword'] = array();
-
-        foreach ($relKeywords as $value) {
-            if ($value->nodeValue) {
-                $result['relkeyword'][] = trim($value->nodeValue);
-            }
-        }
+    if (!$dataNaverShopping) {
+        throw new Exception(null, 204);
     }
+
+    $result = array_merge($result, $dataNaverShopping);
 
     echo json_encode($result);
 } catch (Exception $e) {
