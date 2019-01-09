@@ -5,7 +5,7 @@
  */
 class NaverShoppingCrawling
 {
-    private const URL_NAVER_SHOPPING = 'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=';
+    const URL_NAVER_SHOPPING = 'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=';
 
     private $data = array(
         'keyword' => null, // 검색 키워드
