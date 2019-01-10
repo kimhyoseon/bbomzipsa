@@ -53,6 +53,11 @@ try {
 
         if ((max($trends) - min($trends)) > 70) {
             $result['seasonMonth'] = array_keys($trends, max($trends))[0] + 1;
+
+            if ($result['seasonMonth'] < 3 || $result['seasonMonth'] > 10) $result['season'] = 4;
+            else if ($result['seasonMonth'] < 6) $result['season'] = 1;
+            else if ($result['seasonMonth'] < 9) $result['season'] = 2;
+            else if ($result['seasonMonth'] < 11) $result['season'] = 3;
         }
 
         $result['trends'] = $trends;
