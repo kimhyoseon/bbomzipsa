@@ -83,11 +83,57 @@ footer{
 	color: #202022;
 }
 
-.fa-question-circle{
-	margin-left: 3px;
+.box-etc{
+	margin: 0 2px;
+}
+
+.chart-mini{
+	width: 24px;
+	height: 20px;
+	border-left: 1px dotted #d5d5d5;
+	border-bottom: 1px dotted #d5d5d5;
+}
+
+.fa-battery-empty{
+	padding-top: 3px;
+	color:crimson;
+}
+
+.fa-battery-quarter{
+	padding-top: 3px;
+	color:orange;
+}
+
+.fa-battery-half{
+	padding-top: 3px;
+	color:burlywood;
+}
+
+.fa-battery-three-quarters{
+	padding-top: 3px;
+	color:greenyellow;
+}
+
+.fa-battery-full{
+	padding-top: 3px;
+	color:green;
 }
 
 /* common */
+.fas,
+.fa{
+	margin: 0 3px;
+}
+
+/* responsive */
+@media (min-width: 576px) {
+	th.d-sm-block,
+	td.d-sm-block{
+		display: table-cell !important;
+	}
+}
+
+/* table-sort */
 th[role=columnheader]:not(.no-sort) {
 	cursor: pointer;
 }

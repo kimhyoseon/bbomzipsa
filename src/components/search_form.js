@@ -62,6 +62,7 @@ class SearchForm extends React.Component {
           });
 
           this.keywordInput.value = '';
+          this.keywordInput.blur();
         }, this),
         error: $.proxy(function(result, textStatus, jqXHR) {
           Layer.toast('통신 오류입니다. 잠시 후 다시 시도해주세요.');
@@ -83,7 +84,7 @@ class SearchForm extends React.Component {
                 <div className="col-md-6">
                   <div id="custom-search-input">
                     <div className="input-group">
-                        <input type="text" id="keyword" ref={(input) => { this.keywordInput = input; }} value={this.state.value} className="form-control input-lg" placeholder="키워드를 입력해주세요." />
+                        <input type="text" id="keyword" autoComplete="off" ref={(input) => { this.keywordInput = input; }} value={this.state.value} className="form-control input-lg" placeholder="키워드를 입력해주세요." />
                         <span className="input-group-btn">
                           <button id="btn-search-submit" type="submit" className="btn btn-info btn-lg">
                             <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>

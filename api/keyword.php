@@ -31,6 +31,29 @@ try {
 
     $result = $keywordstool['keywordList'][0];
 
+    // 키워드 검색 트렌드 api (https://developers.naver.com/docs/datalab/search/) - 하루 1000건 제한
+    $keywordtrend = $api->POST("https://openapi.naver.com/v1/datalab/search", array(
+        'startDate' => '2018-01-01',
+        'endDate' => '2018-12-31',
+        'timeUnit'=> 'month',
+        "keywordGroups" => array(
+            array(
+                'groupName' => KEYWORD,
+                'keywords' => array(KEYWORD)
+            )
+        )
+    ));
+
+    if (!empty($keywordtrend) && !empty($keywordtrend['results']) && !empty($keywordtrend['results'][0]['data'])) {
+        $trends = array();
+
+        foreach ($keywordtrend['results'][0]['data'] as $trend) {
+            $trends[] = @ceil($trend['ratio']);
+        }
+
+        $result['trends'] = $trends;
+    }
+
     // 네이버쇼핑 크롤링
     $oNaverShoppingCrawling = new NaverShoppingCrawling();
 

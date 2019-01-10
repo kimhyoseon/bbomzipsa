@@ -19,10 +19,10 @@ class Main extends React.Component {
           <SearchForm />
         </div>
         <Common />
-        <footer class="footer mt-auto py-3">
-          <div class="container">
-            <span class="text-muted">Copyright&copy;<a href="/"> ppomzipsa.com</a></span>
-            <a href="mailto:gytjs4473@gmail.com" target="_blank" class="btn btn-sm btn-secondary float-right">문의 및 제안</a>
+        <footer className="footer mt-auto py-3">
+          <div className="container">
+            <span className="text-muted">Copyright&copy;<a href="/"> ppomzipsa.com</a></span>
+            <a href="mailto:gytjs4473@gmail.com" target="_blank" className="btn btn-sm btn-secondary float-right">문의 및 제안</a>
           </div>
         </footer>
       </div>
