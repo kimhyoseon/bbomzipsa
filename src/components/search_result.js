@@ -31,9 +31,17 @@ class SearchResult extends React.Component {
 
       let raceBattery = 'float-left fas fa-battery-empty';
       if (raceIndex < 0.05) raceBattery = 'float-left fas fa-battery-full';
-      else if (raceIndex < 0.5) raceBattery = 'float-left fas fa-battery-three-quarter';
+      else if (raceIndex < 0.5) raceBattery = 'float-left fas fa-battery-three-quarters';
       else if (raceIndex < 1) raceBattery = 'float-left fas fa-battery-half';
       else if (raceIndex < 5) raceBattery = 'float-left fas fa-battery-quarter';
+
+      const seasonMonth = function() {
+        if (!item.seasonMonth) return '';
+        else if (item.seasonMonth < 3 || item.seasonMonth > 10) return (<span className="box-etc float-left"><span className="badge badge-secondary winter">겨울</span></span>)
+        else if (item.seasonMonth < 6) return (<span className="box-etc float-left"><span className="badge badge-secondary spring">봄</span></span>)
+        else if (item.seasonMonth < 9) return (<span className="box-etc float-left"><span className="badge badge-secondary summer">여름</span></span>)
+        else if (item.seasonMonth < 11) return (<span className="box-etc float-left"><span className="badge badge-secondary fall">가을</span></span>)
+      }();
 
       this.tableSort.refresh();
 
@@ -57,6 +65,7 @@ class SearchResult extends React.Component {
           <span className="box-etc float-left">
             <a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={icoNShopping} width="20" height="20" className="d-inline-block align-middle"/></a>
           </span>
+          {seasonMonth}
         </td>
 			</tr>);
       }

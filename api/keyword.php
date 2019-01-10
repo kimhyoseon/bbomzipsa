@@ -6,7 +6,7 @@ try {
     header('Content-Type: application/json');
 
     define('KEYWORD', (filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING)));
-    //define('KEYWORD', '바지');
+    //define('KEYWORD', '다이어리');
 
     if (!KEYWORD) throw new Exception(null, 400);
 
@@ -49,6 +49,10 @@ try {
 
         foreach ($keywordtrend['results'][0]['data'] as $trend) {
             $trends[] = @ceil($trend['ratio']);
+        }
+
+        if ((max($trends) - min($trends)) > 70) {
+            $result['seasonMonth'] = array_keys($trends, max($trends))[0] + 1;
         }
 
         $result['trends'] = $trends;

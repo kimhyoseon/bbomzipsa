@@ -66,18 +66,18 @@ class NaverShoppingCrawling
             return false;
         }
 
+        $nodeTotalItems = $xPath->query("//a[@class='_productSet_total']");
+
+        if ($nodeTotalItems->length == 0) return false;
+
+        $this->data['totalItems'] = filter_var(trim($nodeTotalItems[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
+
         $nodeRelKeywords = $xPath->query("//div[@class='co_relation_srh']/ul/li/a");
 
         if ($nodeRelKeywords->length > 0) {
             foreach ($nodeRelKeywords as $nodeRelKeyword) {
                 $this->data['relKeywords'][] = trim($nodeRelKeyword->nodeValue);
             }
-        }
-
-        $nodeTotalItems = $xPath->query("//a[@class='_productSet_total']");
-
-        if ($nodeTotalItems->length > 0) {
-            $this->data['totalItems'] = filter_var(trim($nodeTotalItems[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
         }
 
         $nodeItems = $xPath->query("//ul[@class='goods_list']/li");
@@ -137,8 +137,10 @@ class NaverShoppingCrawling
         if (!empty($this->data['titles'])) {
             foreach ($this->data['titles'] as $title) {
                 $title = strip_tags($title);
-                $title = str_replace(array('_', ',', '/', '(', ')', '[', ']'), ' ', $title);
+                $title = str_replace(array('-', '_', ',', '/', '(', ')', '[', ']'), ' ', $title);
+                $title = trim(preg_replace('/\s+/', ' ', $title));
                 $titles = explode(' ', $title);
+                $titles = array_filter($titles);
 
                 if (!empty($titles)) {
                     $this->data['hotKeywords'] = array_merge($this->data['hotKeywords'], $titles);
@@ -149,7 +151,7 @@ class NaverShoppingCrawling
                 $this->data['hotKeywords'] = array_count_values($this->data['hotKeywords']);
                 unset($this->data['hotKeywords']['']);
                 arsort($this->data['hotKeywords']);
-                $this->data['hotKeywords'] = array_slice($this->data['hotKeywords'], 0, 10);
+                $this->data['hotKeywords'] = array_slice($this->data['hotKeywords'], 0, 10, true);
             }
         }
 

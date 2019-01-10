@@ -6,6 +6,25 @@ footer{
 	background-color: #f5f5f5;
 }
 
+.footer-naver-guide{
+	margin-right: 10px;
+}
+
+.footer-naver-guide .breadcrumb{
+	margin:0;
+	padding:.25rem .5rem;
+	background-color: transparent;
+}
+
+.footer-naver-guide .breadcrumb a{
+	color: #00c73c;
+	font-size: 0.9rem;
+}
+
+.footer-naver-guide .breadcrumb-item + .breadcrumb-item::before{
+	display: none;
+}
+
 .navbar-brand{
 	font-size:1.5rem;
 }
@@ -85,6 +104,27 @@ footer{
 
 .box-etc{
 	margin: 0 2px;
+	vertical-align: middle;
+}
+
+.box-etc .badge{
+	padding: .3em;
+}
+
+.box-etc .spring{
+	background-color: chartreuse
+}
+
+.box-etc .summer{
+	background-color: dodgerblue
+}
+
+.box-etc .fall{
+	background-color: orangered
+}
+
+.box-etc .winter{
+	background-color:mediumaquamarine;
 }
 
 .chart-mini{
