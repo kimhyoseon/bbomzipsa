@@ -47,12 +47,8 @@ class SearchResult extends React.Component {
 
       return (
         <tr key={item.relKeyword}>
-        <td className="align-middle text-center">
-          <span className="fa"><svg className="chart-mini"><polyline  fill="none" stroke="#00c73c" strokeWidth="1" points={trendsGraph} /></svg></span>
-        </td>
-        <td className="text-center">
-          {item.relKeyword}
-        </td>
+        <td className="align-middle text-center"><span className="fa"><svg className="chart-mini"><polyline  fill="none" stroke="#00c73c" strokeWidth="1" points={trendsGraph} /></svg></span></td>
+        <td className="align-middle text-center">{item.relKeyword}</td>
         <td className="align-middle text-right">{this.numberWithCommas(item.totalItems)}개</td>
         <td className="align-middle text-right">{this.numberWithCommas(searchAmount)}건</td>
         <td className="align-middle text-right"><i className={raceBattery}></i>{raceIndex}</td>
@@ -62,9 +58,7 @@ class SearchResult extends React.Component {
         <td className="align-middle text-right d-none d-sm-block" data-toggle="tooltip" data-placement="right" title={ttipPrice}>{this.numberWithCommas(item.avgPrice)}원</td>
         <td className="align-middle d-none d-sm-block" data-toggle="tooltip" data-placement="right" title={hotKeywordFull}><small>{hotKeyword.join(', ')}</small></td>
         <td className="align-middle d-none d-sm-block">
-          <span className="box-etc float-left">
-            <a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={icoNShopping} width="20" height="20" className="d-inline-block align-middle"/></a>
-          </span>
+          <span className="box-etc float-left"><a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={icoNShopping} width="20" height="20" className="d-inline-block align-middle"/></a></span>
           {seasonMonth}
         </td>
 			</tr>);
@@ -147,40 +141,40 @@ class SearchResult extends React.Component {
           <table id="table-search-keyword" className="table" ref={(elem) => { this.tableSearch = elem; }}>
             <thead className="thead-light">
                 <tr>
-                  <th scope="col" className="text-center no-sort" data-sort-method='none'></th>
-                  <th scope="col" className="text-center">키워드</th>
-                  <th scope="col" className="text-center" data-sort-method='number'>
+                  <th scope="col" className="align-middle text-center no-sort" data-sort-method='none'></th>
+                  <th scope="col" className="align-middle text-center">키워드</th>
+                  <th scope="col" className="align-middle text-center" data-sort-method='number'>
                     등록상품수
                   </th>
-                  <th scope="col" className="text-center" data-sort-method='number'>
+                  <th scope="col" className="align-middle text-center" data-sort-method='number'>
                     월검색수
                     <i data-toggle="tooltip" data-placement="right" title="최근 1달간 네이버에서 키워드를 검색한 숫자" className="fas fa-question-circle"></i>
                   </th>
-                  <th scope="col" className="text-center" data-sort-method='number'>
+                  <th scope="col" className="align-middle text-center" data-sort-method='number'>
                     경쟁지수
                     <i data-toggle="tooltip" data-placement="right" title="낮을수록 좋은 키워드 (등록상품수/월검색수)" className="fas fa-question-circle"></i>
                   </th>
-                  <th scope="col" className="text-center d-none d-sm-block" data-sort-method='number'>
+                  <th scope="col" className="align-middle text-center d-none d-sm-block" data-sort-method='number'>
                     평균매출액
                     <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 1개 소셜판매자당 매출추정액" className="fas fa-question-circle"></i>
                   </th>
-                  <th scope="col" className="text-center d-none d-sm-block" data-sort-method='number'>
+                  <th scope="col" className="align-middle text-center d-none d-sm-block" data-sort-method='number'>
                     평균구매
                     <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 1개 스토어당 등록된 평균 구매 수" className="fas fa-question-circle"></i>
                   </th>
-                  <th scope="col" className="text-center d-none d-sm-block" data-sort-method='number'>
+                  <th scope="col" className="align-middle text-center d-none d-sm-block" data-sort-method='number'>
                     평균리뷰
                     <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 1개 스토어당 등록된 평균 리뷰 수" className="fas fa-question-circle"></i>
                   </th>
-                  <th scope="col" className="text-center d-none d-sm-block" data-sort-method='number'>
+                  <th scope="col" className="align-middle text-center d-none d-sm-block" data-sort-method='number'>
                     평균상품가격
                     <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 평균 상품가격" className="fas fa-question-circle"></i>
                   </th>
-                  <th scope="col" className="text-center d-none d-sm-block">
+                  <th scope="col" className="align-middle text-center d-none d-sm-block">
                     인기키워드
                     <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 상품명에 많이 언급된 단어 (횟수)" className="fas fa-question-circle"></i>
                   </th>
-                  <th scope="col" className="text-center d-none d-sm-block no-sort" data-sort-method='none'></th>
+                  <th scope="col" className="align-middle text-center d-none d-sm-block no-sort" data-sort-method='none'></th>
                 </tr>
             </thead>
             {this.keywordRow()}
