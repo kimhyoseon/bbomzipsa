@@ -47,9 +47,9 @@ class SearchForm extends React.Component {
           keyword: keyword
         },
         success: $.proxy(function (result, textStatus) {
-          console.log(result);
           if (!result || textStatus != 'success') {
             Layer.toast(textStatus);
+            return false;
           }
 
           this.state.items.push(result);

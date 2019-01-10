@@ -7,7 +7,7 @@ class Header extends React.Component {
       <div>
         <nav className="navbar navbar-dark bg-dark mb-4">
           <a className="navbar-brand" href="#">
-            <img src={logo} width="40" height="40" className="d-inline-block align-top header-logo"/>
+            <img src={logo} width="40" height="40" className="d-inline-block align-middle header-logo"/>
             뽐집사
           </a>
         </nav>
