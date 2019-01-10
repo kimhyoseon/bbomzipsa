@@ -125,14 +125,6 @@ footer{
 	margin: 0 3px;
 }
 
-/* responsive */
-@media (min-width: 576px) {
-	th.d-sm-block,
-	td.d-sm-block{
-		display: table-cell !important;
-	}
-}
-
 /* table-sort */
 th[role=columnheader]:not(.no-sort) {
 	cursor: pointer;
@@ -166,4 +158,27 @@ th[aria-sort]:not(.no-sort):after {
 th[role=columnheader]:not(.no-sort):hover:after {
 	visibility: visible;
 	opacity: 1;
+}
+
+/* responsive */
+@media (min-width: 576px) {
+	th.d-sm-block,
+	td.d-sm-block{
+		display: table-cell !important;
+	}
+}
+
+@media (max-width: 575px) {
+	.rel-keywords-list,
+	#table-search-keyword{
+		font-size: 12px;
+	}
+
+	th[role=columnheader]:not(.no-sort):after{
+		margin-top: 0;
+	}
+
+	.table td, .table th{
+		padding:.25rem;
+	}
 }
