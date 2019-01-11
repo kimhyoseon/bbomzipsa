@@ -16,6 +16,8 @@ class NaverShoppingCrawling
         'sells' => array(), // 판매수
         'sellsPrice' => array(), // 판매수 * 가격
         'reviews' => array(), // 리뷰수
+        'categoryTexts' => array(),
+        'category' => 0,
         'totalItems' => 0, // 총 등록 상품 수
         'avgSellPrice' => 0, // 평균 판매액
         'lowPrice' => 0,
@@ -109,6 +111,21 @@ class NaverShoppingCrawling
                 if ($nodeReviews->length > 0) {
                     $this->data['reviews'][] = filter_var(trim($nodeReviews[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
                 }
+
+                if (empty($this->data['category'])) {
+                    $nodeAd = $xPath->query("descendant::a[@class='ad_stk']", $nodeItem);
+                    if ($nodeAd->length > 0) continue;
+
+                    $nodeCategories = $xPath->query("descendant::span[@class='depth']/a", $nodeItem);
+                    if ($nodeCategories->length > 0) {
+                        foreach ($nodeCategories as $category) {
+                            $this->data['categoryTexts'][] = $category->nodeValue;
+                            $this->data['category'] = filter_var(trim($category->getAttribute('class')), FILTER_SANITIZE_NUMBER_INT);
+                        }
+
+                        $this->data['categoryTexts'] = implode(',', $this->data['categoryTexts']);
+                    }
+                }
             }
         }
 
@@ -152,13 +169,20 @@ class NaverShoppingCrawling
                 unset($this->data['hotKeywords']['']);
                 arsort($this->data['hotKeywords']);
                 $this->data['hotKeywords'] = array_slice($this->data['hotKeywords'], 0, 10, true);
+
+                $hotKeywords = [];
+                foreach ($this->data['hotKeywords'] as $key => $value) {
+                    $hotKeywords[] = $key.'('.$value.')';
+                }
+
+                $this->data['hotKeywords'] = implode(',', $hotKeywords);
             }
         }
 
         unset($this->data['titles']);
         unset($this->data['prices']);
         unset($this->data['sells']);
-        unset($this->data['sells_price']);
+        unset($this->data['sellsPrice']);
         unset($this->data['reviews']);
 
         return $this->data;

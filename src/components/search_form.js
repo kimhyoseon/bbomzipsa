@@ -1,6 +1,5 @@
 import React from 'react';
 import SearchResult from './search_result';
-import Common from './common';
 
 class SearchForm extends React.Component {
     constructor() {
@@ -16,7 +15,7 @@ class SearchForm extends React.Component {
         isSearching: false,
         keywords: [],
         items: [],
-        relkeyword: null
+        relkeyword: null,
       };
 
       this.handleSubmit = this.handleSubmit.bind(this);
@@ -48,8 +47,8 @@ class SearchForm extends React.Component {
 
       $.ajax({
         type: "POST",
-        //url: "//localhost/api/keyword.php",
-        url: "//ppomzipsa.com/api/keyword.php",
+        url: "//localhost/api/keyword.php",
+        //url: "//ppomzipsa.com/api/keyword.php",
         data: {
           keyword: this.keywordInput.value
         },
@@ -59,7 +58,11 @@ class SearchForm extends React.Component {
             return false;
           }
 
-          console.log(result)
+          if (result.categoryTexts) result.categoryTexts = result.categoryTexts.split(',');
+          if (result.relKeywords) result.relKeywords = result.relKeywords.split(',');
+          if (result.trends) result.trends = result.trends.split(',');
+
+          console.log(result);
 
           this.state.items.push(result);
           this.state.keywords.push(keyword);

@@ -6,7 +6,7 @@ class Header extends React.Component {
     return (
       <div>
         <nav className="navbar navbar-dark bg-dark mb-4">
-          <a className="navbar-brand" href="#">
+          <a className="navbar-brand" href="/">
             <img src={logo} width="40" height="40" className="d-inline-block align-middle header-logo"/>
             뽐집사
           </a>

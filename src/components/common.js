@@ -1,6 +1,6 @@
 import React from 'react';
 
-class Common extends React.Component {
+class Layer extends React.Component {
   constructor() {
     super();
 
@@ -39,6 +39,6 @@ class Common extends React.Component {
   }
 }
 
-export default Common;
+export default Layer;
 
 

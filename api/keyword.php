@@ -1,21 +1,38 @@
 <?php
 try {
     ini_set("display_errors", 1);
-    ini_set("default_socket_timeout", 30);
     header("Access-Control-Allow-Origin: *");
+    ini_set("default_socket_timeout", 30);
     header('Content-Type: application/json');
 
-    define('KEYWORD', (filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING)));
-    //define('KEYWORD', '다이어리');
+    //define('KEYWORD', (filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING)));
+    define('KEYWORD', '또봇');
 
     if (!KEYWORD) throw new Exception(null, 400);
+
+    $accountDb = parse_ini_file("../config/db.ini");
+
+    require_once '../class/pdo.php';
+    $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+    // DB 조회
+    $row = $db->row("SELECT * FROM KEYWORDS WHERE keyword=?", array(KEYWORD));
+
+    if (!empty($row)) {
+        if (!empty($row['modDate']) && $row['modDate'] > date('Y-m-d H:i:s', strtotime('-1 week'))) {
+            $db->CloseConnection();
+            echo json_encode($row);
+            exit();
+        }
+    }
+
+    // 새로 정보가져오기
+    $accountNaver = parse_ini_file("../config/naver.ini");
 
     require_once './naver/restapi.php';
     require_once './naver/NaverShoppingCrawling.php';
 
-    $config = parse_ini_file("./naver/sample.ini");
-
-    $api = new RestApi($config['API_KEY'], $config['SECRET_KEY'], $config['CUSTOMER_ID'], $config['CLIENT_ID'], $config['CLIENT_SECRET']);
+    $api = new RestApi($accountNaver['API_KEY'], $accountNaver['SECRET_KEY'], $accountNaver['CUSTOMER_ID'], $accountNaver['CLIENT_ID'], $accountNaver['CLIENT_SECRET']);
 
     $result = array();
 
@@ -30,11 +47,12 @@ try {
     }
 
     $result = $keywordstool['keywordList'][0];
+    unset($result['relKeyword']);
 
     // 키워드 검색 트렌드 api (https://developers.naver.com/docs/datalab/search/) - 하루 1000건 제한
     $keywordtrend = $api->POST("https://openapi.naver.com/v1/datalab/search", array(
-        'startDate' => '2018-01-01',
-        'endDate' => '2018-12-31',
+        'startDate' => date('Y', strtotime('-1 year')).'-01-01',
+        'endDate' => date('Y', strtotime('-1 year')).'-12-31',
         'timeUnit'=> 'month',
         "keywordGroups" => array(
             array(
@@ -43,6 +61,10 @@ try {
             )
         )
     ));
+
+    $result['trends'] = array();
+    $result['season'] = 0;
+    $result['seasonMonth'] = 0;
 
     if (!empty($keywordtrend) && !empty($keywordtrend['results']) && !empty($keywordtrend['results'][0]['data'])) {
         $trends = array();
@@ -60,7 +82,7 @@ try {
             else if ($result['seasonMonth'] < 11) $result['season'] = 3;
         }
 
-        $result['trends'] = $trends;
+        $result['trends'] = implode(',', $trends);
     }
 
     // 네이버쇼핑 크롤링
@@ -74,6 +96,41 @@ try {
 
     $result = array_merge($result, $dataNaverShopping);
 
+    # 쇼핑연관 키워드 수집
+    if (!empty($result['relKeywords'])) {
+        foreach ($result['relKeywords'] as $relKeyword) {
+            $db->query("INSERT IGNORE INTO KEYWORDS (keyword) VALUES(?)", array($relKeyword));
+        }
+    }
+
+    // 추가 데이터 정리
+    $result['monthlyAveMobileClkCnt'] = @ceil($result['monthlyAveMobileClkCnt']);
+    $result['monthlyAvePcClkCnt'] = @ceil($result['monthlyAvePcClkCnt']);
+    $result['monthlyMobileQcCnt'] = @ceil($result['monthlyMobileQcCnt']);
+    $result['monthlyPcQcCnt'] = @ceil($result['monthlyPcQcCnt']);
+    $result['monthlyQcCnt'] = @ceil($result['monthlyMobileQcCnt'] + $result['monthlyPcQcCnt']);
+    $result['raceIndex'] = @round($result['totalItems'] / $result['monthlyQcCnt'], 3);
+    $result['saleIndex'] = $result['avgReview'] + $result['avgSell'];
+    $result['relKeywords'] = @implode(',', $result['relKeywords']);
+    $result['modDate'] = date('Y-m-d H:i:s');
+
+    if (!empty($row)) {
+        $dbUpdate = array_map(function ($val) {
+            return $val.' = :'.$val;
+        }, $result);
+        $dbResult = $db->query("UPDATE KEYWORDS SET {$dbUpdate} WHERE keyword = :keyword", $result);
+    } else {
+        $dbName = array_keys($result);
+        $dbValues = array_map(function ($val) {
+            return ':'.$val;
+        }, $dbName);
+        $dbName = implode(',', $dbName);
+        $dbValues = implode(',', $dbValues);
+
+        $dbResult = $db->query("INSERT INTO KEYWORDS ({$dbName}) VALUES({$dbValues})", $result);
+    }
+
+    $db->CloseConnection();
     echo json_encode($result);
 } catch (Exception $e) {
     http_response_code($e->getCode());
