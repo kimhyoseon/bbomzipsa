@@ -25,13 +25,11 @@ class Layer extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        <div aria-live="polite" aria-atomic="true" className="d-flex justify-content-center align-items-center">
-          <div ref={(elem) => { this.elemToast = elem; }} className="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="1000">
-            <div className="toast-body">
-              {this.state.message}
-            </div>
+    return (      
+      <div aria-live="polite" aria-atomic="true" className=" d-flex justify-content-center align-items-center">
+        <div ref={(elem) => { this.elemToast = elem; }} className="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="1000" >
+          <div className="toast-body">
+            {this.state.message}
           </div>
         </div>
       </div>

@@ -82,7 +82,7 @@ class NaverShoppingCrawling
             }
         }
 
-        $nodeItems = $xPath->query("//ul[@class='goods_list']/li");
+        $nodeItems = $xPath->query("//div[@id='content']/ul[@class='goods_list']/li");
 
         if ($nodeItems->length > 0) {
             $totalSalesPrice = 0;

@@ -1,28 +1,39 @@
 <?php
+ini_set("display_errors", 1);
+ini_set('max_execution_time', '0'); 
+ini_set('memory_limit', '-1');
+
 $accountDb = parse_ini_file("../config/db.ini");
 
 require_once '../class/pdo.php';
+require_once '../class/curl_async.php';
+
+$curlAsync = new CurlAsync();
 $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
 // DB 조회
-$keywords = $db->column("SELECT keyword FROM KEYWORDS WHERE modDate IS NULL");
+$keywords = $db->column("SELECT keyword FROM KEYWORDS WHERE category=0 LIMIT 99999999");
 
 if (!empty($keywords)) {
-     foreach ($keywords as $keyword) {
-         print_r($keyword);
-         $ch = curl_init();
+    echo sizeof($keywords).'개 키워드 수집 시작'.PHP_EOL;    
 
-        curl_setopt($ch, CURLOPT_URL,"http://localhost/api/keyword.php");
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, "keyword={$keyword}");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $server_output = curl_exec($ch);
+    foreach (array_chunk($keywords, 5) as $keywordChunk) {        
+        foreach ($keywordChunk as $keyword) {        
+            $curlAsync->$keyword(array(
+                'url' => 'http://localhost/api/keyword.php',
+                'post' => array(
+                    'keyword' => $keyword,
+                )
+            ));        
+        }
 
-        print_r($server_output);
+        foreach ($keywordChunk as $keyword) { 
+            echo $keyword.PHP_EOL;                       
+            echo $curlAsync->$keyword().PHP_EOL;                    
+        }
 
-        curl_close ($ch);
-        exit;
-     }
+        sleep(1);
+    }
 }
 
 $db->CloseConnection();

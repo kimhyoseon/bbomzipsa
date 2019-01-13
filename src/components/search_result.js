@@ -16,29 +16,30 @@ class SearchResult extends React.Component {
 	}
 
 	keywordRow() {
-		const listItems = this.props.result.items.map((item) => {
-      //let ttipReview = '최저:' + this.numberWithCommas(item.lowReview) + '건, 최대:'+ this.numberWithCommas(item.highReview) + '건';
-      //let ttipSell = '최저:' + this.numberWithCommas(item.lowSell) + '건, 최대:'+ this.numberWithCommas(item.highSell) + '건';
+		const listItems = this.props.result.items.map((item) => {            
       let ttipPrice = '최저:' + this.numberWithCommas(item.lowPrice) + '원, 최대:'+ this.numberWithCommas(item.highPrice) + '원';
-      let ttipSaleIndex = '평균구매수:' + this.numberWithCommas(item.avgSell) + '건, 평균리뷰수:'+ this.numberWithCommas(item.avgReview) + '건, 평균매출액:'+ this.numberWithCommas(item.avgSellPrice) + '원';
-      // let hotKeyword = [];
-      // let hotKeywordFull = Object.keys(item.hotKeywords).map(function(k, i){
-      //   if (i < 3) hotKeyword.push(k + '('+item.hotKeywords[k]+')');
-      //   return k + '('+item.hotKeywords[k]+')'
-      // }).join(", ");
-      let hotKeyword = item.hotKeywords.slice(0, item.hotKeywords.split(',', 3).join(',').length);
-      let linkNaverShopping = 'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=' + item.keyword;
-      let trendsGraph = item.trends.map((trend, i) => {
-        trend = (trend == 0) ? 0 : Math.ceil(trend / 5);
-        trend = 20 - trend;
-        return i * 2 + ' ' + trend;
-      }).join(", ");
-      let trendsText = item.trends.map((trend, i) => {
-        return (i + 1) + '월(' + trend + ')';
-      }).join(", ");
+      let ttipSaleIndex = '평균구매수:' + this.numberWithCommas(item.avgSell) + '건, 평균리뷰수:'+ this.numberWithCommas(item.avgReview) + '건, 평균매출액:'+ this.numberWithCommas(item.avgSellPrice) + '원';      
+      let hotKeyword = ''
+      if (item.hotKeywords) {
+        hotKeyword = item.hotKeywords.slice(0, item.hotKeywords.split(',', 3).join(',').length);
+      }
+      let linkNaverShopping = 'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=' + item.keyword;      
+      let trendsGraph = '';
+      let trendsText = '';
+      if (item.trends) {
+        if (typeof item.trends == 'string') item.trends = item.trends.split(',');
+        trendsGraph = item.trends.map((trend, i) => {
+          trend = (trend == 0) ? 0 : Math.ceil(trend / 5);
+          trend = 20 - trend;
+          return i * 2 + ' ' + trend;
+        }).join(", ");      
+        trendsText = item.trends.map((trend, i) => {
+          return (i + 1) + '월(' + trend + ')';
+        }).join(", ");
+      }
 
       let raceBattery = 'fas fa-battery-empty';
-      if (item.raceIndex < 0.05) raceBattery = 'fas fa-battery-full';
+      if (item.raceIndex > 0 && item.raceIndex < 0.05) raceBattery = 'fas fa-battery-full';
       else if (item.raceIndex < 0.5) raceBattery = 'fas fa-battery-three-quarters';
       else if (item.raceIndex < 1) raceBattery = 'fas fa-battery-half';
       else if (item.raceIndex < 5) raceBattery = 'fas fa-battery-quarter';
@@ -65,6 +66,17 @@ class SearchResult extends React.Component {
         else if (item.season == 4) return (<span className="box-etc float-left"><span className="badge badge-secondary winter">겨울</span></span>)
       }();
 
+      let category = ''
+      if (item.categoryTexts) {        
+        category = item.categoryTexts.split(',').map((category, i) => {
+          let nextArrow = (i == 0) ? '' : (<i className="fas fa-caret-right text-muted"></i>);
+          return (<span key={category} className="d-inline">{nextArrow}{category}</span>);
+        });
+        //category = item.categoryTexts.replace(/,/gi, (<i class="fas fa-caret-right"></i>));
+      }
+
+      //if (result.categoryTexts) result.categoryTexts = result.categoryTexts.split(',');
+
       this.tableSort.refresh();
 
       return (
@@ -74,12 +86,10 @@ class SearchResult extends React.Component {
         <td className="align-middle text-right">{this.numberWithCommas(item.totalItems)}개</td>
         <td className="align-middle text-right">{this.numberWithCommas(item.monthlyQcCnt)}건</td>
         <td className="align-middle text-right">{this.numberWithCommas(item.raceIndex)}<i className={raceBattery}></i></td>
-        <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={ttipSaleIndex}>{this.numberWithCommas(item.saleIndex)}<i className={saleBattery}></i></td>
-				{/* <td className={"align-middle text-right" + this.getOpenResultClass()}>{this.numberWithCommas(item.avgSellPrice)}원</td>
-        <td className={"align-middle text-right" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={ttipSell}>{this.numberWithCommas(item.avgSell)}건</td>
-        <td className={"align-middle text-right" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={ttipReview}>{this.numberWithCommas(item.avgReview)}건</td> */}
+        <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={ttipSaleIndex}>{this.numberWithCommas(item.saleIndex)}<i className={saleBattery}></i></td>				
         <td className={"align-middle text-right" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={ttipPrice}>{this.numberWithCommas(item.avgPrice)}원</td>
-        <td className={"align-middle" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={item.hotKeywords}><small>{hotKeyword}</small></td>
+        <td className={"align-middle" + this.getOpenResultClass()} ><small>{category}</small></td>
+        <td className={"align-middle" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={item.hotKeywords}><small>{hotKeyword}</small></td>        
         <td className={"align-middle" + this.getOpenResultClass()}>
           <span className="box-etc float-left"><a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={icoNShopping} width="20" height="20" className="d-inline-block align-middle"/></a></span>
           {device}
@@ -130,8 +140,10 @@ class SearchResult extends React.Component {
     this.setState({openResult: !this.state.openResult});
   }
 
-  numberWithCommas(num) {
-      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  numberWithCommas(num) {  
+    let parts = num.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");          
   }
 
   componentDidUpdate() {
@@ -190,24 +202,15 @@ class SearchResult extends React.Component {
                   <th scope="col" className="align-middle text-center" data-sort-method='number'>
                     판매지수
                     <i data-toggle="tooltip" data-placement="right" title="높을수록 판매가 활발한 좋은 키워드 입니다 (리뷰수 + 판매수)" className="fas fa-question-circle"></i>
-                  </th>
-                  {/* <th scope="col" className={"align-middle text-right" + this.getOpenResultClass()} data-sort-method='number'>
-                    평균매출액
-                    <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 1개 소셜판매자당 매출추정액" className="fas fa-question-circle"></i>
-                  </th>
-                  <th scope="col" className={"align-middle text-right" + this.getOpenResultClass()} data-sort-method='number'>
-                    평균구매
-                    <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 1개 스토어당 등록된 평균 구매 수" className="fas fa-question-circle"></i>
-                  </th>
-                  <th scope="col" className={"align-middle text-right" + this.getOpenResultClass()} data-sort-method='number'>
-                    평균리뷰
-                    <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 1개 스토어당 등록된 평균 리뷰 수" className="fas fa-question-circle"></i>
-                  </th> */}
-                  <th scope="col" className={"align-middle text-right" + this.getOpenResultClass()} data-sort-method='number'>
+                  </th>                  
+                  <th scope="col" className={"align-middle text-center" + this.getOpenResultClass()} data-sort-method='number'>
                     평균상품가격
                     <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 평균 상품가격" className="fas fa-question-circle"></i>
                   </th>
-                  <th scope="col" className={"align-middle text-right" + this.getOpenResultClass()}>
+                  <th scope="col" className={"align-middle text-center" + this.getOpenResultClass()}>
+                    카테고리                    
+                  </th>
+                  <th scope="col" className={"align-middle text-center" + this.getOpenResultClass()}>
                     인기키워드
                     <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 상품명에 많이 언급된 단어 (횟수)" className="fas fa-question-circle"></i>
                   </th>
