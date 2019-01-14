@@ -113,7 +113,7 @@ try {
             $trends['oneYearBefore'] = array_slice($trendsFull, 12);
 
             foreach ($trends as $key => $trend) {
-                if (max($trend) != 100) {
+                if (max($trend) != 100 && max($trend) > 0) {
                     $trendRatio = (100 / max($trend));
                     foreach ($trend as $k => $v) {
                         $trends[$key][$k] = floor($v * $trendRatio);
