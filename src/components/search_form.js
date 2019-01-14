@@ -162,7 +162,7 @@ class SearchForm extends React.Component {
 
       $.ajax({
         type: "POST",
-        url: this.urlApi + 'list.php',
+        url: this.urlApi + '/list.php',
         data: {
           page: this.state.page,
           category: categories
