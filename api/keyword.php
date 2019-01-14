@@ -24,7 +24,7 @@ try {
     $row = $db->row("SELECT * FROM keywords WHERE keyword=?", array(KEYWORD));
 
     if (!empty($row)) {
-        if (!empty($row['modDate']) && $row['modDate'] > date('Y-m-d H:i:s', strtotime('-1 week'))) {
+        if (!empty($row['modDate']) && $row['modDate'] > date('Y-m-d H:i:s', strtotime('-1 day'))) {
             $db->CloseConnection();
             echo json_encode($row);
             exit();
