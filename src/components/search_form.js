@@ -12,8 +12,8 @@ class SearchForm extends React.Component {
         return check;
       })();
 
-      //this.urlApi = "//localhost/api/keyword.php";
-      this.urlApi = "//ppomzipsa.com/api/keyword.php";
+      //this.urlApi = "//localhost/api";
+      this.urlApi = "//ppomzipsa.com/api";
 
       this.state = {
         page: 1,
@@ -86,7 +86,7 @@ class SearchForm extends React.Component {
 
       $.ajax({
         type: "POST",
-        url: this.urlApi,
+        url: this.urlApi + '/keyword.php',
         data: {
           keyword: this.keywordInput.value
         },
@@ -162,7 +162,7 @@ class SearchForm extends React.Component {
 
       $.ajax({
         type: "POST",
-        url: this.urlApi,
+        url: this.urlApi + 'list.php',
         data: {
           page: this.state.page,
           category: categories
