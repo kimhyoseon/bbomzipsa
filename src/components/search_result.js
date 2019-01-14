@@ -16,14 +16,14 @@ class SearchResult extends React.Component {
 	}
 
 	keywordRow() {
-		const listItems = this.props.result.items.map((item) => {            
+		const listItems = this.props.result.items.map((item) => {
       let ttipPrice = '최저:' + this.numberWithCommas(item.lowPrice) + '원, 최대:'+ this.numberWithCommas(item.highPrice) + '원';
-      let ttipSaleIndex = '평균구매수:' + this.numberWithCommas(item.avgSell) + '건, 평균리뷰수:'+ this.numberWithCommas(item.avgReview) + '건, 평균매출액:'+ this.numberWithCommas(item.avgSellPrice) + '원';      
+      let ttipSaleIndex = '평균구매수:' + this.numberWithCommas(item.avgSell) + '건, 평균리뷰수:'+ this.numberWithCommas(item.avgReview) + '건, 평균매출액:'+ this.numberWithCommas(item.avgSellPrice) + '원';
       let hotKeyword = ''
       if (item.hotKeywords) {
         hotKeyword = item.hotKeywords.slice(0, item.hotKeywords.split(',', 3).join(',').length);
       }
-      let linkNaverShopping = 'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=' + item.keyword;      
+      let linkNaverShopping = (!mobileCheck) ?'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=' + item.keyword : 'https://msearch.shopping.naver.com/search/all?frm=NVSHSRC&cat_id=&pb=true&mall=&query=' + item.keyword;
       let trendsGraph = '';
       let trendsText = '';
       if (item.trends) {
@@ -32,7 +32,7 @@ class SearchResult extends React.Component {
           trend = (trend == 0) ? 0 : Math.ceil(trend / 5);
           trend = 20 - trend;
           return i * 2 + ' ' + trend;
-        }).join(", ");      
+        }).join(", ");
         trendsText = item.trends.map((trend, i) => {
           return (i + 1) + '월(' + trend + ')';
         }).join(", ");
@@ -67,7 +67,7 @@ class SearchResult extends React.Component {
       }();
 
       let category = ''
-      if (item.categoryTexts) {        
+      if (item.categoryTexts) {
         category = item.categoryTexts.split(',').map((category, i) => {
           let nextArrow = (i == 0) ? '' : (<i className="fas fa-caret-right text-muted"></i>);
           return (<span key={category} className="d-inline">{nextArrow}{category}</span>);
@@ -86,10 +86,10 @@ class SearchResult extends React.Component {
         <td className="align-middle text-right">{this.numberWithCommas(item.totalItems)}개</td>
         <td className="align-middle text-right">{this.numberWithCommas(item.monthlyQcCnt)}건</td>
         <td className="align-middle text-right">{this.numberWithCommas(item.raceIndex)}<i className={raceBattery}></i></td>
-        <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={ttipSaleIndex}>{this.numberWithCommas(item.saleIndex)}<i className={saleBattery}></i></td>				
+        <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={ttipSaleIndex}>{this.numberWithCommas(item.saleIndex)}<i className={saleBattery}></i></td>
         <td className={"align-middle text-right" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={ttipPrice}>{this.numberWithCommas(item.avgPrice)}원</td>
         <td className={"align-middle" + this.getOpenResultClass()} ><small>{category}</small></td>
-        <td className={"align-middle" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={item.hotKeywords}><small>{hotKeyword}</small></td>        
+        <td className={"align-middle" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={item.hotKeywords}><small>{hotKeyword}</small></td>
         <td className={"align-middle" + this.getOpenResultClass()}>
           <span className="box-etc float-left"><a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={icoNShopping} width="20" height="20" className="d-inline-block align-middle"/></a></span>
           {device}
@@ -140,10 +140,10 @@ class SearchResult extends React.Component {
     this.setState({openResult: !this.state.openResult});
   }
 
-  numberWithCommas(num) {  
+  numberWithCommas(num) {
     let parts = num.toString().split(".");
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return parts.join(".");          
+    return parts.join(".");
   }
 
   componentDidUpdate() {
@@ -202,13 +202,13 @@ class SearchResult extends React.Component {
                   <th scope="col" className="align-middle text-center" data-sort-method='number'>
                     판매지수
                     <i data-toggle="tooltip" data-placement="right" title="높을수록 판매가 활발한 좋은 키워드 입니다 (리뷰수 + 판매수)" className="fas fa-question-circle"></i>
-                  </th>                  
+                  </th>
                   <th scope="col" className={"align-middle text-center" + this.getOpenResultClass()} data-sort-method='number'>
                     평균상품가격
                     <i data-toggle="tooltip" data-placement="right" title="네이버쇼핑 1페이지 기준, 평균 상품가격" className="fas fa-question-circle"></i>
                   </th>
                   <th scope="col" className={"align-middle text-center" + this.getOpenResultClass()}>
-                    카테고리                    
+                    카테고리
                   </th>
                   <th scope="col" className={"align-middle text-center" + this.getOpenResultClass()}>
                     인기키워드

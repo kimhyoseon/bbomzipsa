@@ -78,77 +78,79 @@ try {
     $result['seasonMonth'] = 0;
 
     // 키워드 검색 트렌드 api (https://developers.naver.com/docs/datalab/search/) - 하루 1000건 제한 - 월검색 500건 이상인 경우에만 수집
-    if ($result['monthlyQcCnt'] > 500) {
-        $startTrend = date('Y', strtotime('-2 year')).'-01-01';
-        $endTrend = date('Y', strtotime('-1 year')).'-12-31';
-        $period = new DatePeriod((new DateTime($startTrend))->modify('first day of this month'), DateInterval::createFromDateString('1 month'), (new DateTime($endTrend))->modify('first day of next month'));
-        $trendsFull = array();
+    if (DEBUG == true || (empty($row) && empty($row['trends']))) {
+        if ($result['monthlyQcCnt'] > 500) {
+            $startTrend = date('Y', strtotime('-2 year')).'-01-01';
+            $endTrend = date('Y', strtotime('-1 year')).'-12-31';
+            $period = new DatePeriod((new DateTime($startTrend))->modify('first day of this month'), DateInterval::createFromDateString('1 month'), (new DateTime($endTrend))->modify('first day of next month'));
+            $trendsFull = array();
 
-        foreach ($period as $date) {
-            $trendsFull[$date->format("Y-m").'-01'] = 0;
-        }
+            foreach ($period as $date) {
+                $trendsFull[$date->format("Y-m").'-01'] = 0;
+            }
 
-        $keywordtrend = $api->POST("https://openapi.naver.com/v1/datalab/search", array(
-            'startDate' => $startTrend,
-            'endDate' => $endTrend,
-            'timeUnit'=> 'month',
-            "keywordGroups" => array(
-                array(
-                    'groupName' => KEYWORD,
-                    'keywords' => array(KEYWORD)
+            $keywordtrend = $api->POST("https://openapi.naver.com/v1/datalab/search", array(
+                'startDate' => $startTrend,
+                'endDate' => $endTrend,
+                'timeUnit'=> 'month',
+                "keywordGroups" => array(
+                    array(
+                        'groupName' => KEYWORD,
+                        'keywords' => array(KEYWORD)
+                    )
                 )
-            )
-        ));
+            ));
 
-        if (DEBUG == true) print_r($keywordtrend);
+            if (DEBUG == true) print_r($keywordtrend);
 
-        if (!empty($keywordtrend) && !empty($keywordtrend['results']) && !empty($keywordtrend['results'][0]['data'])) {
-            $trends = array();
+            if (!empty($keywordtrend) && !empty($keywordtrend['results']) && !empty($keywordtrend['results'][0]['data'])) {
+                $trends = array();
 
-            foreach ($keywordtrend['results'][0]['data'] as $trend) {
-                $trendsFull[$trend['period']] = $trend['ratio'];
-            }
+                foreach ($keywordtrend['results'][0]['data'] as $trend) {
+                    $trendsFull[$trend['period']] = $trend['ratio'];
+                }
 
-            $trends['twoYearBefore'] = array_slice($trendsFull, 0, 12);
-            $trends['oneYearBefore'] = array_slice($trendsFull, 12);
+                $trends['twoYearBefore'] = array_slice($trendsFull, 0, 12);
+                $trends['oneYearBefore'] = array_slice($trendsFull, 12);
 
-            foreach ($trends as $key => $trend) {
-                if (max($trend) != 100 && max($trend) > 0) {
-                    $trendRatio = (100 / max($trend));
-                    foreach ($trend as $k => $v) {
-                        $trends[$key][$k] = floor($v * $trendRatio);
-                    }
-                } else {
-                    foreach ($trend as $k => $v) {
-                        $trends[$key][$k] = ceil($v);
+                foreach ($trends as $key => $trend) {
+                    if (max($trend) != 100 && max($trend) > 0) {
+                        $trendRatio = (100 / max($trend));
+                        foreach ($trend as $k => $v) {
+                            $trends[$key][$k] = floor($v * $trendRatio);
+                        }
+                    } else {
+                        foreach ($trend as $k => $v) {
+                            $trends[$key][$k] = ceil($v);
+                        }
                     }
                 }
-            }
 
-            foreach ($trends as $key => $trend) {
-                if ((max($trend) - min($trend)) > 60) {
-                    $month = date('m', strtotime(array_keys($trend, max($trend))[0]));
+                foreach ($trends as $key => $trend) {
+                    if ((max($trend) - min($trend)) > 60) {
+                        $month = date('m', strtotime(array_keys($trend, max($trend))[0]));
 
-                    if ($month < 3 || $month > 10) $season = 4;
-                    else if ($month < 6) $season = 1;
-                    else if ($month < 9) $season = 2;
-                    else if ($month < 11) $season = 3;
+                        if ($month < 3 || $month > 10) $season = 4;
+                        else if ($month < 6) $season = 1;
+                        else if ($month < 9) $season = 2;
+                        else if ($month < 11) $season = 3;
 
-                    $trends[$key.'Season'] = array(
-                        'month' => $month,
-                        'season' => $season,
-                    );
+                        $trends[$key.'Season'] = array(
+                            'month' => $month,
+                            'season' => $season,
+                        );
+                    }
                 }
+
+                if (!empty($trends['twoYearBeforeSeason']) && !empty($trends['oneYearBeforeSeason']) && $trends['twoYearBeforeSeason']['season'] == $trends['oneYearBeforeSeason']['season']) {
+                    $result['season'] = $trends['oneYearBeforeSeason']['season'];
+                    $result['seasonMonth'] = $trends['oneYearBeforeSeason']['month'];
+                }
+
+                $result['trends'] = implode(',', $trends['oneYearBefore']);
+
+                if (DEBUG == true) print_r($trends);
             }
-
-            if (!empty($trends['twoYearBeforeSeason']) && !empty($trends['oneYearBeforeSeason']) && $trends['twoYearBeforeSeason']['season'] == $trends['oneYearBeforeSeason']['season']) {
-                $result['season'] = $trends['oneYearBeforeSeason']['season'];
-                $result['seasonMonth'] = $trends['oneYearBeforeSeason']['month'];
-            }
-
-            $result['trends'] = implode(',', $trends['oneYearBefore']);
-
-            if (DEBUG == true) print_r($trends);
         }
     }
 
@@ -169,20 +171,18 @@ try {
     $result = array_merge($result, $dataNaverShopping);
 
     # 새로운 키워드라면 쇼핑연관 키워드 수집
-    // if (empty($row)) {
-        if (!empty($result['relKeywords'])) {
-            $keywordsExist = $db->column("SELECT keyword FROM keywords WHERE keyword IN (:keywords)", array('keywords' => $result['relKeywords']));
+    if (!empty($result['relKeywords'])) {
+        $keywordsExist = $db->column("SELECT keyword FROM keywords WHERE keyword IN (:keywords)", array('keywords' => $result['relKeywords']));
 
-            if (DEBUG == true) print_r($keywordsExist);
+        if (DEBUG == true) print_r($keywordsExist);
 
-            foreach ($result['relKeywords'] as $relKeyword) {
-                if (empty($relKeyword)) continue;
-                if (!empty($keywordsExist) && in_array($relKeyword, $keywordsExist)) continue;
+        foreach ($result['relKeywords'] as $relKeyword) {
+            if (empty($relKeyword)) continue;
+            if (!empty($keywordsExist) && in_array($relKeyword, $keywordsExist)) continue;
 
-                $db->query("INSERT INTO keywords (keyword) VALUES(?)", array($relKeyword));
-            }
+            $db->query("INSERT INTO keywords (keyword) VALUES(?)", array($relKeyword));
         }
-    // }
+    }
 
     // 추가 데이터 정리
     $result['raceIndex'] = @round($result['totalItems'] / $result['monthlyQcCnt'], 4);
