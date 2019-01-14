@@ -28,6 +28,8 @@ class SearchForm extends React.Component {
 
     componentDidMount() {
       document.addEventListener('scroll', this.trackScrolling);
+
+      this.state.modeSearch = 'c';
       this.search();
     }
 
