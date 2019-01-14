@@ -124,6 +124,8 @@ class NaverShoppingCrawling
                         }
 
                         $this->data['categoryTexts'] = implode(',', $this->data['categoryTexts']);
+                    } else {
+                        $this->data['categoryTexts'] = '';
                     }
                 }
             }
@@ -176,10 +178,11 @@ class NaverShoppingCrawling
                 }
 
                 $this->data['hotKeywords'] = implode(',', $hotKeywords);
-            } else {
-                $this->data['hotKeywords'] = '';
             }
         }
+
+        if (empty($this->data['hotKeywords'])) $this->data['hotKeywords'] = '';
+        if (empty($this->data['categoryTexts'])) $this->data['categoryTexts'] = '';
 
         unset($this->data['titles']);
         unset($this->data['prices']);

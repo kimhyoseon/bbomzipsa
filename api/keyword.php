@@ -113,6 +113,8 @@ try {
         }
     }
 
+    if (empty($result['trends'])) $result['trends'] = '';
+
     // 네이버쇼핑 크롤링
     $oNaverShoppingCrawling = new NaverShoppingCrawling();
 
