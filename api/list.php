@@ -40,7 +40,7 @@ try {
     }
 
     // DB 조회
-    $list = $db->query("SELECT * FROM keywords WHERE raceIndex != 0 {$queryWheres} ORDER BY raceIndex ASC LIMIT :offset, :paging", $queryParams);
+    $list = $db->query("SELECT * FROM keywords WHERE raceIndex != 0 AND saleIndex != 0 {$queryWheres} ORDER BY raceIndex ASC LIMIT :offset, :paging", $queryParams);
 
     if (empty($list)) throw new Exception(null, 204);
 
