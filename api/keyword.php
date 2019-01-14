@@ -78,7 +78,7 @@ try {
     $result['seasonMonth'] = 0;
 
     // 키워드 검색 트렌드 api (https://developers.naver.com/docs/datalab/search/) - 하루 1000건 제한 - 월검색 500건 이상인 경우에만 수집
-    if (DEBUG == true || (empty($row) && empty($row['trends']))) {
+    if (DEBUG == true || empty($row) || empty($row['trends'])) {
         if ($result['monthlyQcCnt'] > 500) {
             $startTrend = date('Y', strtotime('-2 year')).'-01-01';
             $endTrend = date('Y', strtotime('-1 year')).'-12-31';
