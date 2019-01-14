@@ -79,9 +79,18 @@ try {
 
     // 키워드 검색 트렌드 api (https://developers.naver.com/docs/datalab/search/) - 하루 1000건 제한 - 월검색 500건 이상인 경우에만 수집
     if ($result['monthlyQcCnt'] > 500) {
+        $startTrend = date('Y', strtotime('-2 year')).'-01-01';
+        $endTrend = date('Y', strtotime('-1 year')).'-12-31';
+        $period = new DatePeriod((new DateTime($startTrend))->modify('first day of this month'), DateInterval::createFromDateString('1 month'), (new DateTime($endTrend))->modify('first day of next month'));
+        $trendsFull = array();
+
+        foreach ($period as $date) {
+            $trendsFull[$date->format("Y-m").'-01'] = 0;
+        }
+
         $keywordtrend = $api->POST("https://openapi.naver.com/v1/datalab/search", array(
-            'startDate' => date('Y', strtotime('-1 year')).'-01-01',
-            'endDate' => date('Y', strtotime('-1 year')).'-12-31',
+            'startDate' => $startTrend,
+            'endDate' => $endTrend,
             'timeUnit'=> 'month',
             "keywordGroups" => array(
                 array(
@@ -97,19 +106,49 @@ try {
             $trends = array();
 
             foreach ($keywordtrend['results'][0]['data'] as $trend) {
-                $trends[] = @ceil($trend['ratio']);
+                $trendsFull[$trend['period']] = $trend['ratio'];
             }
 
-            if ((max($trends) - min($trends)) > 70) {
-                $result['seasonMonth'] = array_keys($trends, max($trends))[0] + 1;
+            $trends['twoYearBefore'] = array_slice($trendsFull, 0, 12);
+            $trends['oneYearBefore'] = array_slice($trendsFull, 12);
 
-                if ($result['seasonMonth'] < 3 || $result['seasonMonth'] > 10) $result['season'] = 4;
-                else if ($result['seasonMonth'] < 6) $result['season'] = 1;
-                else if ($result['seasonMonth'] < 9) $result['season'] = 2;
-                else if ($result['seasonMonth'] < 11) $result['season'] = 3;
+            foreach ($trends as $key => $trend) {
+                if (max($trend) != 100) {
+                    $trendRatio = (100 / max($trend));
+                    foreach ($trend as $k => $v) {
+                        $trends[$key][$k] = floor($v * $trendRatio);
+                    }
+                } else {
+                    foreach ($trend as $k => $v) {
+                        $trends[$key][$k] = ceil($v);
+                    }
+                }
             }
 
-            $result['trends'] = implode(',', $trends);
+            foreach ($trends as $key => $trend) {
+                if ((max($trend) - min($trend)) > 60) {
+                    $month = date('m', strtotime(array_keys($trend, max($trend))[0]));
+
+                    if ($month < 3 || $month > 10) $season = 4;
+                    else if ($month < 6) $season = 1;
+                    else if ($month < 9) $season = 2;
+                    else if ($month < 11) $season = 3;
+
+                    $trends[$key.'Season'] = array(
+                        'month' => $month,
+                        'season' => $season,
+                    );
+                }
+            }
+
+            if (!empty($trends['twoYearBeforeSeason']) && !empty($trends['oneYearBeforeSeason']) && $trends['twoYearBeforeSeason']['season'] == $trends['oneYearBeforeSeason']['season']) {
+                $result['season'] = $trends['oneYearBeforeSeason']['season'];
+                $result['seasonMonth'] = $trends['oneYearBeforeSeason']['month'];
+            }
+
+            $result['trends'] = implode(',', $trends['oneYearBefore']);
+
+            if (DEBUG == true) print_r($trends);
         }
     }
 
