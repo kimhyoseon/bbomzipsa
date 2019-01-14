@@ -176,6 +176,8 @@ class NaverShoppingCrawling
                 }
 
                 $this->data['hotKeywords'] = implode(',', $hotKeywords);
+            } else {
+                $this->data['hotKeywords'] = '';
             }
         }
 
