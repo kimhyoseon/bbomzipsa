@@ -1,6 +1,6 @@
 <?php
 ini_set("display_errors", 1);
-ini_set('max_execution_time', '0'); 
+ini_set('max_execution_time', '0');
 ini_set('memory_limit', '-1');
 header('Content-Type: application/json');
 
@@ -10,7 +10,7 @@ require_once '../class/pdo.php';
 
 $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
-$categories = $db->query("SELECT category, categoryTexts FROM KEYWORDS WHERE 1 GROUP BY category, categoryTexts");
+$categories = $db->query("SELECT category, categoryTexts FROM keywords WHERE 1 GROUP BY category, categoryTexts");
 
 //echo '<pre>';print_r($categories);echo '</pre>';
 
@@ -21,16 +21,16 @@ $result = array(
 );
 
 if (!empty($categories)) {
-    foreach ($categories as $category) {        
+    foreach ($categories as $category) {
         if (empty($category['categoryTexts'])) continue;
         if (empty($categoryId[$category['category']])) $categoryId[$category['category']] = $category['categoryTexts'];
     }
 
     foreach ($categoryId as $category => $categoryTexts) {
-        $categoryTexts = explode(',', $categoryTexts);                
+        $categoryTexts = explode(',', $categoryTexts);
         $categoryTextsBefore = array();
         $parentId = 0;
-        
+
         foreach ($categoryTexts as $caterogyText) {
             $categoryTextsBefore[] = $caterogyText;
             $caterogyTextBeforeString = implode(',', $categoryTextsBefore);
