@@ -1,3 +1,5 @@
+$naverColor: #00c73c;
+
 html {
 	font-size: 14px;
 }
@@ -199,6 +201,10 @@ footer{
 	margin: 0 3px;
 }
 
+.text-color-naver{
+	color: $naverColor;
+}
+
 /* table-sort */
 th[role=columnheader]:not(.no-sort) {
 	cursor: pointer;
@@ -243,6 +249,7 @@ th[role=columnheader]:not(.no-sort):hover:after {
 }
 
 @media (max-width: 575px) {
+	#header h6,
 	.rel-keywords-list,
 	#table-search-keyword{
 		font-size: 12px;

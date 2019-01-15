@@ -6,7 +6,7 @@ class SearchForm extends React.Component {
     constructor() {
       super();
 
-      //this.urlApi = "//localhost/api";
+      this.urlApi = "//localhost/api";
       this.urlApi = "//ppomzipsa.com/api";
 
       this.state = {
@@ -28,9 +28,6 @@ class SearchForm extends React.Component {
 
     componentDidMount() {
       document.addEventListener('scroll', this.trackScrolling);
-
-      this.state.modeSearch = 'c';
-      this.search();
     }
 
     componentWillUnmount() {

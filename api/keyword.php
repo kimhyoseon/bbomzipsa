@@ -11,206 +11,101 @@ try {
     if (DEBUG == true) define('KEYWORD', (filter_input(INPUT_GET, 'keyword', FILTER_SANITIZE_STRING)));
     else define('KEYWORD', (filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING)));
 
+    $db = null;
+
     if (!KEYWORD) {
         throw new Exception(null, 400);
     }
 
+    // 계정
+    $accountNaver = parse_ini_file("../config/naver.ini");
     $accountDb = parse_ini_file("../config/db.ini");
 
     require_once '../class/pdo.php';
+    require_once './naver/restapi.php';
+    require_once './naver/NaverShopping.php';
+
+    $apiNaver = new RestApi($accountNaver['API_KEY'], $accountNaver['SECRET_KEY'], $accountNaver['CUSTOMER_ID'], $accountNaver['CLIENT_ID'], $accountNaver['CLIENT_SECRET']);
+
+    $oNaverShopping = new NaverShopping();
+    $oNaverShopping->setKeyword(KEYWORD);
+    $oNaverShopping->setDebug(DEBUG);
+
     $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
-    // // DB 조회
+    // DB 조회
     $row = $db->row("SELECT * FROM keywords WHERE keyword=?", array(KEYWORD));
+    $oNaverShopping->setData($row);
 
-    if (!empty($row)) {
-        if (DEBUG == false && !empty($row['modDate']) && $row['modDate'] > date('Y-m-d H:i:s', strtotime('-1 day'))) {
-            $db->CloseConnection();
-            echo json_encode($row);
-            exit();
-        }
-    }
-
-    if (DEBUG == true) print_r($row);
-
-    // 새로 정보가져오기
-    $accountNaver = parse_ini_file("../config/naver.ini");
-
-    require_once './naver/restapi.php';
-    require_once './naver/NaverShoppingCrawling.php';
-
-    $api = new RestApi($accountNaver['API_KEY'], $accountNaver['SECRET_KEY'], $accountNaver['CUSTOMER_ID'], $accountNaver['CLIENT_ID'], $accountNaver['CLIENT_SECRET']);
-
-    $result = array();
-
-    // 키워드광고 api
-    $keywordstool = $api->GET("https://api.naver.com/keywordstool", array(
-        'hintKeywords' => KEYWORD,
-        'showDetail' => 1
-    ));
-
-    if (DEBUG == true) print_r($keywordstool);
-
-    if (empty($keywordstool) || empty($keywordstool['keywordList']) || empty($keywordstool['keywordList'][0])) {
+    if (!$oNaverShopping->needUpdate()) {
+        echo json_encode($oNaverShopping->getData());
         $db->CloseConnection();
-
-        if (!empty($keywordstool['code'])) {
-            throw new Exception(null, $keywordstool['code']);
-        }
-
-        throw new Exception(null, 204);
+        exit();
     }
 
-    $result = $keywordstool['keywordList'][0];
-    $result['monthlyAveMobileClkCnt'] = @ceil($result['monthlyAveMobileClkCnt']);
-    $result['monthlyAvePcClkCnt'] = @ceil($result['monthlyAvePcClkCnt']);
-    $result['monthlyMobileQcCnt'] = @filter_var($result['monthlyMobileQcCnt'], FILTER_SANITIZE_NUMBER_INT);
-    $result['monthlyPcQcCnt'] = @filter_var($result['monthlyPcQcCnt'], FILTER_SANITIZE_NUMBER_INT);
-    $result['monthlyQcCnt'] = @ceil($result['monthlyMobileQcCnt'] + $result['monthlyPcQcCnt']);
-    $result['monthlyPcQcCnt'] = @ceil($result['monthlyPcQcCnt']);
-    $result['monthlyQcCnt'] = @ceil($result['monthlyQcCnt']);
-    $result['modDate'] = date('Y-m-d H:i:s');
+    // 키워드 검색량 api
+    if (!$oNaverShopping->requestKeywordSearchAd($apiNaver)) throw new Exception(null, $oNaverShopping->getCode());
 
-    unset($result['relKeyword']);
-
-    $result['trends'] = '';
-    $result['season'] = 0;
-    $result['seasonMonth'] = 0;
-
-    // 키워드 검색 트렌드 api (https://developers.naver.com/docs/datalab/search/) - 하루 1000건 제한 - 월검색 500건 이상인 경우에만 수집
-    if (DEBUG == true || empty($row) || empty($row['trends'])) {
-        if ($result['monthlyQcCnt'] > 500) {
-            $startTrend = date('Y', strtotime('-2 year')).'-01-01';
-            $endTrend = date('Y', strtotime('-1 year')).'-12-31';
-            $period = new DatePeriod((new DateTime($startTrend))->modify('first day of this month'), DateInterval::createFromDateString('1 month'), (new DateTime($endTrend))->modify('first day of next month'));
-            $trendsFull = array();
-
-            foreach ($period as $date) {
-                $trendsFull[$date->format("Y-m").'-01'] = 0;
-            }
-
-            $keywordtrend = $api->POST("https://openapi.naver.com/v1/datalab/search", array(
-                'startDate' => $startTrend,
-                'endDate' => $endTrend,
-                'timeUnit'=> 'month',
-                "keywordGroups" => array(
-                    array(
-                        'groupName' => KEYWORD,
-                        'keywords' => array(KEYWORD)
-                    )
-                )
-            ));
-
-            if (DEBUG == true) print_r($keywordtrend);
-
-            if (!empty($keywordtrend) && !empty($keywordtrend['results']) && !empty($keywordtrend['results'][0]['data'])) {
-                $trends = array();
-
-                foreach ($keywordtrend['results'][0]['data'] as $trend) {
-                    $trendsFull[$trend['period']] = $trend['ratio'];
-                }
-
-                $trends['twoYearBefore'] = array_slice($trendsFull, 0, 12);
-                $trends['oneYearBefore'] = array_slice($trendsFull, 12);
-
-                foreach ($trends as $key => $trend) {
-                    if (max($trend) != 100 && max($trend) > 0) {
-                        $trendRatio = (100 / max($trend));
-                        foreach ($trend as $k => $v) {
-                            $trends[$key][$k] = floor($v * $trendRatio);
-                        }
-                    } else {
-                        foreach ($trend as $k => $v) {
-                            $trends[$key][$k] = ceil($v);
-                        }
-                    }
-                }
-
-                foreach ($trends as $key => $trend) {
-                    if ((max($trend) - min($trend)) > 60) {
-                        $month = date('m', strtotime(array_keys($trend, max($trend))[0]));
-
-                        if ($month < 3 || $month > 10) $season = 4;
-                        else if ($month < 6) $season = 1;
-                        else if ($month < 9) $season = 2;
-                        else if ($month < 11) $season = 3;
-
-                        $trends[$key.'Season'] = array(
-                            'month' => $month,
-                            'season' => $season,
-                        );
-                    }
-                }
-
-                if (!empty($trends['twoYearBeforeSeason']) && !empty($trends['oneYearBeforeSeason']) && $trends['twoYearBeforeSeason']['season'] == $trends['oneYearBeforeSeason']['season']) {
-                    $result['season'] = $trends['oneYearBeforeSeason']['season'];
-                    $result['seasonMonth'] = $trends['oneYearBeforeSeason']['month'];
-                }
-
-                $result['trends'] = implode(',', $trends['oneYearBefore']);
-
-                if (DEBUG == true) print_r($trends);
-            }
-        }
-    }
-
-    if (empty($result['trends'])) $result['trends'] = '';
+    // 키워드 트렌드 api
+    if (!$oNaverShopping->requestKeywordTrend($apiNaver)) throw new Exception(null, $oNaverShopping->getCode());
 
     // 네이버쇼핑 크롤링
-    $oNaverShoppingCrawling = new NaverShoppingCrawling();
+    if (!$oNaverShopping->crawlingNaverShopping()) throw new Exception(null, $oNaverShopping->getCode());
 
-    $dataNaverShopping = $oNaverShoppingCrawling->collectByKeyword(KEYWORD);
+    // 수집된 정보 획득
+    $result = $oNaverShopping->getData();
 
-    if (DEBUG == true) print_r($dataNaverShopping);
-
-    if (empty($dataNaverShopping)) {
-        $db->CloseConnection();
-        throw new Exception(null, 204);
-    }
-
-    $result = array_merge($result, $dataNaverShopping);
-
-    # 새로운 키워드라면 쇼핑연관 키워드 수집
+    // 쇼핑연관 키워드 수집
     if (!empty($result['relKeywords'])) {
-        $keywordsExist = $db->column("SELECT keyword FROM keywords WHERE keyword IN (:keywords)", array('keywords' => $result['relKeywords']));
+        $relKeywords = explode(',', $result['relKeywords']);
 
-        if (DEBUG == true) print_r($keywordsExist);
+        $keywordsExist = $db->column("SELECT keyword FROM keywords WHERE keyword IN (:keywords)", array('keywords' => $relKeywords));
 
-        foreach ($result['relKeywords'] as $relKeyword) {
+        foreach ($relKeywords as $relKeyword) {
             if (empty($relKeyword)) continue;
             if (!empty($keywordsExist) && in_array($relKeyword, $keywordsExist)) continue;
 
             $db->query("INSERT INTO keywords (keyword) VALUES(?)", array($relKeyword));
+            if (DEBUG == true) {
+                print_r('[New rel keyword]');
+                print_r($relKeyword);
+            }
         }
     }
 
-    // 추가 데이터 정리
-    $result['raceIndex'] = @round($result['totalItems'] / $result['monthlyQcCnt'], 4);
-    $result['saleIndex'] = $result['avgReview'] + $result['avgSell'];
-    $result['relKeywords'] = @implode(',', $result['relKeywords']);
+    $result['modDate'] = date('Y-m-d H:i:s');
+    $resultForDb = array_filter($result);
 
     // 업데이트
     if (!empty($row) && !empty($row['id'])) {
         $dbUpdate = array_map(function ($key) {
             return $key.' = :'.$key;
-        }, array_keys(array_filter($result), true));
+        }, array_keys($resultForDb, true));
         $dbUpdate = implode(', ', $dbUpdate);
 
-        if (DEBUG == true) print_r("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}");
+        if (DEBUG == true) {
+            print_r('[Keyword updated]');
+            print_r("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}");
+            print_r($result);
+        }
 
-        $dbResult = $db->query("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}", array_filter($result));
+        $dbResult = $db->query("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}", $resultForDb);
     // 새로 추가
     } else {
-        $dbName = array_keys(array_filter($result), true);
+        $dbName = array_keys($resultForDb, true);
         $dbValues = array_map(function ($val) {
             return ':'.$val;
         }, $dbName);
         $dbName = implode(',', $dbName);
         $dbValues = implode(',', $dbValues);
 
-        if (DEBUG == true) print_r("INSERT INTO keywords ({$dbName}) VALUES({$dbValues})");
+        if (DEBUG == true) {
+            print_r('[Keyword inserted]');
+            print_r("INSERT INTO keywords ({$dbName}) VALUES({$dbValues})");
+            print_r($result);
+        }
 
-        $dbResult = $db->query("INSERT INTO keywords ({$dbName}) VALUES({$dbValues})", array_filter($result));
+        $dbResult = $db->query("INSERT INTO keywords ({$dbName}) VALUES({$dbValues})", $resultForDb);
     }
 
     $db->CloseConnection();
@@ -219,19 +114,27 @@ try {
     if (DEBUG == true) print_r('exception: '.$e->getCode());
 
     if (!empty($row) && !empty($row['id']) && $e->getCode() == 204) {
+        // 수집된 정보 획득
+        $result = $oNaverShopping->getData();
         $result['modDate'] = date('Y-m-d H:i:s', strtotime('+1 year'));
         $result['category'] = '9999';
+        $result = array_filter($result);
 
         $dbUpdate = array_map(function ($key) {
             return $key.' = :'.$key;
-        }, array_keys(array_filter($result), true));
+        }, array_keys($result, true));
         $dbUpdate = implode(', ', $dbUpdate);
 
-        if (DEBUG == true) print_r("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}");
+        if (DEBUG == true) {
+            print_r('[Exception updated]');
+            print_r("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}");
+            print_r($result);
+        }
 
-        $db->query("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}", array_filter($result));
+        $db->query("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}", $result);
     }
 
+    if (!empty($db)) $db->CloseConnection();
     http_response_code($e->getCode());
 }
 ?>
