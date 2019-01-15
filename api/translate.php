@@ -8,6 +8,8 @@ try {
 
     define('DEBUG', filter_input(INPUT_GET, 'debug'));
 
+    //define('KEYWORD', '식욕억제제');
+
     if (DEBUG == true) define('KEYWORD', (filter_input(INPUT_GET, 'keyword', FILTER_SANITIZE_STRING)));
     else define('KEYWORD', (filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING)));
 
@@ -30,7 +32,9 @@ try {
     if (empty($result) || empty($result['message']) || empty($result['message']['result'])) {
         throw new Exception(null, 204);
     }
-
+    
+    $result['message']['result']['translatedText'] = urlencode(iconv("UTF-8", "EUC-CN", $result['message']['result']['translatedText']));        
+    
     echo json_encode($result['message']['result']);
 } catch (Exception $e) {
     http_response_code($e->getCode());

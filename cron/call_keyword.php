@@ -12,7 +12,7 @@ $curlAsync = new CurlAsync();
 $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
 // DB 조회
-$keywords = $db->column("SELECT keyword FROM keywords WHERE category=0 LIMIT 99999999");
+$keywords = $db->column("SELECT keyword FROM keywords WHERE trends is null AND monthlyQcCnt > 5 ORDER BY raceIndex ASC LIMIT 1000");
 
 if (!empty($keywords)) {
     echo sizeof($keywords).'개 키워드 수집 시작'.PHP_EOL;
@@ -23,6 +23,7 @@ if (!empty($keywords)) {
                 'url' => 'http://localhost/api/keyword.php',
                 'post' => array(
                     'keyword' => $keyword,
+                    'debug' => 1,
                 )
             ));
         }

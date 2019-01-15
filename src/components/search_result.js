@@ -11,10 +11,12 @@ class SearchResult extends React.Component {
 
     this.state = {
       openResult: false,
+      isSearching: false,
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.openResult = this.openResult.bind(this);
+    this.link1688 = this.link1688.bind(this);
 	}
 
 	keywordRow() {
@@ -94,7 +96,7 @@ class SearchResult extends React.Component {
         <td className={"align-middle" + this.getOpenResultClass()}>
           <span className="box-etc float-left"><a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={iconNaverShopping} width="20" height="20" className="d-inline-block align-middle"/></a></span>
           <span className="box-etc float-left"><a href={linkGoogleSearch} target="_blank" title="구글검색 바로가기"><img src={iconGoogle} width="20" height="20" className="d-inline-block align-middle"/></a></span>
-          {/* <span className="box-etc float-left"><a href="#" title="1688 바로가기" data-keyword={item.keyword} onClick={this.link1688}><img src={icon1688} width="20" height="20" className="d-inline-block align-middle"/></a></span> */}
+          <span className="box-etc float-left"><a href="#" title="1688 바로가기" data-keyword={item.keyword} onClick={this.link1688}><img src={icon1688} width="20" height="20" className="d-inline-block align-middle"/></a></span>
           {device}
           {season}
         </td>
@@ -109,8 +111,44 @@ class SearchResult extends React.Component {
 
   link1688(event) {
     event.preventDefault();
-    console.log($(event));
-    console.log($(event.target).data('keyword'));
+
+    let keyword = $(event.target).parent().data('keyword');
+    if (!keyword) return false;
+
+    if (this.state.isSearching) {    
+      return false;
+    }
+
+    this.state.isSearching = true;
+        
+    $.ajax({
+      type: "POST",
+      url: this.props.result.urlApi + '/translate.php',
+      data: {
+        keyword: keyword
+      },
+      success: $.proxy(function (result, textStatus) {
+        console.log(result);
+
+        if (!result || textStatus != 'success') {
+          Layer.toast(textStatus);
+          return false;
+        }
+
+        if (!result.translatedText) {
+          Layer.toast('번역에 실패했습니다.');
+          return false;
+        }        
+        
+        window.open("https://s.1688.com/selloffer/offer_search.htm?keywords=" + result.translatedText);        
+      }, this),
+      error: $.proxy(function(result, textStatus, jqXHR) {
+        Layer.toast('통신 오류입니다. 잠시 후 다시 시도해주세요.');
+      }, this),
+      complete: $.proxy(function() {
+        this.state.isSearching = false;
+      }, this)
+    });
   }
 
   getOpenResultClass() {

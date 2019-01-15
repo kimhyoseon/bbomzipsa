@@ -6,10 +6,9 @@ class SearchForm extends React.Component {
     constructor() {
       super();
 
-      //this.urlApi = "//localhost/api";
-      this.urlApi = "//ppomzipsa.com/api";
-
       this.state = {
+        //urlApi: "//localhost/api",
+        urlApi: "//ppomzipsa.com/api",
         page: 1,
         isSearching: false,
         keywords: [],
@@ -28,28 +27,6 @@ class SearchForm extends React.Component {
 
     componentDidMount() {
       document.addEventListener('scroll', this.trackScrolling);
-
-
-      $.ajax({
-        type: "POST",
-        url: this.urlApi + '/translate.php',
-        data: {
-          keyword: '바지'
-        },
-        success: $.proxy(function (result, textStatus) {
-          if (!result || textStatus != 'success') {
-            Layer.toast(textStatus);
-            return false;
-          }
-
-          console.log(result);
-        }, this),
-        error: $.proxy(function(result, textStatus, jqXHR) {
-          Layer.toast('통신 오류입니다. 잠시 후 다시 시도해주세요.');
-        }, this),
-        complete: $.proxy(function() {
-        }, this)
-      });
     }
 
     componentWillUnmount() {
@@ -102,7 +79,7 @@ class SearchForm extends React.Component {
 
       $.ajax({
         type: "POST",
-        url: this.urlApi + '/keyword.php',
+        url: this.state.urlApi + '/keyword.php',
         data: {
           keyword: this.keywordInput.value
         },
@@ -177,7 +154,7 @@ class SearchForm extends React.Component {
 
       $.ajax({
         type: "POST",
-        url: this.urlApi + '/list.php',
+        url: this.state.urlApi + '/list.php',
         data: {
           page: this.state.page,
           category: categories
