@@ -28,6 +28,28 @@ class SearchForm extends React.Component {
 
     componentDidMount() {
       document.addEventListener('scroll', this.trackScrolling);
+
+
+      $.ajax({
+        type: "POST",
+        url: this.urlApi + '/translate.php',
+        data: {
+          keyword: '바지'
+        },
+        success: $.proxy(function (result, textStatus) {
+          if (!result || textStatus != 'success') {
+            Layer.toast(textStatus);
+            return false;
+          }
+
+          console.log(result);
+        }, this),
+        error: $.proxy(function(result, textStatus, jqXHR) {
+          Layer.toast('통신 오류입니다. 잠시 후 다시 시도해주세요.');
+        }, this),
+        complete: $.proxy(function() {
+        }, this)
+      });
     }
 
     componentWillUnmount() {

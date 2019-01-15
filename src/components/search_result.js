@@ -1,7 +1,9 @@
 import $ from 'jquery';
 import React from 'react';
 import tablesort from 'tablesort';
-import icoNShopping from '../images/ico-navershopping.png';
+import iconNaverShopping from '../images/ico-navershopping.png';
+import iconGoogle from '../images/ico-google.png';
+import icon1688 from '../images/ico-1688.png';
 
 class SearchResult extends React.Component {
 	constructor(props) {
@@ -23,7 +25,6 @@ class SearchResult extends React.Component {
       if (item.hotKeywords) {
         hotKeyword = item.hotKeywords.slice(0, item.hotKeywords.split(',', 3).join(',').length);
       }
-      let linkNaverShopping = (!mobileCheck) ?'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=' + item.keyword : 'https://msearch.shopping.naver.com/search/all?frm=NVSHSRC&cat_id=&pb=true&mall=&query=' + item.keyword;
       let trendsGraph = '';
       let trendsText = '';
       if (item.trends) {
@@ -72,10 +73,10 @@ class SearchResult extends React.Component {
           let nextArrow = (i == 0) ? '' : (<i className="fas fa-caret-right text-muted"></i>);
           return (<span key={category} className="d-inline">{nextArrow}{category}</span>);
         });
-        //category = item.categoryTexts.replace(/,/gi, (<i class="fas fa-caret-right"></i>));
       }
 
-      //if (result.categoryTexts) result.categoryTexts = result.categoryTexts.split(',');
+      let linkNaverShopping = (!mobileCheck) ?'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=' + item.keyword : 'https://msearch.shopping.naver.com/search/all?frm=NVSHSRC&cat_id=&pb=true&mall=&query=' + item.keyword;
+      let linkGoogleSearch = 'http://www.google.com/search?q=' + item.keyword + '+위탁+사입+도매';
 
       this.tableSort.refresh();
 
@@ -91,7 +92,9 @@ class SearchResult extends React.Component {
         <td className={"align-middle" + this.getOpenResultClass()} ><small>{category}</small></td>
         <td className={"align-middle" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={item.hotKeywords}><small>{hotKeyword}</small></td>
         <td className={"align-middle" + this.getOpenResultClass()}>
-          <span className="box-etc float-left"><a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={icoNShopping} width="20" height="20" className="d-inline-block align-middle"/></a></span>
+          <span className="box-etc float-left"><a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={iconNaverShopping} width="20" height="20" className="d-inline-block align-middle"/></a></span>
+          <span className="box-etc float-left"><a href={linkGoogleSearch} target="_blank" title="구글검색 바로가기"><img src={iconGoogle} width="20" height="20" className="d-inline-block align-middle"/></a></span>
+          {/* <span className="box-etc float-left"><a href="#" title="1688 바로가기" data-keyword={item.keyword} onClick={this.link1688}><img src={icon1688} width="20" height="20" className="d-inline-block align-middle"/></a></span> */}
           {device}
           {season}
         </td>
@@ -102,6 +105,12 @@ class SearchResult extends React.Component {
 		return (
 			<tbody>{listItems}</tbody>
 		);
+  }
+
+  link1688(event) {
+    event.preventDefault();
+    console.log($(event));
+    console.log($(event.target).data('keyword'));
   }
 
   getOpenResultClass() {

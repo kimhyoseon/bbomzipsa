@@ -1,18 +1,18 @@
 <?php
 
 class RestApi
-{    
+{
     protected $apiKey;
     protected $secretKey;
-    protected $customerId; 
+    protected $customerId;
     protected $clientId;
     protected $clientSecret;
 
     function __construct($apiKey, $secretKey, $customerId, $clientId, $clientSecret)
-    {        
+    {
         $this->apiKey = $apiKey;
         $this->secretKey = $secretKey;
-        $this->customerId = $customerId;     
+        $this->customerId = $customerId;
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
     }
