@@ -37,7 +37,7 @@ class SearchForm extends React.Component {
     trackScrolling() {
       if (this.state.page == 1) return false;
 
-      if(Math.ceil($(window).scrollTop() + $(window).height()) == $(document).height()) {
+      if(Math.ceil($(window).scrollTop() + $(window).height()) > $(document).height() - 10) {
         Layer.toast('목록을 가져오는 중입니다. 잠시만 기다려 주세요.');
         this.search();
       }
@@ -143,6 +143,7 @@ class SearchForm extends React.Component {
 
     search() {
       if (this.state.isSearching) return false;
+      this.state.isSearching = true;
 
       let categories = this.getAllcategoriIds(this.state.categoryId);
       if (categories == 0) categories = null;
@@ -150,8 +151,6 @@ class SearchForm extends React.Component {
       // console.log(this.state.categoryId)
       // console.log(categories);
       // return false;
-
-      this.state.isSearching = true;
       $('#btn-search-submit, .btn-search-categoty').addClass('disabled');
 
       $.ajax({
