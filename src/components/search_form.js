@@ -6,7 +6,7 @@ class SearchForm extends React.Component {
     constructor() {
       super();
 
-      this.urlApi = "//localhost/api";
+      //this.urlApi = "//localhost/api";
       this.urlApi = "//ppomzipsa.com/api";
 
       this.state = {
@@ -37,7 +37,7 @@ class SearchForm extends React.Component {
     trackScrolling() {
       if (this.state.page == 1) return false;
 
-      if($(window).scrollTop() + $(window).height() == $(document).height()) {
+      if(Math.floor($(window).scrollTop() + $(window).height()) == $(document).height()) {
         Layer.toast('목록을 가져오는 중입니다. 잠시만 기다려 주세요.');
         this.search();
       }
