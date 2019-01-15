@@ -12,7 +12,7 @@ $curlAsync = new CurlAsync();
 $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
 // DB 조회
-$keywords = $db->column("SELECT keyword FROM keywords WHERE trends is null AND monthlyQcCnt > 5 ORDER BY raceIndex ASC LIMIT 1000");
+$keywords = $db->column("SELECT keyword FROM keywords WHERE trends is null AND raceIndex > 0 AND monthlyQcCnt > 500 ORDER BY raceIndex ASC LIMIT 1");
 
 if (!empty($keywords)) {
     echo sizeof($keywords).'개 키워드 수집 시작'.PHP_EOL;
@@ -20,10 +20,10 @@ if (!empty($keywords)) {
     foreach (array_chunk($keywords, 5) as $keywordChunk) {
         foreach ($keywordChunk as $keyword) {
             $curlAsync->$keyword(array(
-                'url' => 'http://localhost/api/keyword.php',
+                //'url' => 'http://localhost/api/keyword.php',
+                'url' => 'https://ppomzipsa.com/api/keyword.php',
                 'post' => array(
-                    'keyword' => $keyword,
-                    'debug' => 1,
+                    'keyword' => $keyword,                    
                 )
             ));
         }
