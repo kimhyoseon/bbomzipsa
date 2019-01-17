@@ -1,0 +1,3 @@
+files:
+  - source: ./
+    destination: /home/dev/ppomzipsa
