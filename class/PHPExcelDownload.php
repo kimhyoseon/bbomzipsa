@@ -524,8 +524,14 @@ class PHPExcelDownload {
                     if ($isSame) {
                         $outputSheetData[$key][$filterIndex2['택배사']] = '한진택배';
                         $outputSheetData[$key][$filterIndex2['송장번호']] = $vbody['송장번호'];
-                    }
+                    } 
                 }
+            }
+        }
+
+        foreach ($outputSheetData as $key => $value) {
+            if (empty($outputSheetData[$key][$filterIndex2['택배사']]) && empty($outputSheetData[$key][$filterIndex2['송장번호']])) {
+                unset($outputSheetData[$key]);
             }
         }
 
