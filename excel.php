@@ -3,11 +3,16 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 if (!empty($_POST)) {    
-    if ($_POST['type'] == 'korspo') {        
-        include_once('./class/PHPExcelDownload.php');
-        $excel = new PHPExcelDownload();
-        $excel->korspo($_FILES['excel']);
-    }
+    include_once('./class/PHPExcelDownload.php');
+    $excel = new PHPExcelDownload();
+
+    if ($_POST['type'] == 'korspo') {                
+        $excel->korspo($_FILES['input']);
+    } else if ($_POST['type'] == 'hanjin') {                
+        $excel->hanjin($_FILES['input']);
+    } else if ($_POST['type'] == 'sendall') {                
+        $excel->sendall($_FILES['input'], $_FILES['output']);
+    }    
 }
 ?>
 
@@ -35,11 +40,13 @@ if (!empty($_POST)) {
                 <div class="row">
                     <select id="type" name="type">
                         <option value="korspo">코리아스포츠</option>
-                        <option value="hanjin">한진택배</option>                        
+                        <option value="hanjin">한진택배</option>
+                        <option value="sendall">엑셀일괄발송</option>
                     </select>
                 </div>
                 <div class="row">
-                    <label for="input"></label><input type="file" id="excel" name="excel" />
+                    <label for="input">입력&nbsp;</label><input type="file" id="input" name="input" />
+                    <label for="output">출력&nbsp;</label><input type="file" id="output" name="output" />
                 </div>
                 <div class="row">
                     <button type="submit">변환</button>
