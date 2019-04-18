@@ -309,7 +309,7 @@ class PHPExcelDownload {
                             $isOverwrite = true;                            
                             
                             $body[$k][$index3] = $body[$k][$index3].' / '.$row[$index3];
-                            $body[$k][$index4] += $row[$index4];
+                            $body[$k][$index4] = 1;
                         }
                     }
                 }
@@ -369,13 +369,13 @@ class PHPExcelDownload {
         $excel = new PHPExcel();        
         
         // 셀 구분선
-        $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$cntRow}")->applyFromArray(array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN
-                )
-            )
-        ));
+        // $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$cntRow}")->applyFromArray(array(
+        //     'borders' => array(
+        //         'allborders' => array(
+        //             'style' => PHPExcel_Style_Border::BORDER_THIN
+        //         )
+        //     )
+        // ));
         
         // 셀 폭 최적화
         $widths = array(10, 15, 5, 15, 8, 80, 6, 50, 6, 6, 6, 50);
