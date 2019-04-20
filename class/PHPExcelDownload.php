@@ -555,9 +555,6 @@ class PHPExcelDownload {
 
         $excel = new PHPExcel();   
         
-        // format -> text
-        $excel->setActiveSheetIndex(0)->getDefaultStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);        
-        
         // 셀 폭 최적화
         /*$widths = array(10, 15, 5, 15, 8, 80, 6, 50, 6, 6, 6, 50);
         foreach ($widths as $i => $w) {
@@ -569,6 +566,9 @@ class PHPExcelDownload {
 
         // 데이터 적용
         $excel->getActiveSheet()->fromArray($data, NULL, 'A1');
+
+        // format -> text
+        $excel->setActiveSheetIndex(0)->getDefaultStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);        
 
         // 양식 설정
         ob_end_clean();        
