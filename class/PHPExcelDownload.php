@@ -565,10 +565,19 @@ class PHPExcelDownload {
         $excel->setActiveSheetIndex(0)->setTitle('발송처리');
 
         // 데이터 적용
-        $excel->getActiveSheet()->fromArray($data, NULL, 'A1');
+        $excel->getActiveSheet()->fromArray($data, NULL, 'A1');        
 
         // format -> text
-        $excel->setActiveSheetIndex(0)->getDefaultStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);        
+        foreach ($data  as $key => $value) {                        
+            if ($key < 2) continue;
+            if (!empty($value)) {
+                foreach ($value as $k => $v) {
+                    if (is_numeric($v) && strlen($v) > 15) {                        
+                        $excel->setActiveSheetIndex(0)->setCellValueExplicit($this->columnChar($k + 1).$key, $v, PHPExcel_Cell_DataType::TYPE_STRING);
+                    }
+                }
+            }            
+        }        
 
         // 양식 설정
         ob_end_clean();        
