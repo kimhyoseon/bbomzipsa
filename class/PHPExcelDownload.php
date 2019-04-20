@@ -439,9 +439,13 @@ class PHPExcelDownload {
             '수하인 핸드폰' => '수취인연락처1',
             '수하인 우편번호' => '우편번호',
             '택배사' => '택배사',            
-        );        
+        );     
 
-        $filterMerged = $filter;
+        $filterTmp = array(
+            '상품번호' => '상품번호',            
+        );
+
+        $filterMerged = array_merge($filter, $filterTmp);
 
         $filterArray = array();
         $filterIndex = array();
@@ -464,7 +468,7 @@ class PHPExcelDownload {
                         $filterIndexReverse[$k] = $v;
                     }
                 }
-            } else {
+            } else {                                
                 $row = array();                
 
                 foreach ($value as $k => $v) {
@@ -476,7 +480,7 @@ class PHPExcelDownload {
                 
                 $body[] = $row;
             }
-        }           
+        }    
 
         if (empty($body)) {
             echo '내역이 존재하지 않습니다.';
@@ -488,7 +492,7 @@ class PHPExcelDownload {
         $filterIndex2 = array();     
         $body2 = array();  
         $filterIndexReverse2 = array();        
-        $filterValues = array_values($filter);
+        $filterValues = array_values($filterMerged);
 
         unset($outputSheetData[0]);        
         
@@ -502,6 +506,13 @@ class PHPExcelDownload {
                     }
                 }
             } else {
+                // echo '<pre>';
+                // print_r($filterIndex2);
+                // print_r($value[$filterIndex2['상품번호']]);
+                // echo '</pre>';
+
+                if (in_array($value[$filterIndex2['상품번호']], array('4324723046', '4318623001'))) continue;
+
                 foreach ($body as $kbody => $vbody) {
                     $isSame = true;
                     $hanjinNuber = '';
@@ -518,6 +529,8 @@ class PHPExcelDownload {
                         // echo '</pre>';
 
                         if (strpos($v1, $v2) === false) $isSame = false;
+
+                        //if (in_array($value[$filterIndex['상품번호']], array('4324723046', '4318623001'))) continue;
                     }
                     //echo '<br/>';
 
@@ -528,16 +541,23 @@ class PHPExcelDownload {
                     } 
                 }
             }
-        }
+        }        
 
+        // 송장번호가 입력되지 않은 주문건은 삭제
+        $outputSheetDataNew = array();
+        $newIndex = 1;
         foreach ($outputSheetData as $key => $value) {
             if (empty($outputSheetData[$key][$filterIndex2['택배사']]) && empty($outputSheetData[$key][$filterIndex2['송장번호']])) {
-                unset($outputSheetData[$key]);
+                continue;
             }
-        }
 
-        // echo '<pre>';
-        // print_r($header);        
+            $outputSheetDataNew[$newIndex] = $value;
+            $newIndex++;
+        }
+        
+        $outputSheetData = $outputSheetDataNew;
+
+        // echo '<pre>';        
         // print_r($filterArray);        
         // print_r($filterIndexReverse);        
         // print_r($filterValues);                
@@ -582,17 +602,25 @@ class PHPExcelDownload {
             if (!empty($value)) {
                 foreach ($value as $k => $v) {
                     if (is_numeric($v) && strlen($v) > 9) {   
+                        $cellPos = PHPExcel_Cell::stringFromColumnIndex($k).$key;
                         // echo '<pre>';
                         // print_r(PHPExcel_Cell::stringFromColumnIndex($k).$key);                        
-                        // echo '</pre>';                        
+                        // echo '</pre>';  
+                        // echo '<pre>';                        
+                        // print_r($excel->getActiveSheet()->getCell(PHPExcel_Cell::stringFromColumnIndex($k).$key)->getValue());
+                        // echo '</pre>';                         
                         // echo '<pre>';                        
                         // print_r($v);
-                        // echo '</pre>';                        
-                        $excel->setActiveSheetIndex(0)->setCellValueExplicit(PHPExcel_Cell::stringFromColumnIndex($k).$key, $v, PHPExcel_Cell_DataType::TYPE_STRING);
+                        // echo '</pre>';     
+                        
+                        // 이전값과 현재값이 같을때만 변경
+                        if ($excel->getActiveSheet()->getCell(PHPExcel_Cell::stringFromColumnIndex($k).$key)->getValue() == $v) {                   
+                            $excel->setActiveSheetIndex(0)->setCellValueExplicit($cellPos, $v, PHPExcel_Cell_DataType::TYPE_STRING);
+                        }
                     }
                 }
             }            
-        }        
+        }                
 
         // 양식 설정
         ob_end_clean();        
