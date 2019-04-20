@@ -155,8 +155,8 @@ class PHPExcelDownload {
         $data = array_merge(array($header), $bodyOptimized);
         $cntRow = sizeof($bodyOptimized) + 1;
         $bgColumn = array('_우편번호', '_수량', '구분', '운임');
-        $bgColor = 'FFD8D8D8';        
-        $lastChar = $this->columnChar(count($header) - 1);
+        $bgColor = 'FFD8D8D8';                
+        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($header) - 1));
 
         $excel = new PHPExcel();
         // 헤더 진하게
@@ -364,19 +364,19 @@ class PHPExcelDownload {
 
         
         $data = $bodyOptimized;
-        $cntRow = sizeof($bodyOptimized);        
-        $lastChar = $this->columnChar(count($bodyOptimized) - 1);
+        $cntRow = sizeof($bodyOptimized);                
+        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($bodyOptimized[1]) - 1));
 
         $excel = new PHPExcel();        
         
         // 셀 구분선
-        // $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$cntRow}")->applyFromArray(array(
-        //     'borders' => array(
-        //         'allborders' => array(
-        //             'style' => PHPExcel_Style_Border::BORDER_THIN
-        //         )
-        //     )
-        // ));
+        $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$cntRow}")->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
         
         // 셀 폭 최적화
         $widths = array(10, 15, 5, 15, 8, 80, 6, 50, 6, 6, 6, 50);
@@ -551,9 +551,18 @@ class PHPExcelDownload {
         
         $data = $outputSheetData;
         $cntRow = sizeof($outputSheetData);        
-        $lastChar = $this->columnChar(count($outputSheetData) - 1);
+        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($outputSheetData[1]) - 1));
 
-        $excel = new PHPExcel();   
+        $excel = new PHPExcel();  
+        
+        // 셀 구분선
+        $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$cntRow}")->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
         
         // 셀 폭 최적화
         /*$widths = array(10, 15, 5, 15, 8, 80, 6, 50, 6, 6, 6, 50);
@@ -572,8 +581,14 @@ class PHPExcelDownload {
             if ($key < 2) continue;
             if (!empty($value)) {
                 foreach ($value as $k => $v) {
-                    if (is_numeric($v) && strlen($v) > 12) {                        
-                        $excel->setActiveSheetIndex(0)->setCellValueExplicit($this->columnChar($k + 1).$key, $v, PHPExcel_Cell_DataType::TYPE_STRING);
+                    if (is_numeric($v) && strlen($v) > 9) {   
+                        // echo '<pre>';
+                        // print_r(PHPExcel_Cell::stringFromColumnIndex($k).$key);                        
+                        // echo '</pre>';                        
+                        // echo '<pre>';                        
+                        // print_r($v);
+                        // echo '</pre>';                        
+                        $excel->setActiveSheetIndex(0)->setCellValueExplicit(PHPExcel_Cell::stringFromColumnIndex($k).$key, $v, PHPExcel_Cell_DataType::TYPE_STRING);
                     }
                 }
             }            
