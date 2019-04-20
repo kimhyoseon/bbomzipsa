@@ -572,7 +572,7 @@ class PHPExcelDownload {
             if ($key < 2) continue;
             if (!empty($value)) {
                 foreach ($value as $k => $v) {
-                    if (is_numeric($v) && strlen($v) > 15) {                        
+                    if (is_numeric($v) && strlen($v) > 10) {                        
                         $excel->setActiveSheetIndex(0)->setCellValueExplicit($this->columnChar($k + 1).$key, $v, PHPExcel_Cell_DataType::TYPE_STRING);
                     }
                 }
