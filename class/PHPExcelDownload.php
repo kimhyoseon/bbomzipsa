@@ -550,19 +550,13 @@ class PHPExcelDownload {
         // exit(); 
         
         $data = $outputSheetData;
-        //$cntRow = sizeof($outputSheetData);        
-        //$lastChar = $this->columnChar(count($outputSheetData) - 1);
+        $cntRow = sizeof($outputSheetData);        
+        $lastChar = $this->columnChar(count($outputSheetData) - 1);
 
-        $excel = new PHPExcel();        
+        $excel = new PHPExcel();   
         
-        // 셀 구분선
-        // $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$cntRow}")->applyFromArray(array(
-        //     'borders' => array(
-        //         'allborders' => array(
-        //             'style' => PHPExcel_Style_Border::BORDER_THIN
-        //         )
-        //     )
-        // ));
+        // format -> text
+        $excel->setActiveSheetIndex(0)->getDefaultStyle()->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);        
         
         // 셀 폭 최적화
         /*$widths = array(10, 15, 5, 15, 8, 80, 6, 50, 6, 6, 6, 50);
