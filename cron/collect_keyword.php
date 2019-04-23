@@ -11,8 +11,7 @@ try {
     $KEYWORD = $argv[1];
     // $KEYWORD = '롤빗';    
 
-    $db = null;
-    $list = array();
+    $db = null;    
 
     if (empty($KEYWORD)) {
         throw new Exception(null, 400);
@@ -61,7 +60,8 @@ try {
     if (empty($allRelkeywords)) throw new Exception(null, $oNaverShopping->getCode());
     
     // 테스트 2개
-    $allRelkeywords = array_slice($allRelkeywords, 0, 2);        
+    // $allRelkeywords = array_slice($allRelkeywords, 0, 2);        
+    
     $collectRelkeywords = $allRelkeywords;
     $addRelkeywords = array();
     $times = 0;
@@ -128,16 +128,14 @@ try {
                 }
 
                 // 쇼핑 연관 검색어를 추가로 수집
-                if (!empty($colletResult['relKeywords'])) {
-                    foreach (explode(',', $colletResult['relKeywords']) as $key => $relk) {
-                        if (!in_array($relk, $allRelkeywords)) {
-                            $allRelkeywords[] = $relk;
-                            $addRelkeywords[] = $relk;
-                        }
-                    }
-                }
-
-                $list[] = $colletResult;
+                // if (!empty($colletResult['relKeywords'])) {
+                //     foreach (explode(',', $colletResult['relKeywords']) as $key => $relk) {
+                //         if (!in_array($relk, $allRelkeywords)) {
+                //             $allRelkeywords[] = $relk;
+                //             $addRelkeywords[] = $relk;
+                //         }
+                //     }
+                // }                
             }
 
             sleep(1);
