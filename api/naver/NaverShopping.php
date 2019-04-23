@@ -11,7 +11,7 @@ class NaverShopping
 
     private $debug = false;
 
-    private $data = array(
+    private $data = array(        
         'keyword' => null, // 검색 키워드
         'relKeywords' => '', // 연관쇼핑
         'hotKeywords' => '', // 많이 사용되는 키워드
@@ -139,6 +139,50 @@ class NaverShopping
         $this->data['monthlyQcCnt'] = @ceil($resultTool['monthlyMobileQcCnt'] + $resultTool['monthlyPcQcCnt']);
 
         return true;
+    }
+
+    /**
+     * 키워드 검색광고 데이터 수집
+     * 무제한
+     * 연관 키워드 수집
+     */
+    public function requestKeywordSearchAdAll(RestApi $api)
+    {
+        if (empty($this->data['keyword'])) {
+            $this->setCode(400);
+            return false;
+        }
+
+        if (empty($api)) {
+            $this->setCode(203);
+            return false;
+        }
+
+        // 키워드광고 api
+        $keywordstool = $api->GET("https://api.naver.com/keywordstool", array(
+            'hintKeywords' => $this->data['keyword'],
+            'showDetail' => 1
+        ));
+
+        if (empty($keywordstool) || empty($keywordstool['keywordList']) || empty($keywordstool['keywordList'][0])) {
+
+            if (!empty($keywordstool['code'])) {
+                $this->setCode($keywordstool['code']);
+                return false;
+            }
+
+            $this->setCode(204);
+            return false;
+        }
+
+        $keywordstoolFiltered = array();
+
+        foreach ($keywordstool['keywordList'] as $key => $value) {
+            if ($value['monthlyMobileQcCnt'] < 101 || $value['monthlyPcQcCnt'] < 101) continue;
+            $keywordstoolFiltered[] = $value['relKeyword'];
+        }
+
+        return $keywordstoolFiltered;        
     }
 
     /**

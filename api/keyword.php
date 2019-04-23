@@ -106,6 +106,7 @@ try {
         }
 
         $dbResult = $db->query("INSERT INTO keywords ({$dbName}) VALUES({$dbValues})", $resultForDb);
+        $result['id'] = $db->lastInsertId();
     }
 
     $db->CloseConnection();
