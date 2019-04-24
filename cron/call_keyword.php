@@ -6,31 +6,97 @@ ini_set('memory_limit', '-1');
 $accountDb = parse_ini_file("../config/db.ini");
 
 require_once '../class/pdo.php';
+require_once '../class/category.php';
 require_once '../class/curl_async.php';
 
+$queryWheres = $queryParams = array();          
+
+/**
+ * 제외 카테고리 설정
+ */
+$category = new Category();
 $curlAsync = new CurlAsync();
 $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
+$exceptCategory = array('50007053', '50007054', '50007057', '50007057', '9999');
+$exceptCategoryAll = array();
+
+foreach ($exceptCategory as $value) {
+    $exceptCategoryAll = array_merge($exceptCategoryAll, $category->getAllChildCategoriesById($value));
+}
+
+$queryWheres[] = "category NOT IN (:category)";
+$queryParams['category'] = implode(',', $exceptCategoryAll);
+
+// echo '<pre>';
+// print_r($exceptCategoryAll);
+// echo '</pre>';
+// exit();
+
+/**
+ * 제외키워드 제외
+ */
+$queryWheres[] = "ignored = :ignored";
+$queryParams['ignored'] = 0;
+
+/**
+ * 경쟁률 1 이하
+ */
+$queryWheres[] = "raceIndex < :raceIndex";
+$queryParams['raceIndex'] = 1;
+
+/**
+ * 500개 제한
+ */
+$queryParams['limit'] = 500;
+
+/**
+ * 쿼리 정리
+ */
+if (!empty($queryWheres)) {
+    $queryWheres = implode(' AND ', $queryWheres);                        
+} else {
+    $queryWheres = '';
+}
+
 // DB 조회
-$keywords = $db->column("SELECT keyword FROM keywords WHERE trends is null AND raceIndex > 0 AND monthlyQcCnt > 500 ORDER BY raceIndex ASC LIMIT 1000");
+$keywords = $db->query("SELECT keyword, modDate, raceIndex FROM keywords WHERE {$queryWheres} ORDER BY modDate ASC, raceIndex ASC LIMIT :limit", $queryParams);
+
+// echo '<pre>';
+// print_r($keywords);
+// echo '</pre>';
+// exit();
 
 if (!empty($keywords)) {
     echo sizeof($keywords).'개 키워드 수집 시작'.PHP_EOL;
 
     foreach (array_chunk($keywords, 5) as $keywordChunk) {
-        foreach ($keywordChunk as $keyword) {
-            $curlAsync->$keyword(array(
-                //'url' => 'http://localhost/api/keyword.php',
-                'url' => 'https://ppomzipsa.com/api/keyword.php',
+        foreach ($keywordChunk as $keyword) {    
+            $id = $keyword['keyword']; 
+            $curlAsync->$id(array(
+                'url' => 'http://localhost/api/keyword.php',
+                // 'url' => 'https://ppomzipsa.com/api/keyword.php',
                 'post' => array(
-                    'keyword' => $keyword,                    
+                    'keyword' => $id,
                 )
             ));
         }
 
         foreach ($keywordChunk as $keyword) {
-            echo $keyword.PHP_EOL;
-            echo $curlAsync->$keyword().PHP_EOL;
+            $id = $keyword['keyword']; 
+            $collectResultJSON = $curlAsync->$id();
+            // $collectResult = json_decode($collectResultJSON, true);            
+
+            // $changeRaceIndex = $keyword['raceIndex'] - $collectResult['raceIndex'];
+
+            // echo '<pre>';
+            // print_r($keyword);
+            // print_r($collectResult);
+            // echo '</pre>';
+            // exit();
+
+            echo $id.PHP_EOL;
+            echo $collectResultJSON.PHP_EOL;
         }
 
         sleep(1);

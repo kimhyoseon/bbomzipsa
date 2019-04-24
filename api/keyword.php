@@ -78,15 +78,21 @@ try {
 
     // 업데이트
     if (!empty($row) && !empty($row['id'])) {
+        // raceIndex 증감량
+        if ($row['raceIndex'] > 0) {
+            $resultForDb['raceIndexChange'] = $row['raceIndex'] - $resultForDb['raceIndex'];
+            $result['raceIndexChange'] = $resultForDb['raceIndexChange'];
+        }
+
         $dbUpdate = array_map(function ($key) {
             return $key.' = :'.$key;
         }, array_keys($resultForDb, true));
         $dbUpdate = implode(', ', $dbUpdate);
 
-        if (DEBUG == true) {
+        if (DEBUG == true) {            
             print_r('[Keyword updated]');
             print_r("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}");
-            print_r($result);
+            print_r($resultForDb);
         }
 
         $dbResult = $db->query("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}", $resultForDb);
