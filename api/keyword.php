@@ -37,6 +37,15 @@ try {
     $row = $db->row("SELECT * FROM keywords WHERE keyword=?", array(KEYWORD));
     $oNaverShopping->setData($row);
 
+    // 상세보기 여부
+    if (!empty($row)) {
+        $hasDetail = $db->row("SELECT * FROM keywords_rel WHERE keywords_id=? LIMIT 1", array($row['id']));
+
+        if (!empty($hasDetail)) $oNaverShopping->setData(array(
+            'hasDetail' => 1
+        ));
+    }
+
     if (!$oNaverShopping->needUpdate()) {
         echo json_encode($oNaverShopping->getData());
         $db->CloseConnection();
@@ -71,31 +80,35 @@ try {
                 print_r($relKeyword);
             }
         }
-    }
+    }    
 
     $result['modDate'] = date('Y-m-d H:i:s');
     $resultForDb = array_filter($result);
+    unset($resultForDb['hasDetail']);
 
     // 업데이트
     if (!empty($row) && !empty($row['id'])) {
         // raceIndex 증감량
         if ($row['raceIndex'] > 0) {
-            $resultForDb['raceIndexChange'] = $row['raceIndex'] - $resultForDb['raceIndex'];
-            $result['raceIndexChange'] = $resultForDb['raceIndexChange'];
+            $raceIndexChange = $row['raceIndex'] - $resultForDb['raceIndex'];
+            if ($raceIndexChange != 0) {
+                $resultForDb['raceIndexChange'] = $row['raceIndex'] - $resultForDb['raceIndex'];
+                $result['raceIndexChange'] = $resultForDb['raceIndexChange'];
+            }            
         }
 
         $dbUpdate = array_map(function ($key) {
             return $key.' = :'.$key;
-        }, array_keys($resultForDb, true));
-        $dbUpdate = implode(', ', $dbUpdate);
+        }, array_keys($resultForDb, true));        
+        $dbUpdate = implode(', ', $dbUpdate);        
 
         if (DEBUG == true) {            
             print_r('[Keyword updated]');
-            print_r("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}");
-            print_r($resultForDb);
+            print_r("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}");            
+            print_r($resultForDb);                        
         }
 
-        $dbResult = $db->query("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}", $resultForDb);
+        $dbResult = $db->query("UPDATE keywords SET {$dbUpdate} WHERE id = {$row['id']}", $resultForDb);        
     // 새로 추가
     } else {
         $dbName = array_keys($resultForDb, true);

@@ -7,8 +7,8 @@ class SearchForm extends React.Component {
       super();
 
       this.state = {
-        //urlApi: "//localhost/api",
-        urlApi: "//ppomzipsa.com/api",
+        urlApi: "//localhost/api",
+        //urlApi: "//ppomzipsa.com/api",
         page: 1,
         isSearching: false,
         keywords: [],
@@ -16,7 +16,8 @@ class SearchForm extends React.Component {
         relkeyword: null,
         modeSearch: null,
         category: [categoryData.categoryDepthText[0]],
-        categoryId: 0
+        categoryId: 0,
+        detailId: null
       };
 
       this.handleSubmit = this.handleSubmit.bind(this);
@@ -89,7 +90,7 @@ class SearchForm extends React.Component {
             return false;
           }
 
-          console.log(result);
+          // console.log(result);
 
           this.state.items.push(result);
           this.state.keywords.push(keyword);
@@ -134,7 +135,8 @@ class SearchForm extends React.Component {
       this.state.items = [];
       this.state.page = 1;
       this.state.relkeyword = null;
-      this.state.modeSearch = 'c';
+      this.state.detailId = null;
+      this.state.modeSearch = 'c';      
       this.setState(this.state);
 
       this.search();
@@ -157,6 +159,8 @@ class SearchForm extends React.Component {
         url: this.state.urlApi + '/list.php',
         data: {
           page: this.state.page,
+          mode: this.state.modeSearch,
+          detailId: this.state.detailId,
           category: categories
         },
         success: $.proxy(function (result, textStatus) {
@@ -256,7 +260,7 @@ class SearchForm extends React.Component {
             </form>
           </div>
           <div>
-            <SearchResult result={this.state} submit={this.handleSubmit.bind(this)}/>
+            <SearchResult search={this.search.bind(this)} result={this.state} submit={this.handleSubmit.bind(this)}/>
           </div>
         </div>
       );

@@ -18,12 +18,7 @@ $category = new Category();
 $curlAsync = new CurlAsync();
 $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
-$exceptCategory = array('50007053', '50007054', '50007057', '50007057', '9999');
-$exceptCategoryAll = array();
-
-foreach ($exceptCategory as $value) {
-    $exceptCategoryAll = array_merge($exceptCategoryAll, $category->getAllChildCategoriesById($value));
-}
+$exceptCategoryAll = $category->getExceptCategories();
 
 $queryWheres[] = "category NOT IN (:category)";
 $queryParams['category'] = implode(',', $exceptCategoryAll);

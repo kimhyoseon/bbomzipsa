@@ -66,7 +66,7 @@ class NaverShopping
     public function getData()
     {
         return $this->data;
-    }
+    }    
 
     private function setCode($code)
     {

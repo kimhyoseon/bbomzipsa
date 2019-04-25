@@ -12,16 +12,21 @@ class SearchResult extends React.Component {
     this.state = {
       openResult: false,
       isSearching: false,
+      selectedKeywords: []      
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.openResult = this.openResult.bind(this);
     this.link1688 = this.link1688.bind(this);
+    this.selectKeyword = this.selectKeyword.bind(this);
+    this.handleSubmitIgnore = this.handleSubmitIgnore.bind(this);    
+    this.searchKeywordDetail = this.searchKeywordDetail.bind(this);        
 	}
 
 	keywordRow() {
 		const listItems = this.props.result.items.map((item) => {
       let ttipPrice = '최저:' + this.numberWithCommas(item.lowPrice) + '원, 최대:'+ this.numberWithCommas(item.highPrice) + '원';
+      let ttipRaceIndex = '증감:' + item.raceIndexChange;
       let ttipSaleIndex = '평균구매수:' + this.numberWithCommas(item.avgSell) + '건, 평균리뷰수:'+ this.numberWithCommas(item.avgReview) + '건, 평균매출액:'+ this.numberWithCommas(item.avgSellPrice) + '원';
       let hotKeyword = ''
       if (item.hotKeywords) {
@@ -69,6 +74,8 @@ class SearchResult extends React.Component {
         else if (item.season == 4) return (<span className="box-etc float-left"><span className="badge badge-secondary winter">겨울</span></span>)
       }();
 
+      const detail = (item.hasDetail != 1) ? '' : (<span className="box-etc float-left"><button onClick={() => this.searchKeywordDetail(item.id)} className="btn badge badge-secondary winter">연관키워드</button></span>);
+
       let category = ''
       if (item.categoryTexts) {
         category = item.categoryTexts.split(',').map((category, i) => {
@@ -85,10 +92,15 @@ class SearchResult extends React.Component {
       return (
         <tr key={item.keyword}>
         <td className="align-middle text-center" data-toggle="tooltip" data-placement="right" title={trendsText}><span className="fa"><svg className="chart-mini"><polyline  fill="none" stroke="#00c73c" strokeWidth="1" points={trendsGraph} /></svg></span></td>
-        <td className="align-middle text-center">{item.keyword}</td>
+        <td className="align-middle text-center">
+          <label>
+            {item.keyword}
+            <input type="checkbox" name="id[]" value={item.id} onClick={this.selectKeyword}/>
+          </label>
+        </td>
         <td className="align-middle text-right">{this.numberWithCommas(item.totalItems)}개</td>
         <td className="align-middle text-right">{this.numberWithCommas(item.monthlyQcCnt)}건</td>
-        <td className="align-middle text-right">{this.numberWithCommas(item.raceIndex)}<i className={raceBattery}></i></td>
+        <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={ttipRaceIndex}>{this.numberWithCommas(item.raceIndex)}<i className={raceBattery}></i></td>
         <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={ttipSaleIndex}>{this.numberWithCommas(item.saleIndex)}<i className={saleBattery}></i></td>
         <td className={"align-middle text-right" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={ttipPrice}>{this.numberWithCommas(item.avgPrice)}원</td>
         <td className={"align-middle" + this.getOpenResultClass()} ><small>{category}</small></td>
@@ -99,6 +111,7 @@ class SearchResult extends React.Component {
           <span className="box-etc float-left"><a href="#" title="1688 바로가기" data-keyword={item.keyword} onClick={this.link1688}><img src={icon1688} width="20" height="20" className="d-inline-block align-middle"/></a></span>
           {device}
           {season}
+          {detail}
         </td>
 			</tr>);
       }
@@ -153,6 +166,81 @@ class SearchResult extends React.Component {
 
   getOpenResultClass() {
      return (!this.state.openResult) ? " d-none d-sm-block" : ""
+  }
+
+  selectKeyword() {
+    var selectedIds = [];
+    $('input[name="id[]"]:checked').each(function(){
+      selectedIds.push($(this).val());
+    });
+
+    this.state.selectedKeywords = selectedIds;    
+    this.setState(this.state);
+  }
+
+  extraFunc() {
+    if (this.state.selectedKeywords.length == 0) return false;
+    
+		return (
+      <div>        
+        <nav aria-label="breadcrumb">
+          <ol className="breadcrumb">
+            <li key="ignore" className="breadcrumb-item">
+              <button onClick={this.handleSubmitIgnore} className="btn btn-warning">{this.state.selectedKeywords.length}개 키워드 제외하기</button>
+            </li>
+          </ol>
+        </nav>
+      </div>
+		);
+  }
+
+  handleSubmitIgnore() {            
+    if (this.state.selectedKeywords.length == 0) {
+      Layer.toast('키워드를 선택해주세요.');            
+      return false;
+    }    
+
+    $('#btn-search-submit, .btn-search-categoty').addClass('disabled');
+
+    $.ajax({
+      type: "POST",
+      url: this.props.result.urlApi + '/ignore.php',
+      data: {
+        ids: this.state.selectedKeywords
+      },
+      success: $.proxy(function (result, textStatus) {
+        if (!result || textStatus != 'success') {
+          Layer.toast(textStatus);
+          return false;
+        }
+
+        // console.log(result);
+        
+        for (let index = 0; index < this.state.selectedKeywords.length; index++) {          
+          $('input[name="id[]"][value=' + this.state.selectedKeywords[index] + ']').closest('tr').hide();
+        }        
+
+        this.state.selectedKeywords = [];
+        this.setState(this.state);
+      }, this),
+      error: $.proxy(function(result, textStatus, jqXHR) {
+        Layer.toast('통신 오류입니다. 잠시 후 다시 시도해주세요.');
+      }, this),
+      complete: $.proxy(function() {
+        $('#btn-search-submit, .btn-search-categoty').removeClass('disabled');        
+      }, this)
+    });
+  }
+
+  searchKeywordDetail(id) {
+    if (!id) return false;
+
+    this.props.result.page = 1;
+    this.props.result.relkeyword = null;
+    this.props.result.modeSearch = 'd';    
+    this.props.result.detailId = id;    
+    
+    this.props.search();
   }
 
   relKeywordList() {
@@ -227,6 +315,9 @@ class SearchResult extends React.Component {
 	render() {
 		return (
       <div>
+        <div className="extra-func">
+          {this.extraFunc()}
+        </div>
         <div className="rel-keywords-list">
           {this.relKeywordList()}
         </div>
