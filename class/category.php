@@ -2,7 +2,7 @@
 class Category
 {
   public $categoryData;
-  private $exceptParentCategories = array('50007053', '50007054', '50007057', '50007057', '50007061', '50007058', '9999');
+  private $exceptParentCategories = array('50007053', '50007054', '50007057', '50007061', '50007058', '50007059', '9999');
 
 	public function __construct()
 	{
