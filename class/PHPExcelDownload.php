@@ -290,6 +290,9 @@ class PHPExcelDownload {
                         if ($filterIndexReverse[$k] == '수량') {      
                             $_v = $v.'개';
                             $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' '.$_v;
+                            
+                            // 택배박스는 무조건 1개로..
+                            $v = 1;
                         }
 
                         $row[array_search($filterIndexReverse[$k], array_keys($filterMerged))] = $v;
