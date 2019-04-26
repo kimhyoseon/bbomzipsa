@@ -69,8 +69,8 @@ if (!empty($keywords)) {
         foreach ($keywordChunk as $keyword) {    
             $id = $keyword['keyword']; 
             $curlAsync->$id(array(
-                'url' => 'http://localhost/api/keyword.php',
-                // 'url' => 'https://ppomzipsa.com/api/keyword.php',
+                //'url' => 'http://localhost/api/keyword.php',
+                'url' => 'https://ppomzipsa.com/api/keyword.php',
                 'post' => array(
                     'keyword' => $id,
                 )
