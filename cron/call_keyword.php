@@ -21,7 +21,7 @@ $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER']
 $exceptCategoryAll = $category->getExceptCategories();
 
 $queryWheres[] = "category NOT IN (:category)";
-$queryParams['category'] = implode(',', $exceptCategoryAll);
+$queryParams['category'] = $exceptCategoryAll;
 
 // echo '<pre>';
 // print_r($exceptCategoryAll);
