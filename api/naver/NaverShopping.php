@@ -37,6 +37,7 @@ class NaverShopping
         'season' => 0,
         'seasonMonth' => 0,
         'modDate' => null,
+        'ignored' => 0,
     );
 
     function __construct() {
@@ -320,8 +321,9 @@ class NaverShopping
         }
 
         $this->data['totalItems'] = filter_var(trim($nodeTotalItems[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
-        $this->data['raceIndex'] = @round($this->data['totalItems'] / $this->data['monthlyQcCnt'], 4);
-        if (is_infinite($this->data['raceIndex'])) 
+        $this->data['raceIndex'] = @round($this->data['totalItems'] / $this->data['monthlyQcCnt'], 4);        
+
+        if ($this->data['raceIndex'] > 10) $this->data['ignored'] = 1;
 
         $nodeRelKeywords = $xPath->query("//div[@class='co_relation_srh']/ul/li/a");
 
