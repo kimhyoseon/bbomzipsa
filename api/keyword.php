@@ -66,7 +66,7 @@ try {
 
     // 쇼핑연관 키워드 수집
     if (!empty($result['relKeywords'])) {
-        $relKeywords = explode(',', $result['relKeywords']);
+        $relKeywords = $result['relKeywords'];
 
         $keywordsExist = $db->column("SELECT keyword FROM keywords WHERE keyword IN (:keywords)", array('keywords' => $relKeywords));
 
