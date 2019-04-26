@@ -136,7 +136,7 @@ class NaverShopping
         $this->data['monthlyAvePcClkCnt'] = @ceil($resultTool['monthlyAvePcClkCnt']);
         $this->data['monthlyMobileQcCnt'] = @filter_var($resultTool['monthlyMobileQcCnt'], FILTER_SANITIZE_NUMBER_INT);
         $this->data['monthlyPcQcCnt'] = @filter_var($resultTool['monthlyPcQcCnt'], FILTER_SANITIZE_NUMBER_INT);
-        $this->data['monthlyQcCnt'] = @ceil($resultTool['monthlyMobileQcCnt'] + $resultTool['monthlyPcQcCnt']);
+        $this->data['monthlyQcCnt'] = @ceil($this->data['monthlyMobileQcCnt'] + $this->data['monthlyPcQcCnt']);
 
         return true;
     }
@@ -321,6 +321,7 @@ class NaverShopping
 
         $this->data['totalItems'] = filter_var(trim($nodeTotalItems[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
         $this->data['raceIndex'] = @round($this->data['totalItems'] / $this->data['monthlyQcCnt'], 4);
+        if (is_infinite($this->data['raceIndex'])) 
 
         $nodeRelKeywords = $xPath->query("//div[@class='co_relation_srh']/ul/li/a");
 
