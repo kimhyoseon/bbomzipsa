@@ -13,6 +13,7 @@ class SearchForm extends React.Component {
         isSearching: false,
         keywords: [],
         items: [],
+        itemsIds: [],
         relkeyword: null,
         modeSearch: null,
         category: [categoryData.categoryDepthText[0]],
@@ -65,6 +66,7 @@ class SearchForm extends React.Component {
 
       if (this.state.modeSearch == 'c') {
         this.state.items = [];
+        this.state.itemsIds = [];
         this.state.page = 1;
         this.state.modeSearch = null;
         this.state.category = [categoryData.categoryDepthText[0]];
@@ -90,9 +92,10 @@ class SearchForm extends React.Component {
             return false;
           }
 
-          // console.log(result);
+          // console.log(result);         
 
           this.state.items.push(result);
+          this.state.itemsIds.push(result.id);
           this.state.keywords.push(keyword);
           if (result.relKeywords) this.state.relkeyword = result.relKeywords.split(',');
 
@@ -133,6 +136,7 @@ class SearchForm extends React.Component {
       if (event) event.preventDefault();
 
       this.state.items = [];
+      this.state.itemsIds = [];
       this.state.page = 1;
       this.state.relkeyword = null;
       this.state.detailId = null;
@@ -169,10 +173,11 @@ class SearchForm extends React.Component {
             return false;
           }
 
-          console.log(result);
+          // console.log(result);
 
           for (let i = 0; i < result.length; i++) {
             this.state.items.push(result[i]);
+            this.state.itemsIds.push(result[i].id);
           }
 
           this.state.page++;

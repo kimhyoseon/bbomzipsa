@@ -11,8 +11,7 @@ class SearchResult extends React.Component {
 
     this.state = {
       openResult: false,
-      isSearching: false,
-      selectedKeywords: []      
+      isSearching: false,      
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -87,7 +86,7 @@ class SearchResult extends React.Component {
       let linkNaverShopping = (!mobileCheck) ?'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=' + item.keyword : 'https://msearch.shopping.naver.com/search/all?frm=NVSHSRC&cat_id=&pb=true&mall=&query=' + item.keyword;
       let linkGoogleSearch = 'http://www.google.com/search?q=' + item.keyword + '+위탁+사입+도매';
 
-      this.tableSort.refresh();
+      this.tableSort.refresh();      
 
       return (
         <tr key={item.keyword}>
@@ -95,7 +94,7 @@ class SearchResult extends React.Component {
         <td className="align-middle text-center">
           <label>
             {item.keyword}
-            <input type="checkbox" name="id[]" value={item.id} onClick={this.selectKeyword}/>
+            <input type="checkbox" name="id[]" value={item.id} onChange={() => this.selectKeyword(item.id)} defaultChecked={true} />
           </label>
         </td>
         <td className="align-middle text-right">{this.numberWithCommas(item.totalItems)}개</td>
@@ -115,12 +114,12 @@ class SearchResult extends React.Component {
         </td>
 			</tr>);
       }
-    );
+    );      
 
 		return (
 			<tbody>{listItems}</tbody>
 		);
-  }
+  }  
 
   link1688(event) {
     event.preventDefault();
@@ -141,7 +140,7 @@ class SearchResult extends React.Component {
         keyword: keyword
       },
       success: $.proxy(function (result, textStatus) {
-        console.log(result);
+        // console.log(result);
 
         if (!result || textStatus != 'success') {
           Layer.toast(textStatus);
@@ -166,27 +165,27 @@ class SearchResult extends React.Component {
 
   getOpenResultClass() {
      return (!this.state.openResult) ? " d-none d-sm-block" : ""
-  }
+  }  
 
-  selectKeyword() {
-    var selectedIds = [];
-    $('input[name="id[]"]:checked').each(function(){
-      selectedIds.push($(this).val());
-    });
-
-    this.state.selectedKeywords = selectedIds;    
-    this.setState(this.state);
+  selectKeyword(id) {       
+    var index = this.props.result.itemsIds.indexOf(id);    
+    if (index !== -1) {
+      this.props.result.itemsIds.splice(index, 1);
+    } else {
+      this.props.result.itemsIds.push(id);
+    }    
+    this.setState(this.state);    
   }
 
   extraFunc() {
-    if (this.state.selectedKeywords.length == 0) return false;
+    if (this.props.result.itemsIds.length == 0) return false;
     
 		return (
       <div>        
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb">
             <li key="ignore" className="breadcrumb-item">
-              <button onClick={this.handleSubmitIgnore} className="btn btn-warning">{this.state.selectedKeywords.length}개 키워드 제외하기</button>
+              <button onClick={this.handleSubmitIgnore} className="btn btn-warning">{this.props.result.itemsIds.length}개 키워드 제외하기</button>
             </li>
           </ol>
         </nav>
@@ -195,7 +194,7 @@ class SearchResult extends React.Component {
   }
 
   handleSubmitIgnore() {            
-    if (this.state.selectedKeywords.length == 0) {
+    if (this.props.result.itemsIds.length == 0) {
       Layer.toast('키워드를 선택해주세요.');            
       return false;
     }    
@@ -206,7 +205,7 @@ class SearchResult extends React.Component {
       type: "POST",
       url: this.props.result.urlApi + '/ignore.php',
       data: {
-        ids: this.state.selectedKeywords
+        ids: this.props.result.itemsIds
       },
       success: $.proxy(function (result, textStatus) {
         if (!result || textStatus != 'success') {
@@ -216,11 +215,11 @@ class SearchResult extends React.Component {
 
         // console.log(result);
         
-        for (let index = 0; index < this.state.selectedKeywords.length; index++) {          
-          $('input[name="id[]"][value=' + this.state.selectedKeywords[index] + ']').closest('tr').hide();
+        for (let index = 0; index < this.props.result.itemsIds.length; index++) {          
+          $('input[name="id[]"][value=' + this.props.result.itemsIds[index] + ']').closest('tr').hide();
         }        
 
-        this.state.selectedKeywords = [];
+        this.props.result.itemsIds = [];
         this.setState(this.state);
       }, this),
       error: $.proxy(function(result, textStatus, jqXHR) {
