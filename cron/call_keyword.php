@@ -70,7 +70,7 @@ if (!empty($keywords)) {
             $id = $keyword['keyword']; 
             $curlAsync->$id(array(
                 //'url' => 'http://localhost/api/keyword.php',
-                'url' => 'https://ppomzipsa.com/api/keyword.php',
+                'url' => 'http://ppomzipsa.com/api/keyword.php',
                 'post' => array(
                     'keyword' => $id,
                 )
