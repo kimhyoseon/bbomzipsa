@@ -68,7 +68,7 @@ try {
     if (!empty($result['relKeywords'])) {
         $relKeywords = explode(',', $result['relKeywords']);
 
-        $keywordsExist = $db->column("SELECT keyword FROM keywords WHERE keyword IN (:keywords)", array('keywords' => $result['relKeywords']));
+        $keywordsExist = $db->column("SELECT keyword FROM keywords WHERE keyword IN (:keywords)", array('keywords' => $relKeywords));
 
         foreach ($relKeywords as $relKeyword) {
             if (empty($relKeyword)) continue;
