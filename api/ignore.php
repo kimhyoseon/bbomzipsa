@@ -1,15 +1,16 @@
 <?php
-try {            
+try {       
     ini_set('memory_limit', '-1');
     ini_set("display_errors", 1);
     ini_set("default_socket_timeout", 30);
     header("Access-Control-Allow-Origin: *");
-    header('Content-Type: application/json');        
+    header('Content-Type: application/json');            
     
     define('DEBUG', filter_input(INPUT_GET, 'debug'));
     define('IDS', filter_input(INPUT_POST, 'ids', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY));        
+    define('IDS_CARED', filter_input(INPUT_POST, 'idsCared', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY));                          
 
-    if (!IDS) throw new Exception(null, 400);
+    if (!IDS) throw new Exception(null, 400);    
 
     $accountDb = parse_ini_file("../config/db.ini");
 
@@ -17,23 +18,46 @@ try {
     $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
     $queryWheres = array();
-    $queryParams = array();
+    $queryParams = array();    
     
     if (!empty(IDS)) {
         $queryWheres[] = "id IN (:id)";        
         $queryParams['id'] = IDS;
     }     
 
+    $queryWheres[] = "ignored != 1";
+
     if (!empty($queryWheres)) {
         $queryWheres = implode(' AND ', $queryWheres);        
     } else {
         $queryWheres = '';
-    }    
+    }            
 
     // DB 갱신
-    $dbResult = $db->query("UPDATE keywords SET ignored=1 WHERE {$queryWheres}", $queryParams);    
+    $dbResult = $db->query("UPDATE keywords SET ignored=1 WHERE {$queryWheres}", $queryParams);            
 
-    if ($dbResult != true) throw new Exception(null, 204);
+    // if ($dbResult != true) throw new Exception(null, 204);    
+
+    if (!empty(IDS_CARED)) {        
+        $queryWheres = array();
+        $queryParams = array();
+        
+        $queryWheres[] = "id IN (:id)";        
+        $queryParams['id'] = IDS_CARED;
+
+        $queryWheres[] = "ignored != 2";                
+
+        if (!empty($queryWheres)) {
+            $queryWheres = implode(' AND ', $queryWheres);        
+        } else {
+            $queryWheres = '';
+        }    
+
+        // DB 갱신
+        $dbResult = $db->query("UPDATE keywords SET ignored=2 WHERE {$queryWheres}", $queryParams);    
+
+        // if ($dbResult != true) throw new Exception(null, 204);
+    }    
 
     $db->CloseConnection();
     

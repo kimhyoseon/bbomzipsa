@@ -31,19 +31,19 @@ $queryParams['category'] = $exceptCategoryAll;
 /**
  * 제외키워드 제외
  */
-$queryWheres[] = "ignored = :ignored";
-$queryParams['ignored'] = 0;
+$queryWheres[] = "ignored != :ignored";
+$queryParams['ignored'] = 1;
 
 /**
  * 경쟁률 1 이하
  */
 $queryWheres[] = "raceIndex < :raceIndex";
-$queryParams['raceIndex'] = 1;
+$queryParams['raceIndex'] = 2;
 
 /**
  * 500개 제한
  */
-$queryParams['limit'] = 500;
+$queryParams['limit'] = 1000;
 
 /**
  * 쿼리 정리

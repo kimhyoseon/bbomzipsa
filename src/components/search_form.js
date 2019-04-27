@@ -7,8 +7,8 @@ class SearchForm extends React.Component {
       super();
 
       this.state = {
-        //urlApi: "//localhost/api",
-        urlApi: "//ppomzipsa.com/api",
+        urlApi: "//localhost/api",
+        //urlApi: "//ppomzipsa.com/api",
         page: 1,
         isSearching: false,
         keywords: [],
@@ -24,15 +24,16 @@ class SearchForm extends React.Component {
       this.handleSubmit = this.handleSubmit.bind(this);
       this.searchCategory = this.searchCategory.bind(this);
       this.changeCategory = this.changeCategory.bind(this);
-      this.trackScrolling = this.trackScrolling.bind(this);
+      this.requestListMore = this.requestListMore.bind(this);
+      // this.trackScrolling = this.trackScrolling.bind(this);
     }
 
     componentDidMount() {
-      document.addEventListener('scroll', this.trackScrolling);
+      // document.addEventListener('scroll', this.trackScrolling);
     }
 
     componentWillUnmount() {
-      document.removeEventListener('scroll', this.trackScrolling);
+      // document.removeEventListener('scroll', this.trackScrolling);
     }
 
     trackScrolling() {
@@ -95,7 +96,7 @@ class SearchForm extends React.Component {
           // console.log(result);         
 
           this.state.items.push(result);
-          this.state.itemsIds.push(result.id);
+          if (result.ignored != 2) this.state.itemsIds.push(result.id);          
           this.state.keywords.push(keyword);
           if (result.relKeywords) this.state.relkeyword = result.relKeywords.split(',');
 
@@ -177,7 +178,10 @@ class SearchForm extends React.Component {
 
           for (let i = 0; i < result.length; i++) {
             this.state.items.push(result[i]);
-            this.state.itemsIds.push(result[i].id);
+
+            if (result[i].ignored != 2) {
+              this.state.itemsIds.push(result[i].id); 
+            }
           }
 
           this.state.page++;
@@ -231,6 +235,20 @@ class SearchForm extends React.Component {
       this.setState(this.state);
     }
 
+    btnMore() {
+      if (this.state.modeSearch != 'c') return false;
+      if (this.state.page < 2) return false;
+      
+      return (        
+        <button onClick={this.requestListMore} className="btn btn-secondary btn-lg btn-block">더보기</button>
+      )
+    }
+
+    requestListMore() {
+      Layer.toast('목록을 가져오는 중입니다. 잠시만 기다려 주세요.');
+      this.search();
+    }
+
     render() {
       return (
         <div>
@@ -266,6 +284,9 @@ class SearchForm extends React.Component {
           </div>
           <div>
             <SearchResult search={this.search.bind(this)} result={this.state} submit={this.handleSubmit.bind(this)}/>
+          </div>
+          <div>
+            {this.btnMore()}
           </div>
         </div>
       );

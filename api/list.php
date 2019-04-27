@@ -66,8 +66,8 @@ try {
     /**
      * ignore 키워드 제외
      */
-    $queryWheres[] = "ignored = :ignored";
-    $queryParams['ignored'] = 0;    
+    $queryWheres[] = "ignored != :ignored";
+    $queryParams['ignored'] = 1;    
 
     if (!empty($queryWheres)) {
         $queryWheres = implode(' AND ', $queryWheres);

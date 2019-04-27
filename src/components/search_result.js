@@ -86,6 +86,8 @@ class SearchResult extends React.Component {
       let linkNaverShopping = (!mobileCheck) ?'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=' + item.keyword : 'https://msearch.shopping.naver.com/search/all?frm=NVSHSRC&cat_id=&pb=true&mall=&query=' + item.keyword;
       let linkGoogleSearch = 'http://www.google.com/search?q=' + item.keyword + '+위탁+사입+도매';
 
+      let isDefualtIgnoreChecked = (item.ignored == 2) ? false : true;
+
       this.tableSort.refresh();      
 
       return (
@@ -94,7 +96,7 @@ class SearchResult extends React.Component {
         <td className="align-middle text-center">
           <label>
             {item.keyword}
-            <input type="checkbox" name="id[]" value={item.id} onChange={() => this.selectKeyword(item.id)} defaultChecked={true} />
+            <input type="checkbox" name="id[]" value={item.id} onChange={() => this.selectKeyword(item.id)} defaultChecked={isDefualtIgnoreChecked} />
           </label>
         </td>
         <td className="align-middle text-right">{this.numberWithCommas(item.totalItems)}개</td>
@@ -199,13 +201,22 @@ class SearchResult extends React.Component {
       return false;
     }    
 
+    var careIds = [];
+    $("input[name='id[]']:not(:checked)").each(function(){
+      careIds.push(parseInt($(this).val()));
+    });        
+
     $('#btn-search-submit, .btn-search-categoty').addClass('disabled');
+
+    // console.log(this.props.result.itemsIds);
+    // console.log(careIds);
 
     $.ajax({
       type: "POST",
       url: this.props.result.urlApi + '/ignore.php',
       data: {
-        ids: this.props.result.itemsIds
+        ids: this.props.result.itemsIds,
+        idsCared: careIds
       },
       success: $.proxy(function (result, textStatus) {
         if (!result || textStatus != 'success') {
