@@ -88,7 +88,7 @@ class SearchResult extends React.Component {
 
       let isDefualtIgnoreChecked = (item.ignored == 2) ? false : true;
 
-      this.tableSort.refresh();      
+      this.tableSort.refresh();     
 
       return (
         <tr key={item.keyword}>
@@ -100,7 +100,7 @@ class SearchResult extends React.Component {
           </label>
         </td>
         <td className="align-middle text-right">{this.numberWithCommas(item.totalItems)}개</td>
-        <td className="align-middle text-right">{this.numberWithCommas(item.monthlyQcCnt)}건</td>
+        <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={item.modDate}>{this.numberWithCommas(item.monthlyQcCnt)}건</td>
         <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={ttipRaceIndex}>{this.numberWithCommas(item.raceIndex)}<i className={raceBattery}></i></td>
         <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={ttipSaleIndex}>{this.numberWithCommas(item.saleIndex)}<i className={saleBattery}></i></td>
         <td className={"align-middle text-right" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={ttipPrice}>{this.numberWithCommas(item.avgPrice)}원</td>
