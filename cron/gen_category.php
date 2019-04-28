@@ -1,4 +1,7 @@
 <?php
+/**
+ * DB에 존재하는 카테고리를 사용할 수 있도록 json 파일로 생성
+ */
 ini_set("display_errors", 1);
 ini_set('max_execution_time', '0');
 ini_set('memory_limit', '-1');

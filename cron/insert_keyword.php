@@ -1,4 +1,7 @@
 <?php
+/**
+ * selenium으로 추출한 네이버 트렌드 쇼핑인사이트 BEST 500 키워드 추출 결과를 DB에 삽입 
+ */
 ini_set("display_errors", 1);
 ini_set('max_execution_time', '0');
 ini_set('memory_limit', '-1');

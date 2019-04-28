@@ -1,4 +1,7 @@
 <?php
+/**
+ * 한개의 키워드에서 연관된 모든 키워드를 묶어서 검색 (옵션에 연관키워드 버튼이 생김)
+ */
 try {
     ini_set("display_errors", 1);
     ini_set('max_execution_time', '0');
