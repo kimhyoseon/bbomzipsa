@@ -12,7 +12,7 @@ require_once '../class/pdo.php';
 
 $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
-$keywordsBest = file_get_contents('../config/naverkeyword.json');
+$keywordsBest = file_get_contents('../data/naverkeyword.json');
 $keywordsBest = json_decode($keywordsBest, true);
 
 $keywordsBest = array_unique($keywordsBest);
