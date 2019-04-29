@@ -16,6 +16,9 @@ try {
     if (DEBUG == true) define('DETAILID', filter_input(INPUT_GET, 'detailId'));
     else define('DETAILID', filter_input(INPUT_POST, 'detailId', FILTER_SANITIZE_NUMBER_INT));        
 
+    if (DEBUG == true) define('KEYWORD', filter_input(INPUT_GET, 'keyword'));
+    else define('KEYWORD', filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING));        
+
     if (!PAGE) throw new Exception(null, 400);    
 
     $accountDb = parse_ini_file("../config/db.ini");
@@ -36,7 +39,13 @@ try {
             $queryWheres[] = 'category IN (:category)';
             $queryParams['category'] = CATEGORY;
         /**
-         * 선택된 카테고리가 없는 경우 예외 카테고리 제외
+         * 키워드 검색인 경우
+         */
+        } else if (!empty(KEYWORD)) {
+            $queryWheres[] = "keyword LIKE :keyword";
+            $queryParams['keyword'] = '%'.KEYWORD.'%';        
+        /**
+         * 전체검색인 경우 예외 카테고리 제외
          */
         } else { 
             require_once '../class/category.php';
@@ -66,8 +75,8 @@ try {
     /**
      * ignore 키워드 제외
      */
-    $queryWheres[] = "ignored != :ignored";
-    $queryParams['ignored'] = 1;    
+    // $queryWheres[] = "ignored != :ignored";
+    // $queryParams['ignored'] = 1;    
 
     if (!empty($queryWheres)) {
         $queryWheres = implode(' AND ', $queryWheres);

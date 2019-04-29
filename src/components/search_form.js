@@ -7,8 +7,8 @@ class SearchForm extends React.Component {
       super();
 
       this.state = {
-        // urlApi: "//localhost/api",
-        urlApi: "//ppomzipsa.com/api",
+        urlApi: "//localhost/api",
+        // urlApi: "//ppomzipsa.com/api",
         page: 1,
         isSearching: false,
         keywords: [],
@@ -18,7 +18,8 @@ class SearchForm extends React.Component {
         modeSearch: null,
         category: [categoryData.categoryDepthText[0]],
         categoryId: 0,
-        detailId: null
+        detailId: null,
+        keyword: null
       };
 
       this.handleSubmit = this.handleSubmit.bind(this);
@@ -94,13 +95,20 @@ class SearchForm extends React.Component {
           }
 
           // console.log(result);         
-
-          this.state.items.push(result);
-          if (result.ignored != 2) this.state.itemsIds.push(result.id);          
+          
+          this.pushItems(result);
           this.state.keywords.push(keyword);
-          if (result.relKeywords) this.state.relkeyword = result.relKeywords.split(',');
+          if (result.relKeywords) this.state.relkeyword = result.relKeywords.split(',');          
 
+          // 유사 키워드 모두 가져오기
+          this.state.page = 1;
+          this.state.keyword = this.keywordInput.value;          
+          this.state.isSearching = false;
           this.setState(this.state);
+          
+          $('#btn-search-submit, .btn-search-categoty').removeClass('disabled');
+
+          this.search();
 
           this.keywordInput.value = '';
 
@@ -133,6 +141,29 @@ class SearchForm extends React.Component {
       return categories;
     }
 
+    pushItems(items) {
+      if (!items) return false;
+
+      if (items.keyword) {
+        for (let index = 0; index < this.state.items.length; index++) {
+          if (this.state.items[index].keyword == items.keyword) {
+            this.state.items[index] = items;
+            return true;
+          }
+        }
+
+        this.state.items.push(items);
+        
+        if (items.ignored != 2) {
+          this.state.itemsIds.push(items.id); 
+        }
+      } else {
+        for (let index = 0; index < items.length; index++) {          
+          this.pushItems(items[index]);
+        }
+      }       
+    }
+
     searchCategory(event) {
       if (event) event.preventDefault();
 
@@ -141,6 +172,7 @@ class SearchForm extends React.Component {
       this.state.page = 1;
       this.state.relkeyword = null;
       this.state.detailId = null;
+      this.state.keyword = null;
       this.state.modeSearch = 'c';      
       this.setState(this.state);
 
@@ -159,6 +191,14 @@ class SearchForm extends React.Component {
       // return false;
       $('#btn-search-submit, .btn-search-categoty').addClass('disabled');
 
+      console.log({
+        page: this.state.page,
+        mode: this.state.modeSearch,
+        detailId: this.state.detailId,
+        keyword: this.state.keyword,
+        category: categories
+      });
+
       $.ajax({
         type: "POST",
         url: this.state.urlApi + '/list.php',
@@ -166,23 +206,16 @@ class SearchForm extends React.Component {
           page: this.state.page,
           mode: this.state.modeSearch,
           detailId: this.state.detailId,
+          keyword: this.state.keyword,
           category: categories
         },
         success: $.proxy(function (result, textStatus) {
           if (!result || textStatus != 'success') {
             Layer.toast(textStatus);
             return false;
-          }
+          }          
 
-          // console.log(result);
-
-          for (let i = 0; i < result.length; i++) {
-            this.state.items.push(result[i]);
-
-            if (result[i].ignored != 2) {
-              this.state.itemsIds.push(result[i].id); 
-            }
-          }
+          this.pushItems(result);
 
           this.state.page++;
 
