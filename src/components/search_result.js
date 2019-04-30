@@ -52,10 +52,10 @@ class SearchResult extends React.Component {
       else if (item.raceIndex < 5) raceBattery = 'fas fa-battery-quarter';
 
       let saleBattery = 'fas fa-battery-empty';
-      if (item.saleIndex > 5000) saleBattery = 'fas fa-battery-full';
-      else if (item.saleIndex > 2000) saleBattery = 'fas fa-battery-three-quarters';
-      else if (item.saleIndex > 1000) saleBattery = 'fas fa-battery-half';
-      else if (item.saleIndex > 500) saleBattery = 'fas fa-battery-quarter';
+      if (item.saleIndex > 3000) saleBattery = 'fas fa-battery-full';
+      else if (item.saleIndex > 1000) saleBattery = 'fas fa-battery-three-quarters';
+      else if (item.saleIndex > 500) saleBattery = 'fas fa-battery-half';
+      else if (item.saleIndex > 300) saleBattery = 'fas fa-battery-quarter';
 
       const device  = function() {
         if (item.monthlyQcCnt == 0) return '';
@@ -102,7 +102,7 @@ class SearchResult extends React.Component {
         <td className="align-middle text-right">{this.numberWithCommas(item.totalItems)}개</td>
         <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={item.modDate}>{this.numberWithCommas(item.monthlyQcCnt)}건</td>
         <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={ttipRaceIndex}>{this.numberWithCommas(item.raceIndex)}<i className={raceBattery}></i></td>
-        <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={ttipSaleIndex}>{this.numberWithCommas(item.saleIndex)}<i className={saleBattery}></i></td>
+        <td className="align-middle text-right" data-toggle="tooltip" data-placement="right" title={ttipSaleIndex}>{this.numberWithCommas(item.highReview)}<i className={saleBattery}></i></td>
         <td className={"align-middle text-right" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={ttipPrice}>{this.numberWithCommas(item.avgPrice)}원</td>
         <td className={"align-middle" + this.getOpenResultClass()} ><small>{category}</small></td>
         <td className={"align-middle" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={item.hotKeywords}><small>{hotKeyword}</small></td>
