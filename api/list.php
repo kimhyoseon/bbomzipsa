@@ -53,7 +53,10 @@ try {
             $exceptCategoryAll = $category->getExceptCategories();
 
             $queryWheres[] = "category NOT IN (:category)";
-            $queryParams['category'] = $exceptCategoryAll;
+            $queryParams['category'] = $exceptCategoryAll;            
+
+            $queryWheres[] = "highReview > :highReview";
+            $queryParams['highReview'] = 100;
         }
     } else {
         define('PAGING', 9999);                
