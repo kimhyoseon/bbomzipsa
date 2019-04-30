@@ -52,10 +52,10 @@ class SearchResult extends React.Component {
       else if (item.raceIndex < 5) raceBattery = 'fas fa-battery-quarter';
 
       let saleBattery = 'fas fa-battery-empty';
-      if (item.saleIndex > 3000) saleBattery = 'fas fa-battery-full';
-      else if (item.saleIndex > 1000) saleBattery = 'fas fa-battery-three-quarters';
-      else if (item.saleIndex > 500) saleBattery = 'fas fa-battery-half';
-      else if (item.saleIndex > 300) saleBattery = 'fas fa-battery-quarter';
+      if (item.highReview > 3000) saleBattery = 'fas fa-battery-full';
+      else if (item.highReview > 1000) saleBattery = 'fas fa-battery-three-quarters';
+      else if (item.highReview > 500) saleBattery = 'fas fa-battery-half';
+      else if (item.highReview > 300) saleBattery = 'fas fa-battery-quarter';
 
       const device  = function() {
         if (item.monthlyQcCnt == 0) return '';
