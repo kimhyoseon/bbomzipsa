@@ -106,7 +106,7 @@ class SearchForm extends React.Component {
           this.state.isSearching = false;
           this.setState(this.state);
           
-          $('#btn-search-submit, .btn-search-categoty').removeClass('disabled');
+          // $('#btn-search-submit, .btn-search-categoty').removeClass('disabled');
 
           this.search();
 
@@ -147,7 +147,7 @@ class SearchForm extends React.Component {
       if (items.keyword) {
         for (let index = 0; index < this.state.items.length; index++) {
           if (this.state.items[index].keyword == items.keyword) {
-            this.state.items[index] = items;
+            //this.state.items[index] = items;
             return true;
           }
         }
