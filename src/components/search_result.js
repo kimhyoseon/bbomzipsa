@@ -74,6 +74,7 @@ class SearchResult extends React.Component {
       }();
 
       const detail = (item.hasDetail != 1) ? '' : (<span className="box-etc float-left"><button onClick={() => this.searchKeywordDetail(item.id)} className="btn badge badge-secondary winter">연관키워드</button></span>);
+      const mainShoppingSearch = (item.hasMainShoppingSearch != 1) ? '' : (<span className="box-etc float-left" data-toggle="tooltip" data-placement="right" title="네이버메인 쇼핑검색 키워드"><i className="fas fa-home"></i></span>);
 
       let category = ''
       if (item.categoryTexts) {
@@ -107,12 +108,13 @@ class SearchResult extends React.Component {
         <td className={"align-middle" + this.getOpenResultClass()} ><small>{category}</small></td>
         <td className={"align-middle" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={item.hotKeywords}><small>{hotKeyword}</small></td>
         <td className={"align-middle" + this.getOpenResultClass()}>
-          <span className="box-etc float-left"><a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={iconNaverShopping} width="20" height="20" className="d-inline-block align-middle"/></a></span>
-          <span className="box-etc float-left"><a href={linkGoogleSearch} target="_blank" title="구글검색 바로가기"><img src={iconGoogle} width="20" height="20" className="d-inline-block align-middle"/></a></span>
-          <span className="box-etc float-left"><a href="#" title="1688 바로가기" data-keyword={item.keyword} onClick={this.link1688}><img src={icon1688} width="20" height="20" className="d-inline-block align-middle"/></a></span>
+          {mainShoppingSearch}
+          {detail}
           {device}
           {season}
-          {detail}
+          <span className="box-etc float-left"><a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={iconNaverShopping} width="20" height="20" className="d-inline-block align-middle"/></a></span>
+          <span className="box-etc float-left"><a href={linkGoogleSearch} target="_blank" title="구글검색 바로가기"><img src={iconGoogle} width="20" height="20" className="d-inline-block align-middle"/></a></span>
+          <span className="box-etc float-left"><a href="#" title="1688 바로가기" data-keyword={item.keyword} onClick={this.link1688}><img src={icon1688} width="20" height="20" className="d-inline-block align-middle"/></a></span>                              
         </td>
 			</tr>);
       }

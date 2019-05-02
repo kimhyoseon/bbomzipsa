@@ -5,7 +5,8 @@
  */
 class NaverShopping
 {
-    const URL_NAVER_SHOPPING = 'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=';
+    const URL_NAVER_SHOPPING = 'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=';    
+    const URL_NAVER_MAIN = 'https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&query=';    
 
     private $code = 200;
 
@@ -38,6 +39,7 @@ class NaverShopping
         'seasonMonth' => 0,
         'modDate' => null,
         'ignored' => 0,
+        'hasMainShoppingSearch' => 0,
     );
 
     function __construct() {
@@ -296,8 +298,8 @@ class NaverShopping
             $this->setCode(400);
             return false;
         }
-
-        $xPath = $this->getXpath();
+        
+        $xPath = $this->getXpath(self::URL_NAVER_SHOPPING.$this->data['keyword']);
 
         if (!$xPath) {
             $this->setCode(400);
@@ -438,7 +440,18 @@ class NaverShopping
 
                 $this->data['hotKeywords'] = implode(',', $hotKeywordTexts);
             }
-        }
+        }   
+        
+        // 메인쇼핑검색 여부        
+        $xPathMain = $this->getXpath(self::URL_NAVER_MAIN.$this->data['keyword']);        
+
+        if ($xPathMain) {            
+            $nodeMainShopping = $xPathMain->query("//div[@class='dsc_ncaution2 _shopping_info_area']");                        
+
+            if ($nodeMainShopping->length > 0) {            
+                $this->data['hasMainShoppingSearch'] = 1;
+            }     
+        }                
 
         if ($this->debug) {
             print_r('[crawlingNaverShopping]');
@@ -455,14 +468,12 @@ class NaverShopping
         return true;
     }
 
-    private function getXpath()
+    private function getXpath($url)
     {
-        if (empty($this->data['keyword'])) {
+        if (empty($url)) {
             $this->setCode(400);
             return false;
-        }
-
-        $url = self::URL_NAVER_SHOPPING.$this->data['keyword'];
+        }        
 
         $ch = curl_init();
         $timeout = 5;
@@ -474,7 +485,7 @@ class NaverShopping
 
         $dom = new DOMDocument();
 
-        @$dom->loadHTML($html);
+        @$dom->loadHTML($html);        
 
         return new DOMXPath($dom);
     }
