@@ -20,6 +20,7 @@ class SearchResult extends React.Component {
     this.selectKeyword = this.selectKeyword.bind(this);
     this.handleSubmitIgnore = this.handleSubmitIgnore.bind(this);    
     this.searchKeywordDetail = this.searchKeywordDetail.bind(this);        
+    this.refreshItem = this.refreshItem.bind(this);        
 	}
 
 	keywordRow() {
@@ -75,6 +76,7 @@ class SearchResult extends React.Component {
 
       const detail = (item.hasDetail != 1) ? '' : (<span className="box-etc float-left"><button onClick={() => this.searchKeywordDetail(item.id)} className="btn badge badge-secondary winter">연관키워드</button></span>);
       const mainShoppingSearch = (item.hasMainShoppingSearch != 1) ? '' : (<span className="box-etc float-left" data-toggle="tooltip" data-placement="right" title="네이버메인 쇼핑검색 키워드"><i className="fas fa-home"></i></span>);
+      const refresh = (<span className="box-etc float-left"><a href="#" onClick={(e) => this.refreshItem(e, item.keyword)}><i className="fas fa-sync"></i></a></span>);
 
       let category = ''
       if (item.categoryTexts) {
@@ -112,6 +114,7 @@ class SearchResult extends React.Component {
           {detail}
           {device}
           {season}
+          {refresh}
           <span className="box-etc float-left"><a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={iconNaverShopping} width="20" height="20" className="d-inline-block align-middle"/></a></span>
           <span className="box-etc float-left"><a href={linkGoogleSearch} target="_blank" title="구글검색 바로가기"><img src={iconGoogle} width="20" height="20" className="d-inline-block align-middle"/></a></span>
           <span className="box-etc float-left"><a href="#" title="1688 바로가기" data-keyword={item.keyword} onClick={this.link1688}><img src={icon1688} width="20" height="20" className="d-inline-block align-middle"/></a></span>                              
@@ -253,6 +256,39 @@ class SearchResult extends React.Component {
     this.props.result.detailId = id;    
     
     this.props.search();
+  }
+
+  refreshItem(e, keyword) {
+    if (e) e.preventDefault();
+    if (!keyword) return false;        
+
+    $.ajax({
+      type: "POST",
+      url: this.props.result.urlApi + '/keyword.php',
+      data: {
+        keyword: keyword
+      },
+      success: $.proxy(function (result, textStatus) {
+        if (!result || textStatus != 'success') {
+          Layer.toast(textStatus);
+          return false;
+        }        
+
+        for (let index = 0; index < this.props.result.items.length; index++) {
+          if (this.props.result.items[index].keyword == result.keyword) {                        
+            this.props.result.items[index] = result;
+            this.setState(this.state);
+            return true;
+          }
+        }        
+      }, this),
+      error: $.proxy(function(result, textStatus, jqXHR) {
+        Layer.toast('통신 오류입니다. 잠시 후 다시 시도해주세요.');
+      }, this),
+      complete: $.proxy(function() {
+        $('#btn-search-submit, .btn-search-categoty').removeClass('disabled');        
+      }, this)
+    });
   }
 
   relKeywordList() {

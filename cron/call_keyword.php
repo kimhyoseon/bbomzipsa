@@ -76,6 +76,7 @@ if (!empty($keywords)) {
                 'url' => 'http://ppomzipsa.com/api/keyword.php',
                 'post' => array(
                     'keyword' => $id,
+                    'refresh' => 1,
                 )
             ));
         }

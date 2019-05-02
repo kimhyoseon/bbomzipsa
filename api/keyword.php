@@ -6,7 +6,8 @@ try {
     header("Access-Control-Allow-Origin: *");
     header('Content-Type: application/json');
 
-    define('DEBUG', filter_input(INPUT_GET, 'debug'));
+    define('DEBUG', filter_input(INPUT_GET, 'debug'));    
+    define('REFRESH', filter_input(INPUT_POST, 'refresh'));
 
     if (DEBUG == true) define('KEYWORD', (filter_input(INPUT_GET, 'keyword', FILTER_SANITIZE_STRING)));
     else define('KEYWORD', (filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING)));
@@ -15,7 +16,7 @@ try {
 
     if (!KEYWORD) {
         throw new Exception(null, 400);
-    }
+    }    
 
     // 계정
     $accountNaver = parse_ini_file("../config/naver.ini");
@@ -30,6 +31,7 @@ try {
     $oNaverShopping = new NaverShopping();
     $oNaverShopping->setKeyword(KEYWORD);
     $oNaverShopping->setDebug(DEBUG);
+    $oNaverShopping->setRefresh(REFRESH);
 
     $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 

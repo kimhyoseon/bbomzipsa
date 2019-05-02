@@ -11,6 +11,7 @@ class NaverShopping
     private $code = 200;
 
     private $debug = false;
+    private $refresh = false;
 
     private $data = array(        
         'keyword' => null, // 검색 키워드
@@ -48,6 +49,11 @@ class NaverShopping
     public function setDebug($bool)
     {
         $this->debug = $bool;
+    }
+
+    public function setRefresh($bool)
+    {
+        $this->refresh = $bool;
     }
 
     public function setKeyword($keyword)
@@ -88,6 +94,7 @@ class NaverShopping
     public function needUpdate()
     {
         if ($this->debug) return true;
+        if ($this->refresh) return true;
         if (empty($this->data['modDate'])) return true;
         if ($this->data['modDate'] < date('Y-m-d H:i:s', strtotime('-1 day'))) return true;
 
