@@ -2,11 +2,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-/*
-6228-2441-2091	하영희	안티버스트짐볼55/블루 /1 개
-6228-2441-2102	채연	안티버스트짐볼55/더스티블루 /1 개
- */
-
 if (!empty($_POST)) {    
     include_once('./class/PHPExcelDownload.php');
     $excel = new PHPExcelDownload();
@@ -120,30 +115,7 @@ body {
         <div class="form-group">
             <button class="btn btn-lg btn-primary btn-block" type="submit">변환하기</button>        
         </div>
-    </form>
-
-    <!-- <div id="wrap">        
-        <div id="container">            
-            <div id="content">
-            <form action="" method="POST" accept-charset="UTF-8" enctype="multipart/form-data">
-                <div class="row">
-                    <select id="type" name="type">
-                        <option value="korspo">코리아스포츠</option>
-                        <option value="hanjin">한진택배</option>
-                        <option value="sendall">엑셀일괄발송</option>
-                    </select>
-                </div>
-                <div class="row">
-                    <label for="input">입력&nbsp;</label><input type="file" id="input" name="input" />
-                    <label for="output">출력&nbsp;</label><input type="file" id="output" name="output" />
-                </div>
-                <div class="row">
-                    <button type="submit">변환</button>
-                </div>
-            </form>
-            </div>            
-        </div>        
-    </div> -->
+    </form>    
 </body>
 <script>
 $('select[name=type]').change(function(){
@@ -160,6 +132,5 @@ $('.input-direct').change(function(){
         $('.wrap-input').show();
     }    
 });
-
 </script>
 </html>
