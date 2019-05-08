@@ -368,7 +368,7 @@ class PHPExcelDownload {
         
         $data = $bodyOptimized;
         $cntRow = sizeof($bodyOptimized);                
-        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($bodyOptimized[1]) - 1));
+        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($bodyOptimized[0]) - 1));
 
         $excel = new PHPExcel();        
         
@@ -590,7 +590,7 @@ class PHPExcelDownload {
         
         $data = $outputSheetData;
         $cntRow = sizeof($outputSheetData);        
-        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($outputSheetData[1]) - 1));
+        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($outputSheetData[0]) - 1));
 
         $excel = new PHPExcel();  
         
