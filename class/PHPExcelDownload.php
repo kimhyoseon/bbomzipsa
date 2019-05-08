@@ -416,25 +416,30 @@ class PHPExcelDownload {
     /**
      * 엑셀일괄발송
      */
-     public function sendall($filesInput, $filesOutput) {
+     public function sendall($filesInput, $filesOutput, $type = null) {
         if (empty($filesInput) || empty($filesOutput)) {
             echo '파일을 첨부해주세요.';
             return false;
         }        
 
-        $inputFile = $filesInput['tmp_name'];
-        $inputFileType = PHPExcel_IOFactory::identify($inputFile);
-        $objReader = PHPExcel_IOFactory::createReader($inputFileType);
-        $objPHPExcel = $objReader->load($inputFile);
-        $objPHPExcel->setActiveSheetIndex(0);
-        $inputSheetData = $objPHPExcel->getActiveSheet()->toArray();
+        if (!empty($filesInput['tmp_name'])) {
+            $inputFile = $filesInput['tmp_name'];
+            $inputFileType = PHPExcel_IOFactory::identify($inputFile);
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+            $objPHPExcel = $objReader->load($inputFile);
+            $objPHPExcel->setActiveSheetIndex(0);
+            $inputSheetData = $objPHPExcel->getActiveSheet()->toArray();
+        // 직접입력
+        } else {
+            $inputSheetData = $filesInput;
+        }        
         
         $outputFile = $filesOutput['tmp_name'];
         $outputFileType = PHPExcel_IOFactory::identify($outputFile);
         $objReader = PHPExcel_IOFactory::createReader($outputFileType);
         $objPHPExcel = $objReader->load($outputFile);
         $objPHPExcel->setActiveSheetIndex(0);
-        $outputSheetData = $objPHPExcel->getActiveSheet()->toArray();
+        $outputSheetData = $objPHPExcel->getActiveSheet()->toArray();        
 
         $filter = array(
             '운송장번호' => '송장번호',            
@@ -488,7 +493,7 @@ class PHPExcelDownload {
         if (empty($body)) {
             echo '내역이 존재하지 않습니다.';
             return false;
-        }
+        }        
 
         // 출력데이터 생성
         $filterArray2 = array(); 
@@ -499,7 +504,7 @@ class PHPExcelDownload {
 
         unset($outputSheetData[0]);        
         
-        foreach ($outputSheetData as $key => $value) {
+        foreach ($outputSheetData as $key => $value) {  
             if ($key == 1) {                
                 foreach ($value as $k => $v) {
                     if (in_array($v, $filterValues)) {
@@ -513,8 +518,11 @@ class PHPExcelDownload {
                 // print_r($filterIndex2);
                 // print_r($value[$filterIndex2['상품번호']]);
                 // echo '</pre>';
-
-                if (in_array($value[$filterIndex2['상품번호']], array('4324723046', '4318623001'))) continue;
+                if ($type = 'kospo') {
+                    if (!in_array($value[$filterIndex2['상품번호']], array('4324723046'))) continue;
+                } else {
+                    if (in_array($value[$filterIndex2['상품번호']], array('4324723046', '4318623001'))) continue;
+                }
 
                 foreach ($body as $kbody => $vbody) {
                     $isSame = true;
@@ -522,16 +530,19 @@ class PHPExcelDownload {
 
                     foreach ($vbody as $kb => $vb) {
                         if ($kb == '송장번호') continue;
+                        if ($kb == '택배사') continue;
                         
                         // 하나의 항목이라도 다르다면 continue;   
                         $v1 = str_replace('-', '', $value[$filterIndex2[$kb]]);
                         $v2 = $vb;
-                        
-                        // echo '<pre>';
-                        // print_r($v1.'/'.$v2);
-                        // echo '</pre>';
 
-                        if (strpos($v1, $v2) === false) $isSame = false;
+                        // echo '<pre>';
+                        // print_r($kb.'/'.$v1.'/'.$v2);
+                        // echo '</pre>';                            
+
+                        if (strpos($v1, $v2) === false) {                            ;
+                            $isSame = false;
+                        }
 
                         //if (in_array($value[$filterIndex['상품번호']], array('4324723046', '4318623001'))) continue;
                     }
@@ -539,7 +550,12 @@ class PHPExcelDownload {
 
                     // 모두 일치하는 경우
                     if ($isSame) {
-                        $outputSheetData[$key][$filterIndex2['택배사']] = '한진택배';
+                        if ($type = 'kospo') {
+                            $outputSheetData[$key][$filterIndex2['택배사']] = 'CJ대한통운';
+                        } else {
+                            $outputSheetData[$key][$filterIndex2['택배사']] = '한진택배';
+                        }
+                        
                         $outputSheetData[$key][$filterIndex2['송장번호']] = $vbody['송장번호'];
                     } 
                 }
@@ -662,5 +678,28 @@ class PHPExcelDownload {
 
     public function columnChar($i) {
         return chr(65 + $i); 
+    }
+
+    public function convertDirectDataToInputExcelData($data) {
+        if (empty($data)) return false;
+        
+        $postInputDirect = preg_split('/[\s]+/', $data);
+        $inputDirect = array(array('운송장번호', '수하인명'));
+        $rowIndex = 1;
+        $rowArray = array();
+
+        foreach ($postInputDirect as $value) {            
+            if (strpos($value, '/') !== false) continue;
+            else if ($value == '개') {                
+                $inputDirect[$rowIndex] = $rowArray;
+                $rowArray = array();
+                $rowIndex++;
+                continue;
+            }
+            
+            $rowArray[] = $value;
+        }
+
+        return $inputDirect;
     }
 }
