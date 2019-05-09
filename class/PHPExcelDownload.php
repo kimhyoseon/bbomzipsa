@@ -515,10 +515,11 @@ class PHPExcelDownload {
                 }
             } else {
                 // echo '<pre>';
+                // print_r($type);
                 // print_r($filterIndex2);
                 // print_r($value[$filterIndex2['상품번호']]);
                 // echo '</pre>';
-                if ($type = 'kospo') {
+                if ($type == 'kospo') {
                     if (!in_array($value[$filterIndex2['상품번호']], array('4324723046'))) continue;
                 } else {
                     if (in_array($value[$filterIndex2['상품번호']], array('4324723046', '4318623001'))) continue;
@@ -550,7 +551,7 @@ class PHPExcelDownload {
 
                     // 모두 일치하는 경우
                     if ($isSame) {
-                        if ($type = 'kospo') {
+                        if ($type == 'kospo') {
                             $outputSheetData[$key][$filterIndex2['택배사']] = 'CJ대한통운';
                         } else {
                             $outputSheetData[$key][$filterIndex2['택배사']] = '한진택배';

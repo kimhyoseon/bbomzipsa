@@ -10,8 +10,8 @@ if (!empty($_POST)) {
         $excel->korspo($_FILES['input']);
     } else if ($_POST['type'] == 'hanjin') {                
         $excel->hanjin($_FILES['input']);
-    } else if ($_POST['type'] == 'sendall') {                
-        if (!empty($_POST['input-direct'])) {            
+    } else if ($_POST['type'] == 'sendall') {           
+        if (!empty($_POST['input-direct'])) {                                  
             $excel->sendall($excel->convertDirectDataToInputExcelData($_POST['input-direct']), $_FILES['output'], 'kospo');
         } else {
             $excel->sendall($_FILES['input'], $_FILES['output'], null);
