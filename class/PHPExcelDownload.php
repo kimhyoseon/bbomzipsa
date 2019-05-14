@@ -284,7 +284,7 @@ class PHPExcelDownload {
 
                         if ($filterIndexReverse[$k] == '옵션정보') {      
                             $_v = $this->getShortOption($v);
-                            $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' '.$_v;   
+                            $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' ['.$_v.']';   
                         }
 
                         if ($filterIndexReverse[$k] == '수량') {      
