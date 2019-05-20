@@ -691,7 +691,7 @@ class PHPExcelDownload {
 
         foreach ($postInputDirect as $value) {            
             if (strpos($value, '/') !== false) continue;
-            else if ($value == '개') {                
+            else if (preg_replace('/[0-9]+/', '', $value) == '개') {                            
                 $inputDirect[$rowIndex] = $rowArray;
                 $rowArray = array();
                 $rowIndex++;
@@ -699,7 +699,13 @@ class PHPExcelDownload {
             }
             
             $rowArray[] = $value;
-        }
+        }        
+
+        // echo '<pre>';
+        // print_r($postInputDirect);
+        // print_r($inputDirect);
+        // echo '</pre>';
+        // exit;
 
         return $inputDirect;
     }
