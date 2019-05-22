@@ -13,6 +13,7 @@ class PHPExcelDownload {
         '롤빗' => '롤빗',
         '수면안대' => '레드썬 수면안대',
         '뽀송양말' => '뽀송양말',
+        '좌욕기' => '엉따좌욕기',
     );
 
     public function __construct() {
