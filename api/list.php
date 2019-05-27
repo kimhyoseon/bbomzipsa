@@ -30,24 +30,25 @@ try {
     $queryParams = array();
 
     if (empty(DETAILID)) {
-        define('PAGING', 100);
-
         /**
          * 선택된 카테고리가 있는 경우
          */
         if (!empty(CATEGORY)) {
+            define('PAGING', 100);
             $queryWheres[] = 'category IN (:category)';
             $queryParams['category'] = CATEGORY;
         /**
          * 키워드 검색인 경우
          */
         } else if (!empty(KEYWORD)) {
+            define('PAGING', 9999);
             $queryWheres[] = "keyword LIKE :keyword";
             $queryParams['keyword'] = '%'.KEYWORD.'%';        
         /**
          * 전체검색인 경우 예외 카테고리 제외
          */
         } else { 
+            define('PAGING', 100);
             require_once '../class/category.php';
             $category = new Category();        
             $exceptCategoryAll = $category->getExceptCategories();
