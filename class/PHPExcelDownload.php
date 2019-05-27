@@ -15,6 +15,10 @@ class PHPExcelDownload {
         '뽀송양말' => '뽀송양말',
         '좌욕기' => '가정용대야',
         '심리스팬티' => '심리스의류',
+        '천연약쑥' => '천연약쑥',
+        'NBR' => 'NBR 요가매트',
+        'TPE' => 'TPE 요가매트',
+        
     );
 
     public function __construct() {
