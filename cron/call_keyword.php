@@ -38,13 +38,19 @@ $queryWheres[] = "ignored != :ignored";
 $queryParams['ignored'] = 1;
 
 /**
- * 경쟁률 1 이하
+ * 경쟁률 2 이하
  */
 $queryWheres[] = "raceIndex < :raceIndex";
 $queryParams['raceIndex'] = 2;
 
 /**
- * 500개 제한
+ * 경쟁률 0이 아닌
+ */
+$queryWheres[] = "raceIndex > :raceIndexNot";
+$queryParams['raceIndexNot'] = 0;
+
+/**
+ * 5000개 제한
  */
 $queryParams['limit'] = 5000;
 
@@ -58,7 +64,7 @@ if (!empty($queryWheres)) {
 }
 
 // DB 조회
-$keywords = $db->query("SELECT keyword, modDate, raceIndex FROM keywords WHERE {$queryWheres} ORDER BY modDate ASC, raceIndex ASC LIMIT :limit", $queryParams);
+$keywords = $db->query("SELECT keyword, modDate, raceIndex FROM keywords WHERE {$queryWheres} ORDER BY modDate DESC, raceIndex ASC LIMIT :limit", $queryParams);
 
 // echo '<pre>';
 // print_r($keywords);
