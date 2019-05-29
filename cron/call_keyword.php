@@ -6,11 +6,11 @@ ini_set("display_errors", 1);
 ini_set('max_execution_time', '0');
 ini_set('memory_limit', '-1');
 
-$accountDb = parse_ini_file("../config/db.ini");
+$accountDb = parse_ini_file("/home/dev/ppomzipsa/config/db.ini");
 
-require_once '../class/pdo.php';
-require_once '../class/category.php';
-require_once '../class/curl_async.php';
+require_once '/home/dev/ppomzipsa/class/pdo.php';
+require_once '/home/dev/ppomzipsa/class/category.php';
+require_once '/home/dev/ppomzipsa/class/curl_async.php';
 
 $queryWheres = $queryParams = array();          
 
