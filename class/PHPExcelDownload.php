@@ -87,7 +87,7 @@ class PHPExcelDownload {
                     }
                 }
             } else {
-                if (!in_array($value[$filterIndex['상품번호']], array('4324723046'))) continue;
+                if (!in_array($value[$filterIndex['상품번호']], array('4324723046', '4529428871'))) continue;
 
                 $row = array();
 
@@ -279,7 +279,7 @@ class PHPExcelDownload {
                 }
             } else {
                 // 짐볼, 폼롤러 제외
-                if (in_array($value[$filterIndex['상품번호']], array('4324723046', '4318623001'))) continue;
+                if (in_array($value[$filterIndex['상품번호']], array('4324723046', '4529428871', '4318623001'))) continue;
 
                 $row = array();                
 
@@ -528,9 +528,9 @@ class PHPExcelDownload {
                 // print_r($value[$filterIndex2['상품번호']]);
                 // echo '</pre>';
                 if ($type == 'kospo') {
-                    if (!in_array($value[$filterIndex2['상품번호']], array('4324723046'))) continue;
+                    if (!in_array($value[$filterIndex2['상품번호']], array('4324723046', '4529428871'))) continue;
                 } else {
-                    if (in_array($value[$filterIndex2['상품번호']], array('4324723046', '4318623001'))) continue;
+                    if (in_array($value[$filterIndex2['상품번호']], array('4324723046', '4529428871', '4318623001'))) continue;
                 }
 
                 foreach ($body as $kbody => $vbody) {
@@ -553,7 +553,7 @@ class PHPExcelDownload {
                             $isSame = false;
                         }
 
-                        //if (in_array($value[$filterIndex['상품번호']], array('4324723046', '4318623001'))) continue;
+                        //if (in_array($value[$filterIndex['상품번호']], array('4324723046', '4529428871', '4318623001'))) continue;
                     }
                     //echo '<br/>';
 
