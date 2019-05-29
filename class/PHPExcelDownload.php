@@ -47,7 +47,7 @@ class PHPExcelDownload {
             '배송지' => '주소',
             '수취인연락처1' => '수령자TEL1',
             '수취인연락처2' => '수령자TEL2',
-            '_수량' => '수량', // 내용이 없어야 하는 값
+            '_수량' => '수량', // 내용이 없어야 하는 값            
             '구분' => '구분',
             '운임' => '운임',
             '선/착' => '선/착',
@@ -57,6 +57,7 @@ class PHPExcelDownload {
         );
 
         $filterTmp = array(
+            '상품명' => '상품명',
             '상품번호' => '상품번호',
         );
 
@@ -106,7 +107,7 @@ class PHPExcelDownload {
         if (empty($body)) {
             echo '내역이 존재하지 않습니다.';
             return false;
-        }
+        }        
         
         $bodyOptimized = array();
         $index = 1;
@@ -130,23 +131,41 @@ class PHPExcelDownload {
         }
         
         foreach ($bodyOptimized as $key => $value) {
-            $optionIndex = array_search('옵션정보', array_keys($filter));                            ;
+            $optionIndex = array_search('옵션정보', array_keys($filter));                        
 
-            if (!empty($value[$optionIndex])) {
-                $value[$optionIndex] = explode(':', $value[$optionIndex])[1];
-                $value[$optionIndex] = trim($value[$optionIndex]);
-                $optionInfo = explode(' ', $value[$optionIndex]);
-                $optionInfo[0] = str_replace('cm', '', $optionInfo[0]);
-                $optionInfo[1] = str_replace('(', '', $optionInfo[1]);
-                $optionInfo[1] = str_replace(')', '', $optionInfo[1]);
-                $option = '';
+            if (!empty($value[$optionIndex])) {                
+                if (strpos($value[$optionIndex], '타입') !== false) {
+                    $value[$optionIndex] = explode(':', $value[$optionIndex])[1];
+                    $value[$optionIndex] = trim($value[$optionIndex]);
+                    $optionInfo = explode(' ', $value[$optionIndex]);
+                    $optionInfo[0] = str_replace('cm', '', $optionInfo[0]);
+                    $optionInfo[1] = str_replace('(', '', $optionInfo[1]);
+                    $optionInfo[1] = str_replace(')', '', $optionInfo[1]);
+                    $option = '';
 
-                if (in_array($optionInfo[1], array('블루', '레드'))) {
-                    $option = "안티버스트 짐볼 {$optionInfo[0]} ({$optionInfo[1]})";
-                } else {
-                    $option = "안티버스트 파스텔 짐볼 {$optionInfo[0]} ({$optionInfo[1]})";
-                }
-                $bodyOptimized[$key][$optionIndex] = $option;
+                    if (in_array($optionInfo[1], array('블루', '레드'))) {
+                        $option = "안티버스트 짐볼 {$optionInfo[0]} ({$optionInfo[1]})";
+                    } else {
+                        $option = "안티버스트 파스텔 짐볼 {$optionInfo[0]} ({$optionInfo[1]})";
+                    }
+                    $bodyOptimized[$key][$optionIndex] = $option;   
+                } else if (strpos($value[$optionIndex], '두께') !== false) {                    
+                    $options = explode(' / ', $value[$optionIndex]);
+                    $thick = trim(explode(':', $options[0])[1]);
+                    $color = trim(explode(':', $options[1])[1]);
+                    $option = '';
+
+                    $titleIndex = array_search('상품명', array_keys($filterMerged));
+                    $title = $body[$key][$titleIndex];
+
+                    if (strpos($title, 'TPE') !== false) {
+                        $option = "TPE {$thick} 매트 ({$color})";
+                    } else if (strpos($title, 'NBR') !== false) {
+                        $option = "NBR {$thick} 매트 ({$color})";
+                    }
+                    
+                    $bodyOptimized[$key][$optionIndex] = $option;   
+                }                
             }
 
 
