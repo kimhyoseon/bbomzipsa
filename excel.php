@@ -76,6 +76,7 @@ body {
   border-top-right-radius: 0;
 }
 
+.wrap-direct,
 .inp-direct,
 .wrap-output {
   display: none;
@@ -119,8 +120,11 @@ body {
 </body>
 <script>
 $('select[name=type]').change(function(){
-    if ($(this).val() == 'sendall') $('.wrap-output').show();
-    else $('.wrap-output').hide();
+    if ($(this).val() == 'sendall') {        
+        $('.wrap-output, .wrap-direct').show();
+    } else {
+        $('.wrap-output, .wrap-direct').hide();
+    }
 });
 
 $('.input-direct').change(function(){
