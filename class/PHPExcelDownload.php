@@ -172,7 +172,7 @@ class PHPExcelDownload {
             if (!empty($bodyOptimized[$key][$messageIndex])) {
                 $bodyOptimized[$key][$messageIndex] = ' / '.$bodyOptimized[$key][$messageIndex];
             }
-            $bodyOptimized[$key][$messageIndex] = '보내는이:쿠힛 010-5154-7515'.$bodyOptimized[$key][$messageIndex];
+            $bodyOptimized[$key][$messageIndex] = '보내는이:쿠힛 010-6608-2359'.$bodyOptimized[$key][$messageIndex];
 
             $prevIndex = array_search('선/착', array_keys($filter));
             $bodyOptimized[$key][$prevIndex] = '선불';
