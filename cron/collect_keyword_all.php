@@ -53,7 +53,7 @@ try {
     if (empty($allRelkeywords)) throw new Exception(null, 400);
     
     // 테스트 2개
-    $allRelkeywords = array_slice($allRelkeywords, 0, 2);        
+    // $allRelkeywords = array_slice($allRelkeywords, 0, 2);        
     
     $collectRelkeywords = $allRelkeywords;
     $addRelkeywords = array();    
