@@ -56,18 +56,27 @@ body {
 
         <div class="form-group">            
             <div class="wrap-direct">
-                <textarea class="form-control inp-direct" name="input-direct" rows="3">애견 강아지 숱 미용 머리 헤어 커트 장 숯 앞머리 컷트 일본 일제 숱치는 미용실 이발소 셀프 가정용 어린이 틴닝  유아 안전 스트록 블런트</textarea>                
+                <textarea class="form-control inp-direct" name="input-direct" rows="3"></textarea>                
             </div>
-        </div>
+        </div>        
         
         <div class="form-group">
             <button class="btn btn-lg btn-primary btn-block" type="button">조합하기</button>        
         </div>
 
+        <h1 class="h3 mb-3 font-weight-normal">결과 : <span class="total">0</span>개</h1>
+
         <div class="form-group">                 
             <div class="wrap-result">            
-                <label>결과</label>       
+                <label>결과 (콤마)</label>       
                 <textarea class="form-control inp-result" name="input-result" rows="3"></textarea>                
+            </div>
+        </div>
+
+        <div class="form-group">                 
+            <div class="wrap-result">            
+                <label>결과 (한줄)</label>   
+                <textarea class="form-control inp-result-line" name="input-result-line" rows="3"></textarea>                
             </div>
         </div>
     </form>    
@@ -76,6 +85,7 @@ body {
 $(".btn-block").click(function () {
     var keywords = $(".inp-direct").val().trim();    
     var keywordsMixed = [];
+    var keywordEnd = ['추천', '효과'];
 
     if (!keywords) return false;
 
@@ -83,18 +93,46 @@ $(".btn-block").click(function () {
     keywords = keywords.filter(Boolean);
     keywords = keywords.filter(function(item, pos) {
         return keywords.indexOf(item) == pos;
-    });
-    
-    // console.log(keywords);
+    });    
+
+    for (i = 0; i < keywordEnd.length; i++) {
+      if (keywords.indexOf(keywordEnd[i]) !== -1) continue;            
+      keywords.push(keywordEnd[i]);
+    }    
 
     for (i = 0; i < keywords.length; i++) {
-        for (j = 0; j < keywords.length; j++) {
-            if (keywords[i] == keywords[j]) continue;
-            keywordsMixed.push(keywords[i] + keywords[j]);
-        }
-    }
+      if (keywordEnd.indexOf(keywords[i]) !== -1) continue;
+      
+      for (j = 0; j < keywords.length; j++) {
+          if (keywords[i] == keywords[j]) continue;
+          if (keywords[i].indexOf(keywords[j]) !== -1) continue;
+          if (keywords[j].indexOf(keywords[i]) !== -1) continue;            
+          keywordsMixed.push(keywords[i] + keywords[j]);
+      }
+    }    
 
+    var total = keywordsMixed.length;
+    var has = false;
+
+    for (i = 0; i < total; i++) {      
+      has = false;
+      
+      for (j = 0; j < keywordEnd.length; j++) {        
+        if (keywordsMixed[i].indexOf(keywordEnd[j]) !== -1) has = true;        
+      }
+
+      if (has == true) continue;
+
+      for (j = 0; j < keywordEnd.length; j++) {                
+        keywordsMixed.push(keywordsMixed[i] + keywordEnd[j]);
+      }      
+    }   
+
+    // console.log(keywordsMixed);
+    
+    $(".total").text(keywordsMixed.length.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
     $(".inp-result").val(keywordsMixed.join(","));
+    $(".inp-result-line").val(keywordsMixed.join("\n"));
 });
 </script>
 </html>
