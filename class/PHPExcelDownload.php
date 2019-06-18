@@ -29,7 +29,183 @@ class PHPExcelDownload {
     /**
      * 코리아스포츠
      */
-    public function korspo($files) {
+    public function korspo($files) {        
+        if (empty($files)) return false;
+
+        list($header, $bodyOptimized) = $this->korspoDataFilter($files);
+
+        $data = array_merge(array($header), $bodyOptimized);
+        $cntRow = sizeof($bodyOptimized) + 1;
+        $bgColumn = array('우편번호', '수량', '구분', '운임');
+        $bgColor = 'FFD8D8D8';                
+        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($header) - 1));
+
+        $excel = new PHPExcel();
+        // 헤더 진하게
+        $excel->setActiveSheetIndex(0)->getStyle("A1:${lastChar}1")->getFont()->setBold(true);
+        
+        foreach ($bgColumn as $value) {
+            $bgIndex = array_search($value, $header);    
+            // 입력할 수 없는 부분 배경색
+            $bgChar = $this->columnChar($bgIndex);
+            $excel->setActiveSheetIndex(0)->getStyle("{$bgChar}1:{$bgChar}{$cntRow}")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setARGB($bgColor);
+        }        
+        
+        // 셀 구분선
+        $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$cntRow}")->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        
+        // 셀 폭 최적화
+        $widths = array(6, 10, 10, 80, 15, 15, 6, 6, 6, 6, 40, 10, 80);
+        foreach ($widths as $i => $w) {
+            $excel->setActiveSheetIndex(0)->getColumnDimension($this->columnChar($i))->setWidth($w);
+        }
+        
+        // 시트명 변경
+        $excel->setActiveSheetIndex(0)->setTitle('출력용');
+
+        // 데이터 적용
+        $excel->getActiveSheet()->fromArray($data, NULL, 'A1');
+
+        // 양식 설정
+        ob_end_clean();        
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');        
+
+        header('Content-type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="택배양식(쿠힛)_'.date('Ymd').'.xlsx"');
+        header('Cache-Control: max-age=0');
+        
+        // 다운로드
+        $writer->save('php://output');
+        die();
+
+        /*echo '<pre>';
+        print_r($data);
+        print_r($filterArray);
+        print_r($filterIndex);
+        print_r($filterIndexReverse);
+        echo '</pre>';*/
+    }
+
+    /**
+     * 코리아스포츠 가격계산
+     */
+    public function korspoPrice($files) {
+        if (empty($files)) return false;
+
+        list($header, $bodyOptimized) = $this->korspoDataFilter($files);
+        $header = array('E-count 품명', '내품수량', '단가', '총액', '수취인');        
+
+        $priceProduct = 0;
+        $priceDelivery = 0;
+        $bodyPrice = array();
+
+        $prices = array(
+            '짐볼 55' => array(5000, 3000),
+            '짐볼 65' => array(5700, 3000),
+            '짐볼 75' => array(7900, 3000),
+            
+            '8mm' => array(5500, 4000),
+            '10mm' => array(6000, 4000),
+            '16mm' => array(8000, 4000),
+            '20mm' => array(11200, 4000),
+            
+            '4mm' => array(9000, 4000),
+            '6mm' => array(11500, 4000),            
+        );
+
+        foreach ($bodyOptimized as $key => $value) {
+            $item = $value[10];
+
+            foreach ($prices as $k => $v) {            
+                if (strpos($item, $k) !== false) {
+                    $priceProduct = $v[0];
+                    $priceDelivery = $v[1];                
+                }
+            }
+            
+            if (!empty($bodyPrice['총액'])) {            
+                $bodyPrice['총액'][3] = $bodyPrice['총액'][3] + $priceDelivery + $priceProduct;
+            } else {
+                $bodyPrice['총액'] = array('총액', '', '', $priceDelivery + $priceProduct, '');
+            }
+    
+            if (!empty($bodyPrice['배송비'])) {  
+                if (strpos($bodyPrice['배송비'][4], $value[4]) === false) {
+                    $bodyPrice['배송비'][1]++;
+                    $bodyPrice['배송비'][3] = $bodyPrice['배송비'][3] + $priceDelivery; 
+                    $bodyPrice['배송비'][4] = $bodyPrice['배송비'][4].' '.$value[1];                            
+                }
+            } else {
+                $bodyPrice['배송비'] = array('배송비', 1, '', $priceDelivery, $value[1]);
+            }
+    
+            if (!empty($bodyPrice[$item])) {
+                $bodyPrice[$item][1] = $bodyPrice[$item][1] + $value[11];
+                $bodyPrice[$item][3] = $bodyPrice[$item][3] + $priceProduct;
+                $bodyPrice[$item][4] = $bodyPrice[$item][4].' '.$value[1];            
+            } else {
+                $bodyPrice[$item] = array($item, $value[11], $priceProduct, $priceProduct, $value[1]);
+            }      
+        }
+
+        // echo '<pre>';
+        // print_r($bodyPrice);        
+        // echo '</pre>';
+        // exit();
+
+        $data = array_merge(array($header), $bodyPrice);
+        $cntRow = sizeof($bodyPrice) + 1;        
+        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($header) - 1));
+
+        $excel = new PHPExcel();
+
+        // 헤더 진하게
+        $excel->setActiveSheetIndex(0)->getStyle("A1:${lastChar}1")->getFont()->setBold(true);
+        
+        // 셀 구분선
+        $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$cntRow}")->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        
+        // 셀 폭 최적화
+        $widths = array(80, 10, 10, 10, 200);
+        foreach ($widths as $i => $w) {
+            $excel->setActiveSheetIndex(0)->getColumnDimension($this->columnChar($i))->setWidth($w);
+        }
+        
+        // 시트명 변경
+        $excel->setActiveSheetIndex(0)->setTitle('출력용');
+
+        // 데이터 적용
+        $excel->getActiveSheet()->fromArray($data, NULL, 'A1');
+
+        // 양식 설정
+        ob_end_clean();        
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');        
+
+        header('Content-type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="택배양식(쿠힛)_'.date('Ymd').'_계산서.xlsx"');
+        header('Cache-Control: max-age=0');
+        
+        // 다운로드
+        $writer->save('php://output');
+        die();
+    }
+
+    /**
+     * 코리아스포츠 데이터 정제
+     */
+    public function korspoDataFilter($files) {
         if (empty($files)) return false;
 
         $inputFile = $files['tmp_name'];
@@ -147,7 +323,7 @@ class PHPExcelDownload {
                     } else {
                         $option = "안티버스트 파스텔 짐볼 {$optionInfo[0]} ({$optionInfo[1]})";
                     }
-                    $bodyOptimized[$key][$optionIndex] = $option;   
+                    $bodyOptimized[$key][$optionIndex] = $option;                       
                 } else if (strpos($value[$optionIndex], '두께') !== false) {                    
                     $options = explode(' / ', $value[$optionIndex]);
                     $thick = trim(explode(':', $options[0])[1]);
@@ -163,7 +339,7 @@ class PHPExcelDownload {
                         $option = "NBR {$thick} 매트 ({$color})";
                     }
                     
-                    $bodyOptimized[$key][$optionIndex] = $option;   
+                    $bodyOptimized[$key][$optionIndex] = $option;                       
                 }                
             }
 
@@ -176,64 +352,9 @@ class PHPExcelDownload {
 
             $prevIndex = array_search('선/착', array_keys($filter));
             $bodyOptimized[$key][$prevIndex] = '선불';
-        }                                     
+        } 
 
-        $data = array_merge(array($header), $bodyOptimized);
-        $cntRow = sizeof($bodyOptimized) + 1;
-        $bgColumn = array('_우편번호', '_수량', '구분', '운임');
-        $bgColor = 'FFD8D8D8';                
-        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($header) - 1));
-
-        $excel = new PHPExcel();
-        // 헤더 진하게
-        $excel->setActiveSheetIndex(0)->getStyle("A1:${lastChar}1")->getFont()->setBold(true);
-        
-        foreach ($bgColumn as $value) {
-            $bgIndex = array_search($value, array_keys($filter));    
-            // 입력할 수 없는 부분 배경색
-            $bgChar = $this->columnChar($bgIndex);
-            $excel->setActiveSheetIndex(0)->getStyle("{$bgChar}1:{$bgChar}{$cntRow}")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setARGB($bgColor);
-        }        
-        
-        // 셀 구분선
-        $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$cntRow}")->applyFromArray(array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN
-                )
-            )
-        ));
-        
-        // 셀 폭 최적화
-        $widths = array(6, 10, 10, 80, 15, 15, 6, 6, 6, 6, 40, 10, 80);
-        foreach ($widths as $i => $w) {
-            $excel->setActiveSheetIndex(0)->getColumnDimension($this->columnChar($i))->setWidth($w);
-        }
-        
-        // 시트명 변경
-        $excel->setActiveSheetIndex(0)->setTitle('출력용');
-
-        // 데이터 적용
-        $excel->getActiveSheet()->fromArray($data, NULL, 'A1');
-
-        // 양식 설정
-        ob_end_clean();        
-        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');        
-
-        header('Content-type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment; filename="택배양식(쿠힛)_'.date('Ymd').'.xlsx"');
-        header('Cache-Control: max-age=0');
-        
-        // 다운로드
-        $writer->save('php://output');
-        die();
-
-        /*echo '<pre>';
-        print_r($data);
-        print_r($filterArray);
-        print_r($filterIndex);
-        print_r($filterIndexReverse);
-        echo '</pre>';*/
+        return array($header, $bodyOptimized);
     }
 
     /**

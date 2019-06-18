@@ -7,7 +7,9 @@ if (!empty($_POST)) {
     $excel = new PHPExcelDownload();
 
     if ($_POST['type'] == 'korspo') {                    
-        $excel->korspo($_FILES['input']);
+        $excel->korspo($_FILES['input']);        
+    } else if ($_POST['type'] == 'korspo_price') {                          
+        $excel->korspoPrice($_FILES['input']);
     } else if ($_POST['type'] == 'hanjin') {                
         $excel->hanjin($_FILES['input']);
     } else if ($_POST['type'] == 'sendall') {           
@@ -89,6 +91,7 @@ body {
         <div class="form-group">
             <select id="type" name="type" class="form-control">
                 <option value="korspo">코리아스포츠</option>
+                <option value="korspo_price">코리아스포츠(계산서)</option>
                 <option value="hanjin">한진택배</option>
                 <option value="sendall">엑셀일괄발송</option>
             </select>
