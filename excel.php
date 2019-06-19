@@ -89,11 +89,11 @@ body {
         <h1 class="h3 mb-3 font-weight-normal">엑셀변환기</h1>
         
         <div class="form-group">
-            <select id="type" name="type" class="form-control">
-                <option value="korspo">코리아스포츠</option>
-                <option value="korspo_price">코리아스포츠(계산서)</option>
+            <select id="type" name="type" class="form-control">                
                 <option value="hanjin">한진택배</option>
                 <option value="sendall">엑셀일괄발송</option>
+                <option value="korspo">코리아스포츠</option>
+                <option value="korspo_price">코리아스포츠(계산서)</option>
             </select>
         </div>
 
