@@ -136,7 +136,7 @@ class PHPExcelDownload {
             }
     
             if (!empty($bodyPrice['배송비'])) {  
-                if (strpos($bodyPrice['배송비'][4], $value[4]) === false) {
+                if (strpos($bodyPrice['배송비'][4], $value[1]) === false) {
                     $bodyPrice['배송비'][1]++;
                     $bodyPrice['배송비'][3] = $bodyPrice['배송비'][3] + $priceDelivery; 
                     $bodyPrice['배송비'][4] = $bodyPrice['배송비'][4].' '.$value[1];                            
