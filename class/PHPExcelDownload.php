@@ -132,9 +132,9 @@ class PHPExcelDownload {
             }
             
             if (!empty($bodyPrice['총액'])) {            
-                $bodyPrice['총액'][3] = $bodyPrice['총액'][3] + $priceDelivery + $priceProduct;
+                $bodyPrice['총액'][3] = $bodyPrice['총액'][3] + $priceProduct;
             } else {
-                $bodyPrice['총액'] = array('총액', '', '', $priceDelivery + $priceProduct, '');
+                $bodyPrice['총액'] = array('총액', '', '', $priceProduct, '');
             }
     
             if (!empty($bodyPrice['배송비'])) {  
@@ -142,6 +142,8 @@ class PHPExcelDownload {
                     $bodyPrice['배송비'][1]++;
                     $bodyPrice['배송비'][3] = $bodyPrice['배송비'][3] + $priceDelivery; 
                     $bodyPrice['배송비'][4] = $bodyPrice['배송비'][4].' '.$value[1];                            
+                    
+                    $bodyPrice['총액'][3] = $bodyPrice['총액'][3] + $priceDelivery;
                 }
             } else {
                 $bodyPrice['배송비'] = array('배송비', 1, '', $priceDelivery, $value[1]);
