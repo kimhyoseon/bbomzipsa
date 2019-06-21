@@ -112,6 +112,7 @@ class PHPExcelDownload {
             
             '8mm' => array(5500, 4000),
             '10mm' => array(6000, 4000),
+            '16mm 와이드' => array(13200, 4000),
             '16mm' => array(8000, 4000),
             '20mm' => array(11200, 4000),
             
@@ -436,7 +437,7 @@ class PHPExcelDownload {
 
                         if ($filterIndexReverse[$k] == '수량') {      
                             $_v = $v.'개';
-                            $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' '.$_v;
+                            $row[array_search('상품명', array_keys($filterMerged))] = $_v.' '.$row[array_search('상품명', array_keys($filterMerged))];
                             
                             // 택배박스는 무조건 1개로..
                             $v = 1;
