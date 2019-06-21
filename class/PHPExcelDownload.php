@@ -147,6 +147,7 @@ class PHPExcelDownload {
                 }
             } else {
                 $bodyPrice['배송비'] = array('배송비', 1, '', $priceDelivery, $value[1]);
+                $bodyPrice['총액'][3] = $bodyPrice['총액'][3] + $priceDelivery;
             }
     
             if (!empty($bodyPrice[$item])) {
