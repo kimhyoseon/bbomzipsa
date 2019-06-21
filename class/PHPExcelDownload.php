@@ -126,7 +126,8 @@ class PHPExcelDownload {
             foreach ($prices as $k => $v) {            
                 if (strpos($item, $k) !== false) {
                     $priceProduct = $v[0];
-                    $priceDelivery = $v[1];                
+                    $priceDelivery = $v[1];  
+                    break;              
                 }
             }
             
