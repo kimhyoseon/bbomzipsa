@@ -18,6 +18,8 @@ class PHPExcelDownload {
         '천연약쑥' => '천연약쑥',
         'NBR' => 'NBR 요가매트',
         'TPE' => 'TPE 요가매트',        
+        '발가락교정기' => '발가락교정기',
+        '아치보호대' => '아치보호대',
     );
 
     public function __construct() {
@@ -440,7 +442,12 @@ class PHPExcelDownload {
                         }
 
                         if ($filterIndexReverse[$k] == '수량') {      
-                            $_v = $v.'개';
+                            if ($v > 1) {
+                                $_v = '*'.$v.'개';
+                            } else {
+                                $_v = $v.'개';
+                            }
+                            
                             $row[array_search('상품명', array_keys($filterMerged))] = $_v.' '.$row[array_search('상품명', array_keys($filterMerged))];
                             
                             // 택배박스는 무조건 1개로..
