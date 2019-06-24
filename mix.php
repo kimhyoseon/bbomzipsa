@@ -104,17 +104,18 @@ $(".btn-block").click(function () {
   var keywordsMixed = [];
   var keywordEnd = ['추천', '효과'];  
 
-  if (!keywords) return false;
+  if (!keywords) return false;  
 
   keywords = keywords.replace(/,/g , "");
-  keywords = keywords.split(" ");  
+  keywords = (keywords.indexOf("\n") !== -1) ? keywords.split("\n") : keywords.split(" ");
+  
   keywords = keywords.filter(function(item, pos) {
       return keywords.indexOf(item) == pos;
   });    
 
   if (keywordsReq) {
-    keywordsReq = keywordsReq.replace(/,/g , "");  
-    keywordsReq = keywordsReq.split(" ");  
+    keywordsReq = keywordsReq.replace(/,/g , "");      
+    keywordsReq = (keywordsReq.indexOf("\n") !== -1) ? keywordsReq.split("\n") : keywordsReq.split(" ");
     keywordsReq = keywordsReq.filter(function(item, pos) {
         return keywordsReq.indexOf(item) == pos;
     });      
@@ -125,8 +126,8 @@ $(".btn-block").click(function () {
 
   if (keywordsTail) {
     console.log(keywordsTail);
-    keywordsTail = keywordsTail.replace(/,/g , "");  
-    keywordsTail = keywordsTail.split(" ");  
+    keywordsTail = keywordsTail.replace(/,/g , "");      
+    keywordsTail = (keywordsTail.indexOf("\n") !== -1) ? keywordsTail.split("\n") : keywordsTail.split(" ");
     keywordsTail = keywordsTail.filter(function(item, pos) {
         return keywordsTail.indexOf(item) == pos;
     });    
