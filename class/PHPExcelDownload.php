@@ -161,11 +161,11 @@ class PHPExcelDownload {
             }      
         }
 
-        echo '<pre>';        
-        print_r($bodyOptimized);        
-        print_r($bodyPrice);        
-        echo '</pre>';
-        exit();
+        // echo '<pre>';        
+        // print_r($bodyOptimized);        
+        // print_r($bodyPrice);        
+        // echo '</pre>';
+        // exit();
 
         $data = array_merge(array($header), $bodyPrice);
         $cntRow = sizeof($bodyPrice) + 1;        
