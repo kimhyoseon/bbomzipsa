@@ -127,7 +127,7 @@ class PHPExcelDownload {
 
             foreach ($prices as $k => $v) {            
                 if (strpos($item, $k) !== false) {
-                    $priceProduct = $v[0];
+                    $priceProduct = $v[0] * $value[11];
                     $priceDelivery = $v[1];  
                     break;              
                 }
@@ -161,10 +161,11 @@ class PHPExcelDownload {
             }      
         }
 
-        // echo '<pre>';
-        // print_r($bodyPrice);        
-        // echo '</pre>';
-        // exit();
+        echo '<pre>';        
+        print_r($bodyOptimized);        
+        print_r($bodyPrice);        
+        echo '</pre>';
+        exit();
 
         $data = array_merge(array($header), $bodyPrice);
         $cntRow = sizeof($bodyPrice) + 1;        
