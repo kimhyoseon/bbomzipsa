@@ -20,6 +20,8 @@ class PHPExcelDownload {
         'TPE' => 'TPE 요가매트',        
         '발가락교정기' => '발가락교정기',
         '아치보호대' => '아치보호대',
+        '압박양말' => '압박양말',
+        '귀지압패치' => '귀지압패치',
     );
 
     public function __construct() {
