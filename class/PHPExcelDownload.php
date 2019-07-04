@@ -836,7 +836,16 @@ class PHPExcelDownload {
 
     public function getShortOption($option) {
         if (empty($option)) return '';
-        return trim(explode(':', $option)[1]);
+        
+        if (strpos($option, '/') !== false) {
+            $op = [];
+            foreach (explode('/', $option) as $key => $value) {
+                $op[] = trim(explode(':', $value)[1]);
+            }
+            return implode('/', $op);
+        } else {
+            return trim(explode(':', $option)[1]);
+        }
     }
 
     public function columnChar($i) {
