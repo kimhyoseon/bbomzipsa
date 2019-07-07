@@ -22,6 +22,8 @@ class PHPExcelDownload {
         '아치보호대' => '아치보호대',
         '압박양말' => '압박양말',
         '귀지압패치' => '귀지압패치',
+        '니플패치' => '실리콘패치',
+        '헤어끈통' => '머리끈세트',
     );
 
     public function __construct() {
@@ -698,6 +700,8 @@ class PHPExcelDownload {
                         // 하나의 항목이라도 다르다면 continue;   
                         $v1 = str_replace('-', '', $value[$filterIndex2[$kb]]);
                         $v2 = $vb;
+
+                        if (empty($v2)) continue;
 
                         // echo '<pre>';
                         // print_r($kb.'/'.$v1.'/'.$v2);
