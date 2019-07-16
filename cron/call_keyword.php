@@ -64,7 +64,7 @@ if (!empty($queryWheres)) {
 }
 
 // DB 조회
-$keywords = $db->query("SELECT keyword, modDate, raceIndex FROM keywords WHERE {$queryWheres} ORDER BY modDate DESC, raceIndex ASC LIMIT :limit", $queryParams);
+$keywords = $db->query("SELECT keyword, modDate, raceIndex FROM keywords WHERE {$queryWheres} ORDER BY modDate ASC, raceIndex ASC LIMIT :limit", $queryParams);
 
 // echo '<pre>';
 // print_r($keywords);
