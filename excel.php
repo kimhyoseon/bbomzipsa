@@ -12,6 +12,8 @@ if (!empty($_POST)) {
         $excel->korspoPrice($_FILES['input']);
     } else if ($_POST['type'] == 'hanjin') {                
         $excel->hanjin($_FILES['input']);
+    } else if ($_POST['type'] == 'cj') {                
+        $excel->cj($_FILES['input']);
     } else if ($_POST['type'] == 'sendall') {           
         if (!empty($_POST['input-direct'])) {                                  
             $excel->sendall($excel->convertDirectDataToInputExcelData($_POST['input-direct']), $_FILES['output'], 'kospo');
@@ -90,7 +92,8 @@ body {
         
         <div class="form-group">
             <select id="type" name="type" class="form-control">                
-                <option value="hanjin">한진택배</option>
+                <option value="cj">CJ택배</option>                
+                <!-- <option value="hanjin">한진택배</option>                 -->
                 <option value="sendall">엑셀일괄발송</option>
                 <option value="korspo">코리아스포츠</option>
                 <option value="korspo_price">코리아스포츠(계산서)</option>
