@@ -909,6 +909,7 @@ class PHPExcelDownload {
                     foreach ($vbody as $kb => $vb) {
                         if ($kb == '송장번호') continue;
                         if ($kb == '택배사') continue;
+                        if ($kb == '우편번호') continue; // CJ 우편번호 최적화로 변경이 될 수 있음
                         
                         // 하나의 항목이라도 다르다면 continue;   
                         $v1 = trim(str_replace('-', '', $value[$filterIndex2[$kb]]));
@@ -920,13 +921,6 @@ class PHPExcelDownload {
                         // echo '<pre>';
                         // print_r($kb.'/'.$v1.'/'.$v2);
                         // echo '</pre>';
-                        
-                        // CJ 우편번호 최적화로 변경이 될 수 있음
-                        if ($kb == '우편번호') {
-                            if (strlen($v1) != strlen($v2)) {
-                                continue;
-                            }
-                        }
 
                         if (strpos($v1, $v2) === false) {                            ;
                             $isSame = false;
