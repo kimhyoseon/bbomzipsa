@@ -1320,7 +1320,7 @@ class PHPExcelDownload {
         if (empty($data)) return false;
         
         $postInputDirect = preg_split('/[\s]+/', $data);
-        $inputDirect = array(array('운송장번호', '수하인명'));
+        $inputDirect = array(array('운송장번호', '받는분'));
         $rowIndex = 1;
         $rowArray = array();
 
