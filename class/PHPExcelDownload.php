@@ -919,7 +919,14 @@ class PHPExcelDownload {
                         // 데이터 비교
                         // echo '<pre>';
                         // print_r($kb.'/'.$v1.'/'.$v2);
-                        // echo '</pre>';                            
+                        // echo '</pre>';
+                        
+                        // CJ 우편번호 최적화로 변경이 될 수 있음
+                        if ($kb == '우편번호') {
+                            if (strlen($v1) != strlen($v2)) {
+                                continue;
+                            }
+                        }
 
                         if (strpos($v1, $v2) === false) {                            ;
                             $isSame = false;
