@@ -373,7 +373,7 @@ class PHPExcelDownload {
      * cj택배
      */
     public function cj($files) {
-        if (empty($files)) return false;
+        if (empty($files)) return false;        
 
         $inputFile = $files['tmp_name'];
         $inputFileType = PHPExcel_IOFactory::identify($inputFile);
@@ -400,6 +400,10 @@ class PHPExcelDownload {
         $filterTmp = array(
             '상품번호' => '상품번호',
             '옵션정보' => '옵션정보',
+            '구매자ID' => '구매자ID',
+            '구매자명' => '구매자명',
+            '주문번호' => '주문번호',
+            '상품별 총 주문금액' => '상품별 총 주문금액',
         );
 
         $filterMerged = array_merge($filter, $filterTmp);
@@ -493,8 +497,14 @@ class PHPExcelDownload {
             return false;
         }
         
-        $bodyOptimized = array();        
+        $bodyOptimized = array();  
+        
+        // DB
+        $accountDb = parse_ini_file("./config/db.ini");
+        require_once dirname(__FILE__).'/../class/pdo.php';
+        $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
+        // filter 값만 다시 담기
         foreach ($body as $key => $value) {
             $bodyRow = array();            
 
@@ -506,15 +516,46 @@ class PHPExcelDownload {
                     // print_r(array_search($filterIndexReverse[$i], array_keys($filterMerged)));
                     // exit;            
                 }
+            }     
+            
+            // 지난 주문 조회
+            $dbData = array(
+                'user_key' => $value[array_search('구매자명', array_keys($filterMerged))].'|'.$value[array_search('구매자ID', array_keys($filterMerged))],
+                'order_id' => $value[array_search('주문번호', array_keys($filterMerged))],
+                'price' => str_replace(',', '', $value[array_search('상품별 총 주문금액', array_keys($filterMerged))]),
+            );                        
+            
+            if (!empty($dbData['user_key']) && !empty($dbData['order_id'])) {
+                $row = $db->row("SELECT COUNT(*) AS total, SUM(price) AS total_price FROM smartstore_order WHERE user_key=? AND order_id!=?", array($dbData['user_key'], $dbData['order_id']));
+                
+                // 지난 주문횟수 포함                
+                if (!empty($row) && $row['total'] > 0) {
+                    $indexName = array_search('상품명', array_keys($filterMerged));
+                    $bodyRow[$indexName] = $bodyRow[$indexName]." ({$row['total']})";
+                }                
+
+                // 주문정보 삽입
+                $rowExist = $db->row("SELECT * FROM smartstore_order WHERE order_id=?", array($dbData['order_id']));
+                
+                if (empty($rowExist)) {
+                    $dbName = array_keys($dbData, true);
+                    $dbValues = array_map(function ($val) {
+                        return ':'.$val;
+                    }, $dbName);
+                    $dbName = implode(',', $dbName);
+                    $dbValues = implode(',', $dbValues);                
+
+                    $db->query("INSERT INTO smartstore_order ({$dbName}) VALUES({$dbValues})", $dbData);
+                }                                
             }            
 
-            $bodyOptimized[] = $bodyRow;
+            $bodyOptimized[] = $bodyRow;            
         }
 
         if (empty($bodyOptimized)) {
             echo '내역이 존재하지 않습니다.';
             return false;
-        }        
+        }   
         
         foreach ($bodyOptimized as $key => $value) {
             $prevIndex = array_search('_운임타입', array_keys($filter));
@@ -530,10 +571,10 @@ class PHPExcelDownload {
             $bodyOptimized[$key][$payIndex] = '1';
         }
         
-        // echo '<pre>';
-        // print_r($bodyOptimized);
-        // echo '</pre>';
-        // exit();
+        echo '<pre>';        
+        print_r($bodyOptimized);
+        echo '</pre>';
+        exit();
         
         $data = $bodyOptimized;
         $cntRow = sizeof($bodyOptimized);                
