@@ -571,10 +571,10 @@ class PHPExcelDownload {
             $bodyOptimized[$key][$payIndex] = '1';
         }
         
-        echo '<pre>';        
-        print_r($bodyOptimized);
-        echo '</pre>';
-        exit();
+        // echo '<pre>';        
+        // print_r($bodyOptimized);
+        // echo '</pre>';
+        // exit();
         
         $data = $bodyOptimized;
         $cntRow = sizeof($bodyOptimized);                
