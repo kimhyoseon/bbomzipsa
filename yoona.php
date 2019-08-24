@@ -42,6 +42,9 @@ body {
                 <a href="#" class="list-menu" data-menu="m1m2"><li class="list-group-item">2. M1/M2차트</li></a>
                 <a href="#" class="list-menu" data-menu="jeonmang"><li class="list-group-item">3. 전망차트</li></a>
                 <a href="#" class="list-menu" data-menu="choongjeon"><li class="list-group-item">4. 충전차트</li></a>
+                <a href="#" class="list-menu" data-menu="miboonyang"><li class="list-group-item">5. 미분양차트</li></a>
+                <a href="#" class="list-menu" data-menu="ingoo"><li class="list-group-item">6. 인구수차트</li></a>
+                <a href="#" class="list-menu" data-menu="ingooidong"><li class="list-group-item">7. 인구이동차트</li></a>
             </ul>
         </div>
 
@@ -55,6 +58,7 @@ body {
 var menu = null;
 var chartColumn = 3;
 var chartType = 'LineChart';
+var chartDetail = {};
 
 function clickMenu(e) {    
     menu = $(e.currentTarget).data('menu');    
@@ -371,6 +375,336 @@ function renderchoongjeon(data) {
         drawChart(data, options);        
     }
 }
+
+// 5. 미분양차트
+function rendermiboonyang(data) {   
+    if (!data) return false;    
+    
+    var chartData = [];
+    var index = 0;
+    var min = 0;
+    var max = 0;
+
+    for (var i = 0; i < data.length; i++) {    
+        if (!chartData[index]) chartData[index] = [];
+
+        data[i]['DT'] = parseInt(data[i]['DT'])
+        data[i]['C1_NM'] = data[i]['C1_NM'] + ' ' + data[i]['C2_NM'];
+        
+        // 추가 데이터
+        if (!chartDetail[data[i]['C1_NM']]) {
+            chartDetail[data[i]['C1_NM']] = data[i]['C1'] + '||' + data[i]['C2'];            
+        }
+        
+        chartData[index].push([data[i]['C1_NM'], data[i]['DT']]);
+
+        if (min > data[i]['DT']) {
+            min = data[i]['DT'];
+        }
+
+        if (max < data[i]['DT']) {
+            max = data[i]['DT'];
+        }
+        
+        if (i > 0 && i % 20 == 0) index++;
+    }          
+    
+    // console.log(chartData);    
+
+    chartColumn = 1;
+    
+    chartType = 'ColumnChart';
+
+    for (var i = 0; i < chartData.length; i++) {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', '시군구');
+        data.addColumn('number', '미분양');        
+        data.addRows(chartData[i]);
+
+        var options = {
+            'title': '미분양차트',                 
+            'legend': 'none',             
+            'width': 1000, 
+            'height': 300,
+            vAxis: {                
+                viewWindow: {
+                    max: max,
+                    min: min
+                }
+            }                                    
+        };
+
+        drawChart(data, options);        
+    }   
+    // if (!data) return false;
+    
+    // var chartData = {};
+    
+    // for (var i = 0; i < data.length; i++) {
+    //     for (var j = 0; j < data[i].length; j++) {
+    //         if (!chartData[data[i][j]['C1_NM']]) {
+    //             chartData[data[i][j]['C1_NM']] = [];
+    //         }
+
+    //         chartData[data[i][j]['C1_NM']].push([data[i][j]['PRD_DE'], parseInt(data[i][j]['DT'])]);
+    //     }
+    // }       
+
+    // chartColumn = 1;
+    
+    // chartType = 'ColumnChart';
+
+    // for (key in chartData) {        
+    //     var data = new google.visualization.DataTable();
+    //     data.addColumn('string', 'Date');
+    //     data.addColumn('number', key);       
+    //     data.addRows(chartData[key]);
+
+    //     var options = {
+    //         'title': key,                 
+    //         'legend': 'none',             
+    //         'width': 1000, 
+    //         'height': 300,                
+    //     };
+
+    //     drawChart(data, options);
+    // }    
+}
+
+// 5-1. 미분양 지역상세
+function rendermiboonyangDetail(data) {      
+    if (!data) return false;        
+    
+    var chartData = {};
+    
+    for (var i = 0; i < data.length; i++) {        
+        data[i]['C1_NM'] = data[i]['C1_NM'] + ' ' + data[i]['C2_NM'];
+
+        if (!chartData[data[i]['C1_NM']]) {
+            chartData[data[i]['C1_NM']] = [];
+        }
+
+        chartData[data[i]['C1_NM']].push([data[i]['PRD_DE'], parseInt(data[i]['DT'])]);        
+    }       
+
+    chartColumn = 1;
+    
+    chartType = 'ColumnChart';
+
+    for (key in chartData) {        
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Date');
+        data.addColumn('number', '미분양');       
+        data.addRows(chartData[key]);
+
+        var options = {
+            'title': key,                 
+            'legend': 'none',             
+            'width': 1500, 
+            'height': 300,                
+        };
+
+        drawChart(data, options);
+    }        
+}
+
+// 6. 인구수 (최근 1개월 내)
+function renderingoo(data) {      
+    if (!data) return false;        
+    
+    var chartData = [];
+    var index = 0;
+    var min = 0;
+    var max = 0;
+
+    for (var i = 1; i < data.length; i++) {    
+        if (!chartData[index]) chartData[index] = [];
+
+        data[i]['DT'] = parseInt(data[i]['DT'])
+        
+        // 추가 데이터
+        if (!chartDetail[data[i]['C1_NM']]) {
+            chartDetail[data[i]['C1_NM']] = data[i]['C1'];
+        }
+        
+        chartData[index].push([data[i]['C1_NM'], data[i]['DT']]);
+
+        if (min > data[i]['DT']) {
+            min = data[i]['DT'];
+        }
+
+        if (max < data[i]['DT']) {
+            max = data[i]['DT'];
+        }
+        
+        if (i > 0 && i % 20 == 0) index++;
+    }          
+    
+    // console.log(chartData);    
+
+    chartColumn = 1;
+    
+    chartType = 'ColumnChart';
+
+    for (var i = 0; i < chartData.length; i++) {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', '시군구');
+        data.addColumn('number', '인구수');        
+        data.addRows(chartData[i]);
+
+        var options = {
+            'title': '인구수',                 
+            'legend': 'none',             
+            'width': 1000, 
+            'height': 300,
+            vAxis: {                
+                viewWindow: {
+                    max: max,
+                    min: min
+                }
+            }                                    
+        };
+
+        drawChart(data, options);        
+    }
+}
+
+// 6-1. 인구수차트 지역상세
+function renderingooDetail(data) {      
+    if (!data) return false;
+    
+    var chartData = {};
+    
+    for (var i = 0; i < data['ingoo'].length; i++) {
+        if (!chartData[data['ingoo'][i]['C1_NM']]) {
+            chartData[data['ingoo'][i]['C1_NM']] = [];
+        }
+
+        chartData[data['ingoo'][i]['C1_NM']].push([data['ingoo'][i]['PRD_DE'], parseInt(data['ingoo'][i]['DT']), parseInt(data['sedae'][i]['DT'])]);        
+    }       
+
+    chartColumn = 1;
+    
+    chartType = 'LineChart';
+
+    for (key in chartData) {        
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Date');
+        data.addColumn('number', '인구수');
+        data.addColumn('number', '세대수');
+        data.addRows(chartData[key]);
+
+        var options = {
+            'title': key,                 
+            'legend': 'none',             
+            'width': 1000, 
+            'height': 300, 
+            'series': {                
+                1: { 
+                    'targetAxisIndex': 1
+                }
+            },               
+        };
+
+        drawChart(data, options);
+    }      
+}
+
+// 7. 인구이동차트(최근3개월)
+function renderingooidong(data) {      
+    if (!data) return false;    
+    
+    var chartData = [];
+    var index = 0;
+    var min = 0;
+    var max = 0;
+
+    for (var i = 0; i < data.length; i++) {    
+        if (!chartData[index]) chartData[index] = [];
+
+        data[i]['DT'] = parseInt(data[i]['DT'])
+        
+        // 추가 데이터
+        if (!chartDetail[data[i]['C1_NM']]) {
+            chartDetail[data[i]['C1_NM']] = data[i]['C1'];
+        }
+        
+        chartData[index].push([data[i]['C1_NM'], data[i]['DT']]);
+
+        if (min > data[i]['DT']) {
+            min = data[i]['DT'];
+        }
+
+        if (max < data[i]['DT']) {
+            max = data[i]['DT'];
+        }
+        
+        if (i > 0 && i % 20 == 0) index++;
+    }          
+    
+    // console.log(chartData);    
+
+    chartColumn = 1;
+    
+    chartType = 'ColumnChart';
+
+    for (var i = 0; i < chartData.length; i++) {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', '시군구');
+        data.addColumn('number', '순이동');        
+        data.addRows(chartData[i]);
+
+        var options = {
+            'title': '인구이동차트(최근3개월)',                 
+            'legend': 'none',             
+            'width': 1000, 
+            'height': 300,
+            vAxis: {                
+                viewWindow: {
+                    max: max,
+                    min: min
+                }
+            }                                    
+        };
+
+        drawChart(data, options);        
+    }
+}
+
+// 7-1. 인구이동차트 지역상세
+function renderingooidongDetail(data) {      
+    if (!data) return false;      
+    
+    var chartData = {};
+    
+    for (var i = 0; i < data.length; i++) {        
+        if (!chartData[data[i]['C1_NM']]) {
+            chartData[data[i]['C1_NM']] = [];
+        }
+
+        chartData[data[i]['C1_NM']].push([data[i]['PRD_DE'], parseInt(data[i]['DT'])]);        
+    }       
+
+    chartColumn = 1;
+    
+    chartType = 'ColumnChart';
+
+    for (key in chartData) {        
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Date');
+        data.addColumn('number', key);       
+        data.addRows(chartData[key]);
+
+        var options = {
+            'title': key,                 
+            'legend': 'none',             
+            'width': 1500, 
+            'height': 300,                
+        };
+
+        drawChart(data, options);
+    }        
+}
     
 function drawChart(data, options) {
     if (!data) return false;
@@ -381,6 +715,51 @@ function drawChart(data, options) {
     var chart = new google.visualization[chartType]($('.chart-empty')[0]);
     
     chart.draw(data, options); 
+
+    // 차트 클릭 
+    google.visualization.events.addListener(chart, 'select', function() {
+        var selection = chart.getSelection();
+
+        var message = '';
+        
+        for (var i = 0; i < selection.length; i++) {
+            var item = selection[i]; 
+            var extra = chartDetail[data.getValue(item.row, 0)];
+
+            console.log(extra);        
+            
+            if (extra && window['render' + menu + 'Detail']) {
+
+                $.ajax({
+                    type: "POST",
+                    url: '../api/yoona.php',
+                    dataType : 'json',
+                    cache: false,
+                    timeout: 60000,
+                    data: {
+                        menu: menu + '_detail',
+                        extra: extra 
+                    },
+                    success: function (result, textStatus) {
+                        console.log(result);
+                        console.log(textStatus);                        
+                        window['render' + menu + 'Detail'](result);
+                    },
+                    error: function(result, textStatus, jqXHR) {
+                        console.log(result);
+                        console.log(textStatus);
+                        console.log(jqXHR);
+                    },
+                    complete: function() {
+                    } 
+                });
+            }            
+
+            // console.log(data.getValue(item.row, 0));
+            // console.log(data.getValue(0, item.column));
+            // console.log(data.getValue(item.row, item.column));
+        }        
+    });
 
     $('.chart-empty').eq(0).removeClass('chart-empty');
 }
