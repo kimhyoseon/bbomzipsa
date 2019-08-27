@@ -156,4 +156,26 @@ class Yoona {
 
         return $ingooidongDetail;
     } 
+
+    /**
+     * 시군구 가져오기     
+     */
+    public function getSigoongoo() {
+        $sigoongoo = file_get_contents('http://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&apiKey=NjZkOTczOWMzNWNkNmRlMjAzY2ZjYjNjYjY2YjNjMDY=&itmId=13103890822T1+&objL1=ALL&objL2=1310289082201+&objL3=&objL4=&objL5=&objL6=&objL7=&objL8=&format=json&jsonVD=Y&prdSe=Q&newEstPrdCnt=1&loadGubun=2&orgId=408&tblId=DT_PLCAHTUSE');                      
+        $sigoongoo = json_decode($sigoongoo, true);        
+
+        return $sigoongoo;
+    }
+
+    /**
+     * 평균연령 가져오기     
+     */
+    public function getAgeDetail($code) {
+        if (empty($code)) return false;
+
+        $age = file_get_contents('http://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&apiKey=NjZkOTczOWMzNWNkNmRlMjAzY2ZjYjNjYjY2YjNjMDY=&itmId=T2+&objL1=11200+&objL2=ALL&objL3=&objL4=&objL5=&objL6=&objL7=&objL8=&format=json&jsonVD=Y&prdSe=M&newEstPrdCnt=1&loadGubun=2&orgId=101&tblId=DT_1B04005N');                                                                      
+        $age = json_decode($age, true);        
+
+        return $age;
+    } 
 }

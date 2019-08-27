@@ -42,7 +42,12 @@ try {
         $data = json_encode($yoona->getIngooidong());    
     } else if (MENU == 'ingooidong_detail') {        
         $data = json_encode($yoona->getIngooidongDetail(EXTRA));    
-    } 
+    } else if (MENU == 'age') {
+        $data = json_encode($yoona->getArrayFromExcel('agemonth.xlsx', 0));
+    }
+    // } else if (MENU == 'age_detail') {
+    //     $data = json_encode($yoona->getAgeDetail(EXTRA));    
+    // } 
     // echo '<pre>';
     // print_r($data);
     // echo '</pre>';

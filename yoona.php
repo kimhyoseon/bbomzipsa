@@ -45,6 +45,7 @@ body {
                 <a href="#" class="list-menu" data-menu="miboonyang"><li class="list-group-item">5. 미분양차트</li></a>
                 <a href="#" class="list-menu" data-menu="ingoo"><li class="list-group-item">6. 인구수차트</li></a>
                 <a href="#" class="list-menu" data-menu="ingooidong"><li class="list-group-item">7. 인구이동차트</li></a>
+                <a href="#" class="list-menu" data-menu="age"><li class="list-group-item">8. 평균연령차트</li></a>
             </ul>
         </div>
 
@@ -79,6 +80,38 @@ function clickMenu(e) {
             console.log(textStatus);
             clearChart();
             window['render' + menu](result);
+        },
+        error: function(result, textStatus, jqXHR) {
+            console.log(result);
+            console.log(textStatus);
+            console.log(jqXHR);
+        },
+        complete: function() {
+        } 
+    });
+
+    return false;  
+}
+
+function clickSigoongoo(e) {    
+    extra = $(e.currentTarget).data('code');    
+    
+    if (!extra) return false;
+
+    $.ajax({
+        type: "POST",
+        url: '../api/yoona.php',
+        dataType : 'json',
+        cache: false,
+        timeout: 60000,
+        data: {
+            menu: menu + '_detail',
+            extra: extra 
+        },
+        success: function (result, textStatus) {
+            console.log(result);
+            console.log(textStatus);                        
+            window['render' + menu + 'Detail'](result);
         },
         error: function(result, textStatus, jqXHR) {
             console.log(result);
@@ -705,6 +738,124 @@ function renderingooidongDetail(data) {
         drawChart(data, options);
     }        
 }
+
+// 8. 평균연령
+function renderage(data) {          
+    if (!data) return false;    
+    
+    var chartData = {};    
+    var min = 0;
+    var max = 0;
+    var date = '';
+
+    for (var i = 0; i < data.length; i++) {    
+        if (i == 0) continue;
+        if (i == 1) {
+            date = data[i][1];
+            continue;
+        }
+        if (i == 2) continue;
+        
+        var codes = data[i][0].match(/\((.*)\)/);
+        var name = '';
+        var parent = 0;
+        
+        data[i][0] = data[i][0].substring(0, codes['index']);
+        data[i][0] = data[i][0].split(' ').map(function(item) {
+            if (item) {
+                // 부모
+                if (name) {
+                    parent = name;
+                }
+
+                name = item.trim();
+                return name;
+            }
+        });
+        
+        // console.log(codes[1]);
+        // console.log(name);
+        // return false;
+
+        data[i][3] = parseFloat(data[i][3])
+        
+        // // 추가 데이터
+        // if (!chartDetail[data[i]['C1_NM']]) {
+        //     chartDetail[data[i]['C1_NM']] = data[i]['C1'];
+        // }
+
+
+        if (!chartData[parent]) chartData[parent] = [];
+        chartData[parent].push([name, data[i][3]]);
+
+        if (min > data[i][3]) {
+            min = data[i][3];
+        }
+
+        if (max < data[i][3]) {
+            max = data[i][3];
+        }
+    }          
+    
+    // console.log(chartData);    
+
+    chartColumn = 1;
+    
+    chartType = 'ColumnChart';   
+
+    for (key in chartData) {   
+        // 오름차순 정렬
+        chartData[key].sort(function (a, b) {
+            if (a[1] > b[1]) {
+                return 1;
+            }
+            if (a[1] < b[1]) {
+                return -1;
+            }
+            
+            return 0;
+        });        
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', '읍면동');
+        data.addColumn('number', '평균연령');        
+        data.addRows(chartData[key]);
+        
+        if (key == '0') title = '';        
+        else title = key        
+
+        var options = {
+            'title': title + ' 평균연령 (' + date + ')',                 
+            'legend': 'none',             
+            'width': 1000, 
+            'height': 300,
+            vAxis: {                
+                viewWindow: {
+                    max: max,
+                    min: min
+                }
+            }                                    
+        };
+
+        drawChart(data, options);        
+    } 
+}
+
+// breadcrumb sample
+// function renderage(data) {          
+//     if (!data) return false;     
+    
+//     var html = '<nav aria-label="breadcrumb"><ol class="breadcrumb">';
+
+//     for (var i = 0; i < data.length; i++) {    
+         
+//         html += '<li class="breadcrumb-item"><a href="#" class="sigoongoo" data-code="' + data[i]['C1'] + '">' + data[i]['C1_NM'] + '</a></li>';
+//     } 
+
+//     html += '</ol></nav>';        
+
+//     $('.wrap-chart').html(html);    
+// }
     
 function drawChart(data, options) {
     if (!data) return false;
@@ -785,7 +936,10 @@ function clearChart() {
 }
 
 $(document).ready(function() {
-    $('.list-menu').on('click', clickMenu);    
+    $(document).on('click', '.list-menu', clickMenu);
+    $(document).on('click', '.sigoongoo', clickSigoongoo);
+    // $('.list-menu').on('click', clickMenu);    
+    
 
     // Load the Visualization API and the corechart package.
     google.charts.load('current', {'packages':['corechart']});
