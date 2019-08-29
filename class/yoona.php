@@ -177,5 +177,355 @@ class Yoona {
         $age = json_decode($age, true);        
 
         return $age;
+    }
+
+    /**
+     * 아파트 시군구 가져오기
+     */
+    public function getAptSigoongoo() {
+        // 계정    
+        $accountDb = parse_ini_file($_SERVER['DOCUMENT_ROOT'].'/config/db.ini');
+        require_once $_SERVER['DOCUMENT_ROOT'].'/class/pdo.php';
+        $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+        $list = $db->query("SELECT sigoongoo, code_sigoongoo FROM yoona_apt GROUP BY sigoongoo, code_sigoongoo");
+
+        $db->CloseConnection(); 
+
+        return $list;
+    }
+
+    /**
+     * 아파트 랭킹 가져오기
+     */
+    public function getAptRank($code) {
+        if (empty($code)) return false;
+
+        // 계정    
+        $accountDb = parse_ini_file($_SERVER['DOCUMENT_ROOT'].'/config/db.ini');
+        require_once $_SERVER['DOCUMENT_ROOT'].'/class/pdo.php';
+        $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+        $list = $db->query("SELECT * FROM yoona_apt WHERE code_sigoongoo=?", array($code));
+
+        if (empty($list)) return false;
+
+        $ids = array();
+        $apts = array();
+
+        foreach ($list as $value) {
+            $ids[] = $value['id'];
+            $apts[$value['id']] = $value;
+        }
+
+        $list = $db->query("SELECT yoona_apt_id, MAX(sale_price) as price, size FROM yoona_apt_deal WHERE yoona_apt_id IN (:ids) GROUP BY yoona_apt_id, size", array('ids' => $ids));
+
+        if (empty($list)) return false;
+
+        foreach ($list as $value) {
+            $pyeong = floor(($value['size'] / 3.3) + 10);
+            $pricePerPyeong = floor($value['price'] / $pyeong);            
+            
+            if (empty($apts[$value['yoona_apt_id']]['price']) || $apts[$value['yoona_apt_id']]['price'] < $pricePerPyeong) {
+                $apts[$value['yoona_apt_id']]['price'] = $pricePerPyeong;
+                $apts[$value['yoona_apt_id']]['pyeong'] = $pyeong;
+                $apts[$value['yoona_apt_id']]['size'] = $value['size'];
+            }            
+        }        
+
+        $sort = array();
+
+        foreach ($apts as $key => $value) {
+            if (empty($value['price'])) {
+                unset($apts[$key]);
+                continue;
+            }
+
+            $sort[] = $value['price'];
+        }
+
+        array_multisort($sort, SORT_DESC, $apts);
+
+        $apts = array_slice($apts, 0, 20);
+
+        $db->CloseConnection(); 
+
+        return $apts;
+    }
+
+    /**
+     * 아파트 매매/전세 가져오기
+     */
+    public function getAptDetail($aptId) {
+        if (empty($aptId)) return false;
+
+        $apt = array();
+
+        // 계정    
+        $accountDb = parse_ini_file($_SERVER['DOCUMENT_ROOT'].'/config/db.ini');
+        require_once $_SERVER['DOCUMENT_ROOT'].'/class/pdo.php';
+        $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+        $row = $db->row("SELECT * FROM yoona_apt WHERE id=?", array($aptId));
+
+        if (empty($row)) return false;
+
+        $apt['info'] = $row;        
+
+        $list = $db->query("SELECT * FROM yoona_apt_deal WHERE yoona_apt_id=? ORDER BY date ASC", array($aptId));
+        
+        if (empty($list)) return false;
+
+        $apt['price'] = $list;                
+
+        $db->CloseConnection(); 
+
+        return $apt;
+    }
+
+    
+    
+    
+
+
+
+    /**
+     * CRON *
+     */
+
+    /**
+     * 아파트 매매 가져오기     
+     */
+    public function getAptSale($lawdCd, $date) {
+        if (empty($lawdCd)) return false;
+        if (empty($date)) return false;
+
+        $ch = curl_init();
+        $url = 'http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev';
+        $queryParams  = '?' . urlencode('ServiceKey') . '=' . 'N5FupqoyFxqwcuyheudquznCCBi6IjOliKOT5DpHhTmomTde1WgpW4EkXwCZQ777CmYfcBbtgf%2FBuUqFwbEg2Q%3D%3D'; /*Service Key*/    
+        $queryParams .= '&' . urlencode('pageNo') . '=' . urlencode('1'); /*페이지번호*/
+        $queryParams .= '&' . urlencode('numOfRows') . '=' . urlencode('999'); /*한 페이지 결과 수*/
+        $queryParams .= '&' . urlencode('LAWD_CD') . '=' . urlencode($lawdCd); /*지역코드*/
+        $queryParams .= '&' . urlencode('DEAL_YMD') . '=' . urlencode($date); /*계약월*/
+        $queryParams .= '&' . urlencode('_type') . '=' . urlencode('json'); /*타입*/    
+
+        curl_setopt($ch, CURLOPT_URL, $url . $queryParams);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+        $response = curl_exec($ch);        
+        curl_close($ch);
+
+        if (empty($response)) return false;
+
+        $response = json_decode($response, true); 
+
+        if (empty($response['response']['body']['items']['item'])) return false;
+
+        return $response['response']['body']['items']['item'];          
     } 
+
+    /**
+     * 아파트 전세 가져오기     
+     */
+    public function getAptJeonse($lawdCd, $date) {
+        if (empty($lawdCd)) return false;
+        if (empty($date)) return false;
+
+        $ch = curl_init();
+        $url = 'http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptRent';
+        $queryParams  = '?' . urlencode('ServiceKey') . '=' . 'N5FupqoyFxqwcuyheudquznCCBi6IjOliKOT5DpHhTmomTde1WgpW4EkXwCZQ777CmYfcBbtgf%2FBuUqFwbEg2Q%3D%3D'; /*Service Key*/    
+        $queryParams .= '&' . urlencode('LAWD_CD') . '=' . urlencode($lawdCd); /*지역코드*/
+        $queryParams .= '&' . urlencode('DEAL_YMD') . '=' . urlencode($date); /*계약월*/
+        $queryParams .= '&' . urlencode('_type') . '=' . urlencode('json'); /*타입*/    
+
+        curl_setopt($ch, CURLOPT_URL, $url . $queryParams);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        if (empty($response)) return false;
+
+        $response = json_decode($response, true);    
+
+        if (empty($response['response']['body']['items']['item'])) return false;
+
+        return $response['response']['body']['items']['item'];          
+    }
+
+    /**
+     * 아파트 거래데이터 setter
+     */
+    public function setAptData($result, $data, $type, $date) {
+        if (empty($data)) return false;
+        if (empty($type)) return false;
+        if (empty($date)) return false;        
+
+        // 월세라면 continue
+        if ($type == 'jeonse') {
+            if ($data['월세금액'] > 0) return $result;
+            
+            $price = $data['보증금액'];         
+        } else {
+            $price = $data['거래금액'];        
+        } 
+            
+        
+        $code = "{$data['지역코드']}||{$data['아파트']}";
+        $data['전용면적'] = floor($data['전용면적']);
+        
+        if (empty($result[$code])) {
+            $result[$code] = array();            
+        }
+        
+        if (empty($result[$code][$date])) {            
+            $result[$code][$date] = array();
+        }
+
+        if (empty($result[$code][$date][$data['전용면적']])) {            
+            $result[$code][$date][$data['전용면적']] = array('sale' => array(), 'jeonse' => array());
+        }
+
+        $result[$code][$date][$data['전용면적']][$type][] = intval(str_replace(',', '', $price));
+
+        return $result;
+    }
+
+    /**
+     * 아파트 ID 회득 (없을 시 저장)
+     */
+    public function getAptId($db, $aptData, $sigoongoo) {
+        if (empty($db)) return false;
+        if (empty($aptData)) return false;                
+        if (empty($sigoongoo)) return false;                  
+
+        // 아파트 조회
+        $row = $db->row("SELECT * FROM yoona_apt WHERE code_sigoongoo=? AND name_apt=?", array($aptData['법정동시군구코드'], $aptData['아파트']));
+        
+        // 있다면 id 리턴
+        if (!empty($row)) {
+            $aptData['id'] = $row['id'];
+            return $aptData;
+        }
+        
+        // 없다면 insert 후 id 리턴
+
+        $aptData['법정동코드'] = $aptData['법정동시군구코드'].$aptData['법정동읍면동코드'];
+
+        // 시군구가 동일하게 유지되기 위해서 DB에서 기존 시군구 가져오기
+        $row = $db->row("SELECT * FROM yoona_apt WHERE code_sigoongoo=?", array($aptData['법정동시군구코드']));
+
+        if (!empty($row)) {
+            $sigoongoo = $row['sigoongoo'];
+        }        
+
+        $insertData = array(
+            'year_build' => $aptData['건축년도'],
+            'name_apt' => $aptData['아파트'],            
+            'sigoongoo' => $sigoongoo,
+            'upmyeondong' => $aptData['법정동'],
+            'code_beopjeongdong' => $aptData['법정동코드'],
+            'code_sigoongoo' => $aptData['법정동시군구코드'],
+            'code_eupmyeondong' => $aptData['법정동읍면동코드'],            
+        );
+
+        if (!empty($aptData['일련번호'])) $insertData['number_apt'] = $aptData['일련번호'];
+        if (!empty($aptData['도로명'])) $insertData['road'] = $aptData['도로명'];
+        if (!empty($aptData['도로명코드'])) $insertData['code_road'] = $aptData['도로명코드'];        
+
+        $dbName = array_keys($insertData, true);
+        $dbValues = array_map(function ($val) {
+            return ':'.$val;
+        }, $dbName);
+        $dbName = implode(',', $dbName);
+        $dbValues = implode(',', $dbValues);
+
+        $dbResult = $db->query("INSERT INTO yoona_apt ({$dbName}) VALUES({$dbValues})", $insertData);
+        
+        $aptData['id'] = $db->lastInsertId();
+        return $aptData;        
+    }
+
+    /**
+     * 아파트 거래 저장
+     */
+    public function setAptDeal($db, $aptInfo, $aptDealData) {
+        if (empty($db)) return false;
+        if (empty($aptInfo)) return false;                
+        if (empty($aptDealData)) return false;            
+
+        foreach ($aptDealData as $date => $value1) {
+            foreach ($value1 as $size => $value2) {
+                $insertData = array(
+                    'yoona_apt_id' => $aptInfo['id'],
+                    'date' => $date,
+                    'year' => substr($date, 0, 4),
+                    'month' => substr($date, 4, 2),                    
+                    'size' => $size,                    
+                );
+
+                if (!empty($value2['sale'])) {
+                    $insertData['sale_count'] = count($value2['sale']);
+                    $insertData['sale_price'] = floor(array_sum($value2['sale']) / $insertData['sale_count']);
+                    $insertData['sale_price_max'] = max($value2['sale']);
+                    $insertData['sale_price_min'] = min($value2['sale']);                    
+                }
+
+                if (!empty($value2['jeonse'])) {
+                    $insertData['jeonse_count'] = count($value2['jeonse']);
+                    $insertData['jeonse_price'] = floor(array_sum($value2['jeonse']) / $insertData['jeonse_count']);
+                    $insertData['jeonse_price_max'] = max($value2['jeonse']);
+                    $insertData['jeonse_price_min'] = min($value2['jeonse']);                    
+                }
+
+                // 데이터가 있는지 확인
+                $row = $db->row("SELECT * FROM yoona_apt_deal WHERE yoona_apt_id=? AND date=? AND size=?", array($insertData['yoona_apt_id'], $insertData['date'], $insertData['size']));
+                
+                // print_r(array($insertData['yoona_apt_id'], $insertData['date'], $insertData['size']));
+                // print_r($row);
+
+                // 있다면 UPDATE
+                if (!empty($row)) {
+                    $isPass = true;
+                    // 가격이 같은 경우 continue;
+                    if (!empty($insertData['jeonse_price']) && $row['jeonse_price'] != $insertData['jeonse_price']) $isPass = false;
+                    if (!empty($insertData['sale_price']) && $row['sale_price'] != $insertData['sale_price']) $isPass = false;                    
+                    if ($isPass == true) continue;
+
+                    unset($insertData['yoona_apt_id']);
+                    unset($insertData['date']);
+                    unset($insertData['size']);                    
+
+                    $dbUpdate = array_map(function ($key) {
+                        return $key.' = :'.$key;
+                    }, array_keys($insertData, true));
+                    $dbUpdate = implode(', ', $dbUpdate);                   
+
+                    echo 'UPDATE '.implode(',', $insertData).PHP_EOL;    
+                    // print_r("UPDATE yoona_apt_deal SET {$dbUpdate} WHERE id = {$row['yoona_apt_id']}");
+                    // print_r($insertData);
+
+                    $dbResult = $db->query("UPDATE yoona_apt_deal SET {$dbUpdate} WHERE yoona_apt_id = {$row['yoona_apt_id']} AND date = {$row['date']} AND size = {$row['size']}", $insertData);
+                // 없다면 INSERT
+                } else {
+                    $dbName = array_keys($insertData, true);
+                    $dbValues = array_map(function ($val) {
+                        return ':'.$val;
+                    }, $dbName);
+                    $dbName = implode(',', $dbName);
+                    $dbValues = implode(',', $dbValues);
+
+                    echo 'INSERT '.implode(',', $insertData).PHP_EOL;    
+                    // print_r("INSERT INTO yoona_apt_deal ({$dbName}) VALUES({$dbValues})");
+                    // print_r($insertData);
+            
+                    $dbResult = $db->query("INSERT INTO yoona_apt_deal ({$dbName}) VALUES({$dbValues})", $insertData);                    
+                }     
+            }            
+        }     
+        
+        return true;
+    }
 }

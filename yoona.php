@@ -46,6 +46,7 @@ body {
                 <a href="#" class="list-menu" data-menu="ingoo"><li class="list-group-item">6. 인구수차트</li></a>
                 <a href="#" class="list-menu" data-menu="ingooidong"><li class="list-group-item">7. 인구이동차트</li></a>
                 <a href="#" class="list-menu" data-menu="age"><li class="list-group-item">8. 평균연령차트</li></a>
+                <a href="#" class="list-menu" data-menu="apt"><li class="list-group-item">9. 아파트</li></a>
             </ul>
         </div>
 
@@ -112,6 +113,35 @@ function clickSigoongoo(e) {
             console.log(result);
             console.log(textStatus);                        
             window['render' + menu + 'Detail'](result);
+        },
+        error: function(result, textStatus, jqXHR) {
+            console.log(result);
+            console.log(textStatus);
+            console.log(jqXHR);
+        },
+        complete: function() {
+        } 
+    });
+
+    return false;  
+}
+
+function callApi(data, callback) {
+    if (!data) return false;    
+
+    $.ajax({
+        type: "POST",
+        url: '../api/yoona.php',
+        dataType : 'json',
+        cache: false,
+        timeout: 60000,
+        data: data,
+        success: function (result, textStatus) {
+            console.log(result);
+            console.log(textStatus); 
+            if (callback && typeof callback == 'function') {
+                callback(result);
+            }                                   
         },
         error: function(result, textStatus, jqXHR) {
             console.log(result);
@@ -841,6 +871,66 @@ function renderage(data) {
     } 
 }
 
+// 9. 아파트
+function renderapt(data) {          
+    if (!data) return false;       
+    
+    var html = '<select class="form-control" id="apt-sigoongoo">';
+    html    += '<option value="">- 시군구 -</option>';
+
+    for (var i = 0; i < data.length; i++) {   
+        html += '<option value="' + data[i]['code_sigoongoo'] + '">' + data[i]['sigoongoo'] + '</option>';
+        html += '<li class="breadcrumb-item"><a href="#" class="sigoongoo" data-code="' + data[i]['C1'] + '">' + data[i]['C1_NM'] + '</a></li>';
+    } 
+
+    html += '</select>';        
+
+    $('.wrap-chart').html(html);    
+}
+
+// 9-1. 아파트 랭킹 렌더링
+function renderaptSiRank(data) {          
+    if (!data) return false;           
+    
+    var chartData = [];
+    
+    for (var i = 0; i < data.length; i++) {                
+        var aptName = data[i]['name_apt'] + ' (' + data[i]['upmyeondong'] + ', ' + data[i]['pyeong'] + '평)';
+        
+        // 추가 데이터
+        if (!chartDetail[aptName]) {
+            chartDetail[aptName] = data[i]['id'];
+        }
+
+        chartData.push([aptName, parseInt(data[i]['price'])]);        
+    }       
+
+    chartColumn = 1;
+    
+    chartType = 'ColumnChart';
+    
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', '아파트');
+    data.addColumn('number', '평당가격');       
+    data.addRows(chartData);
+
+    var options = {
+        'title': '평당가격 순위',                 
+        'legend': 'none',             
+        'width': 1500, 
+        'height': 300,                
+    };
+
+    drawChart(data, options);
+}
+
+// 9-2. 아파트 매매/전세, 가치 렌더링
+function renderaptDetail(data) {          
+    if (!data) return false;           
+
+    
+}
+
 // breadcrumb sample
 // function renderage(data) {          
 //     if (!data) return false;     
@@ -877,6 +967,7 @@ function drawChart(data, options) {
             var item = selection[i]; 
             var extra = chartDetail[data.getValue(item.row, 0)];
 
+            console.log(data.getValue(item.row, 0))
             console.log(extra);        
             
             if (extra && window['render' + menu + 'Detail']) {
@@ -938,6 +1029,11 @@ function clearChart() {
 $(document).ready(function() {
     $(document).on('click', '.list-menu', clickMenu);
     $(document).on('click', '.sigoongoo', clickSigoongoo);
+    $(document).on('change', '#apt-sigoongoo', function (){
+        var code = $(this).val();
+        if (!code) return false;        
+        callApi({menu: 'apt_rank', extra: code}, renderaptSiRank);
+    });
     // $('.list-menu').on('click', clickMenu);    
     
 

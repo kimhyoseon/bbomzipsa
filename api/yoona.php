@@ -5,6 +5,15 @@ try {
     ini_set("default_socket_timeout", 30);
     header("Access-Control-Allow-Origin: *");
     header('Content-Type: application/json');   
+
+    // include_once($_SERVER['DOCUMENT_ROOT'].'/class/yoona.php');
+    // $yoona = new Yoona(); 
+    // $data = $yoona->getAptDetail('7');
+
+    // echo '<pre>';
+    // print_r($data);
+    // echo '</pre>';
+    // exit();
     
     define('MENU', (filter_input(INPUT_POST, 'menu', FILTER_SANITIZE_STRING)));
     define('EXTRA', (filter_input(INPUT_POST, 'extra', FILTER_SANITIZE_STRING)));
@@ -44,14 +53,13 @@ try {
         $data = json_encode($yoona->getIngooidongDetail(EXTRA));    
     } else if (MENU == 'age') {
         $data = json_encode($yoona->getArrayFromExcel('agemonth.xlsx', 0));
+    } else if (MENU == 'apt') {
+        $data = json_encode($yoona->getAptSigoongoo());
+    } else if (MENU == 'apt_rank') {
+        $data = json_encode($yoona->getAptRank(EXTRA));
+    } else if (MENU == 'apt_detail') {
+        $data = json_encode($yoona->getAptDetail(EXTRA));
     }
-    // } else if (MENU == 'age_detail') {
-    //     $data = json_encode($yoona->getAgeDetail(EXTRA));    
-    // } 
-    // echo '<pre>';
-    // print_r($data);
-    // echo '</pre>';
-    // exit();
 
     if (empty($data)) {
         throw new Exception(null, 400);
