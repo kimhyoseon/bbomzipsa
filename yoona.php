@@ -926,9 +926,36 @@ function renderaptSiRank(data) {
 
 // 9-2. 아파트 매매/전세, 가치 렌더링
 function renderaptDetail(data) {          
-    if (!data) return false;           
+    if (!data) return false;  
 
+    var startYm = data.price[0].date;
+    var priceDefault = {};
+
+    for (var i = 0; i < data.price.length; i++) {
+        if (!priceDefault[data.price[i]['size']]) priceDefault[data.price[i]['size']] = {};
+        
+        // 여기부터!!!
+        if (!priceDefault[data.price[i]['size']]['jeonse_price'] && data.price[i]['jeonse_price'] > 0) priceDefault[data.price[i]['size']]['jeonse_price'] = data.price[i]['jeonse_price'];
+    }
+
+    // 기본 0 차트데이터 준비
+    var yms = getYmArrayAfterYm(startYm);    
+    var chartData = {};
     
+    for (var i = 0; i < yms.length; i++) {             
+        chartData[yms[i]] = {
+            'sale_count' : 0,
+            'sale_price' : 0,
+            'sale_price_max' : 0,
+            'sale_price_min' : 0,
+            'jeonse_count' : 0,
+            'jeonse_price' : 0,
+            'jeonse_price_max' : 0,
+            'jeonse_price_min' : 0,
+        }
+    } 
+
+    console.log(chartData);
 }
 
 // breadcrumb sample
@@ -1025,6 +1052,41 @@ function insertChart() {
 function clearChart() {
     $('.wrap-chart').html('');
 }
+
+function getYmArrayAfterYm(startYm) {
+    if (!startYm) return false;
+
+    var startYear = parseInt(startYm.substring(0, 4));
+    var startMonth = parseInt(startYm.substring(4, 6)) - 1;               
+
+    var now = new Date();
+    var ym = [];
+    
+    for (var d = new Date(startYear, startMonth, 1); d <= now; d.setMonth(d.getMonth() + 1)) {    
+        var year = d.getFullYear();
+        var month = d.getMonth() + 1;
+        month = (month > 9 ? '' : '0') + month;        
+        ym.push(year + month);        
+    }    
+
+    return ym;
+}
+
+// function getYArrayAfterY(startY) {
+//     if (!startY) return false;
+
+//     var startYear = parseInt(startY.substring(0, 4));    
+
+//     var now = new Date();
+//     var y = [];
+    
+//     for (var d = new Date(startYear, 0, 1); d <= now; d.setYear(d.getYear() + 1)) {    
+//         var year = d.getFullYear();                
+//         y.push(year);        
+//     }    
+
+//     return y;
+// }
 
 $(document).ready(function() {
     $(document).on('click', '.list-menu', clickMenu);
