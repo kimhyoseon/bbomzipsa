@@ -929,31 +929,84 @@ function renderaptDetail(data) {
     if (!data) return false;  
 
     var startYm = data.price[0].date;
-    var priceDefault = {};
+    var priceDefault = {};    
+    var priceDates = {};  
+
+    var now = new Date();
+    var month = now.getMonth() + 1;
+    month = (month > 9 ? '' : '0') + month;  
 
     for (var i = 0; i < data.price.length; i++) {
-        if (!priceDefault[data.price[i]['size']]) priceDefault[data.price[i]['size']] = {};
+        if (!priceDefault[data.price[i]['size']]) priceDefault[data.price[i]['size']] = {'jeonse_price': 0, 'jeonse_price_max': 0, 'jeonse_price_min': 0, 'sale_price': 0, 'sale_price_max': 0, 'sale_price_min': 0};                
+        if (!priceDates[data.price[i]['size']]) priceDates[data.price[i]['size']] = {};                
         
-        // 여기부터!!!
         if (!priceDefault[data.price[i]['size']]['jeonse_price'] && data.price[i]['jeonse_price'] > 0) priceDefault[data.price[i]['size']]['jeonse_price'] = data.price[i]['jeonse_price'];
+        if (!priceDefault[data.price[i]['size']]['jeonse_price_max'] && data.price[i]['jeonse_price_max'] > 0) priceDefault[data.price[i]['size']]['jeonse_price_max'] = data.price[i]['jeonse_price_max'];
+        if (!priceDefault[data.price[i]['size']]['jeonse_price_min'] && data.price[i]['jeonse_price_min'] > 0) priceDefault[data.price[i]['size']]['jeonse_price_min'] = data.price[i]['jeonse_price_min'];
+        if (!priceDefault[data.price[i]['size']]['sale_price'] && data.price[i]['sale_price'] > 0) priceDefault[data.price[i]['size']]['sale_price'] = data.price[i]['sale_price'];
+        if (!priceDefault[data.price[i]['size']]['sale_price_max'] && data.price[i]['sale_price_max'] > 0) priceDefault[data.price[i]['size']]['sale_price_max'] = data.price[i]['sale_price_max'];
+        if (!priceDefault[data.price[i]['size']]['sale_price_min'] && data.price[i]['sale_price_min'] > 0) priceDefault[data.price[i]['size']]['sale_price_min'] = data.price[i]['sale_price_min'];
+
+        priceDates[data.price[i]['size']][data.price[i]['date']] = data.price[i];
     }
 
-    // 기본 0 차트데이터 준비
+    console.log(priceDefault);
+
     var yms = getYmArrayAfterYm(startYm);    
     var chartData = {};
-    
-    for (var i = 0; i < yms.length; i++) {             
-        chartData[yms[i]] = {
-            'sale_count' : 0,
-            'sale_price' : 0,
-            'sale_price_max' : 0,
-            'sale_price_min' : 0,
-            'jeonse_count' : 0,
-            'jeonse_price' : 0,
-            'jeonse_price_max' : 0,
-            'jeonse_price_min' : 0,
+
+    for (var size in priceDefault) {
+        var titlePrice = data.info.name_apt + ' 매매/전세' + '(' + size + ')';
+        var titleCount = data.info.name_apt + ' 거래횟수' + '(' + size + ')';
+        var titleEnergy = data.info.name_apt + ' 충전차트' + '(' + size + ')';
+        var energies = [];
+        chartData[titlePrice] = [];
+        chartData[titleCount] = [];
+        chartData[titleEnergy] = [];
+
+        for (var i = 0; i < yms.length; i++) {             
+            if (priceDates[size][yms[i]]) {
+                if (priceDates[size][yms[i]]['jeonse_price'] > 0) priceDefault[size]['jeonse_price'] = priceDates[size][yms[i]]['jeonse_price'];
+                if (priceDates[size][yms[i]]['jeonse_price_max'] > 0) priceDefault[size]['jeonse_price_max'] = priceDates[size][yms[i]]['jeonse_price_max'];
+                if (priceDates[size][yms[i]]['jeonse_price_min'] > 0) priceDefault[size]['jeonse_price_min'] = priceDates[size][yms[i]]['jeonse_price_min'];
+                if (priceDates[size][yms[i]]['sale_price'] > 0) priceDefault[size]['sale_price'] = priceDates[size][yms[i]]['sale_price'];
+                if (priceDates[size][yms[i]]['sale_price_max'] > 0) priceDefault[size]['sale_price_max'] = priceDates[size][yms[i]]['sale_price_max'];
+                if (priceDates[size][yms[i]]['sale_price_min'] > 0) priceDefault[size]['sale_price_min'] = priceDates[size][yms[i]]['sale_price_min'];
+            }
+
+            chartData[titlePrice].push([
+                yms[i], 
+                priceDefault[size]['jeonse_price'],
+                priceDefault[size]['jeonse_price_max'],
+                priceDefault[size]['jeonse_price_min'],
+                priceDefault[size]['sale_price'],
+                priceDefault[size]['sale_price_max'],
+                priceDefault[size]['sale_price_min'],
+            ]);
+
+            chartData[titleCount].push([
+                yms[i], 
+                (priceDates[size][yms[i]] && priceDates[size][yms[i]]['sale_count'] || 0),
+                (priceDates[size][yms[i]] && priceDates[size][yms[i]]['jeonse_count'] || 0), 
+            ]);
+            
+            // 이번 달과 같다면 가격 추출
+            if (yms[i].substring(4, 6) == month) {
+                var year = yms[i].substring(0, 4);
+                var energy = getEnergy(year, priceDefault[size]['sale_price']);
+                
+                if (energy) {
+                    chartData[titleEnergy].push([
+                        year, 
+                        priceDefault[size]['sale_price'],
+                        energy,
+                    ]);
+
+                    energies.push(energy)
+                }                
+            }
         }
-    } 
+    }
 
     console.log(chartData);
 }
@@ -1070,6 +1123,33 @@ function getYmArrayAfterYm(startYm) {
     }    
 
     return ym;
+}
+
+function getEnergy(year, price) {
+    if (!year) return false;
+    if (!price) return false;
+
+    energy = 0;
+
+    // 연평균소득
+    if (year = '2004') energy = price / 37349688;
+    else if (year = '2005') energy = price / 39025080;
+    else if (year = '2006') energy = price / 41328648;
+    else if (year = '2007') energy = price / 43874412;
+    else if (year = '2008') energy = price / 46807464;
+    else if (year = '2009') energy = price / 46238268;
+    else if (year = '2010') energy = price / 48092052;
+    else if (year = '2011') energy = price / 50983428;
+    else if (year = '2012') energy = price / 53908368;
+    else if (year = '2013') energy = price / 55274592;
+    else if (year = '2014') energy = price / 56815236;
+    else if (year = '2015') energy = price / 57799980;
+    else if (year = '2016') energy = price / 58613376;
+    else if (year = '2017') energy = price / 60031080;
+    else if (year = '2018') energy = price / 61531857;
+    else if (year = '2019') energy = price / 63070153;
+    
+    return (energy * 10000).toFixed(1)
 }
 
 // function getYArrayAfterY(startY) {
