@@ -11,14 +11,14 @@ try {
     $_SERVER['DOCUMENT_ROOT'] = dirname(dirname(__FILE__));    
     
     // 지역코드 5자리 (시군구), 인구수 차트로 확인 가능    
-    $lawdCd = '41273';
-    $sigoongoo = '안산시 단원구';
+    $lawdCd = '44133';
+    $sigoongoo = '천안시 서북구';
 
     // 수집시작일 (이번달)
     $date = date('Ym');    
-    // $date = '201703';    
-    // $dateEnd = null;
-    $dateEnd = '201701';    
+    // $date = '201501';    
+    $dateEnd = null;
+    // $dateEnd = '201501';    
 
     // 계정    
     $accountDb = parse_ini_file($_SERVER['DOCUMENT_ROOT'].'/config/db.ini');
@@ -39,8 +39,8 @@ try {
     // if (!empty($row)) {
     //     $dateEnd = $row['date'];
     // }    
-
-    print_r($dateEnd);    
+    
+    echo "$sigoongoo ({$dateEnd} ~ {$date}) 까지 수집시작.".PHP_EOL;      
 
     // while roof
     while (1) {

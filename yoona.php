@@ -36,12 +36,13 @@ body {
 
 <body>  
     <div class="container-fluid">
-        <div class="row mt-2 mb-2">
+        <div class="row m-0 mt-2 mb-2">
             <ul class="list-group list-group-horizontal">
-                <a href="#" class="list-menu" data-menu="simri"><li class="list-group-item">1. 심리차트</li></a>
+                <a href="#" class="list-menu" data-menu="simri"><li class="list-group-item" title="매주 금요일 업데이트(KB주간)">1. 심리차트(광역시,도)</li></a>
                 <a href="#" class="list-menu" data-menu="m1m2"><li class="list-group-item">2. M1/M2차트</li></a>
-                <a href="#" class="list-menu" data-menu="jeonmang"><li class="list-group-item">3. 전망차트</li></a>
-                <a href="#" class="list-menu" data-menu="choongjeon"><li class="list-group-item">4. 충전차트</li></a>
+                <a href="#" class="list-menu" data-menu="jeonmang"><li class="list-group-item" title="매달 말일 업데이트(KB월간)">3. 전망차트(광역시,도)</li></a>
+                <a href="#" class="list-menu" data-menu="jeonmang2"><li class="list-group-item" title="매주 금요일 업데이트(KB주간)">3-1. 전망차트(시군구)</li></a>
+                <a href="#" class="list-menu" data-menu="choongjeon"><li class="list-group-item" title="매주 금요일 업데이트(KB주간)">4. 충전차트(시군구)</li></a>
                 <a href="#" class="list-menu" data-menu="miboonyang"><li class="list-group-item">5. 미분양차트</li></a>
                 <a href="#" class="list-menu" data-menu="ingoo"><li class="list-group-item">6. 인구수차트</li></a>
                 <a href="#" class="list-menu" data-menu="ingooidong"><li class="list-group-item">7. 인구이동차트</li></a>
@@ -50,7 +51,7 @@ body {
             </ul>
         </div>
 
-        <div class="row mt-2 mb-2">
+        <div class="row m-0 mt-2 mb-2">
             <div class="wrap-chart"></div>
         </div>
     </div>    
@@ -58,7 +59,6 @@ body {
 
 <script>
 var menu = null;
-var chartColumn = 3;
 var chartType = 'LineChart';
 var chartDetail = {};
 
@@ -162,6 +162,7 @@ function rendersimri(data) {
         var chartData = {};
         var chartTitle = {};
         var year = null;
+        var lastDate = null;
         
         for (var i = 0; i < data.length; i++) {
             if (i == 0) continue;
@@ -196,6 +197,8 @@ function rendersimri(data) {
                 
                 chartData[key].push([data[i][0], parseFloat(data[i][key]), parseFloat(data[i][(parseInt(key) + 1)])]);
             }
+
+            lastDate = data[i][0];
         }
     }
         
@@ -203,7 +206,6 @@ function rendersimri(data) {
     // console.log(chartData);
     // return false;  
 
-    chartColumn = 3;
     chartType = 'LineChart';
     
     for (key in chartTitle) {        
@@ -214,10 +216,10 @@ function rendersimri(data) {
         data.addRows(chartData[key]);
 
         var options = {
-            'title': chartTitle[key],                 
+            'title': chartTitle[key] + ' (' + lastDate + ')',                 
             'legend': 'none', 
-            'width': 400, 
-            'height': 200
+            'width': getRowWidth(), 
+            'height': 300,
         };
 
         drawChart(data, options);
@@ -232,7 +234,7 @@ function renderm1m2(data) {
         var m1m2Sum = 0;
         var m1m2Average = 0;
         chartData['m1'] = [];
-        chartData['m1m2'] = [];
+        chartData['m1m2'] = [];        
         
         for (var i = 0; i < data['m1'].length; i++) {
             var m1m2Ratio = parseFloat((data['m1'][i].DT/data['m2'][i].DT).toFixed(2));
@@ -248,8 +250,6 @@ function renderm1m2(data) {
         }
 
         console.log(chartData);        
-
-        chartColumn = 1;
         
         chartType = 'ComboChart';
 
@@ -268,8 +268,8 @@ function renderm1m2(data) {
                 'title': key,                 
                 'legend': 'none', 
                 'seriesType': 'bars',
-                'width': 1000, 
-                'height': 300,                
+                'width': getRowWidth(), 
+                'height': 300,              
             };
 
             if (key == 'm1m2') {                
@@ -330,6 +330,90 @@ function renderjeonmang(data) {
             maemae = parseFloat(maemae.toFixed(2));
             jeonse = parseFloat(jeonse.toFixed(2));
             
+            chartData[key].push([data['maemae'][i][0], jeonse, maemae]);
+        }
+    }
+    
+    // console.log(chartTitle);
+    // console.log(chartData);
+    // return false;  
+
+    chartType = 'ColumnChart';
+
+    for (key in chartTitle) {        
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Date');        
+        data.addColumn('number', '전세');
+        data.addColumn('number', '매매');
+        data.addRows(chartData[key]);
+
+        var options = {
+            'title': chartTitle[key],                 
+            'legend': 'none', 
+            'width': getRowWidth(), 
+            'height': 300,
+        };
+
+        drawChart(data, options);   
+    } 
+}
+
+// 3. 부동산전망 차트2
+function renderjeonmang2(data) {
+    if (!data) return false;
+    
+    var chartData = {};
+    var chartTitle = {};
+    var year = null;
+    
+    for (var i = 0; i < data['maemae'].length; i++) {
+        if (i == 0) continue;
+        if (i == 2) continue;        
+        
+        if (i == 1) {
+            for (var j = 1; j < data['maemae'][i].length; j++) {                                    
+                if (data['maemae'][i][j]) {
+                    chartTitle[j] = data['maemae'][i][j];
+                }
+            }
+
+            continue;
+        }
+        
+        if (!data['maemae'][i][0]) continue;
+
+        // 연도 생성
+        var date = data['maemae'][i][0].split('/');
+        
+        if (date.length == 3) {
+            year = date[0];
+        } else {
+            data['maemae'][i][0] = year + '/' + data['maemae'][i][0];
+        }
+
+        // 데이터가 많아서 올해 데이터만
+        if (year < 19) continue;
+        
+        // // 연도 생성
+        // if (typeof data['maemae'][i][0] == 'string' && data['maemae'][i][0].indexOf('.') !== -1) {
+        //     year = data['maemae'][i][0].split('.')[0]                        
+        //     year = year.substring(1);         
+        //     data['maemae'][i][0] = data['maemae'][i][0].substring(1);
+        // } else {
+        //     data['maemae'][i][0] = year + '.' + data['maemae'][i][0];
+        // }
+
+        for (key in chartTitle) {
+            if (!chartData[key]) {
+                chartData[key] = [];
+            }
+            
+            var jeonse = parseFloat(data['jeonse'][i][key]);
+            var maemae = parseFloat(data['maemae'][i][key]);
+
+            // maemae = parseFloat(maemae.toFixed(2));
+            // jeonse = parseFloat(jeonse.toFixed(2));
+            
             chartData[key].push([data['maemae'][i][0], maemae, jeonse]);
         }
     }
@@ -338,7 +422,6 @@ function renderjeonmang(data) {
     // console.log(chartData);
     // return false;  
 
-    chartColumn = 2;
     chartType = 'ColumnChart';
 
     for (key in chartTitle) {        
@@ -351,8 +434,8 @@ function renderjeonmang(data) {
         var options = {
             'title': chartTitle[key],                 
             'legend': 'none', 
-            'width': 600, 
-            'height': 300
+            'width': getRowWidth(), 
+            'height': 300,
         };
 
         drawChart(data, options);   
@@ -411,8 +494,7 @@ function renderchoongjeon(data) {
     // console.log(chartTitle);
     // console.log(chartData);
     // return false;  
-
-    chartColumn = 3;
+    
     chartType = 'LineChart';
     
     for (key in chartTitle) {        
@@ -426,8 +508,8 @@ function renderchoongjeon(data) {
         var options = {
             'title': chartTitle[key],                 
             'legend': 'none', 
-            'width': 400, 
-            'height': 200,
+            'width': getRowWidth(), 
+            'height': 300,
             'series': {                
                 2: { 
                     'targetAxisIndex': 1
@@ -472,9 +554,7 @@ function rendermiboonyang(data) {
         if (i > 0 && i % 20 == 0) index++;
     }          
     
-    // console.log(chartData);    
-
-    chartColumn = 1;
+    // console.log(chartData);        
     
     chartType = 'ColumnChart';
 
@@ -487,7 +567,7 @@ function rendermiboonyang(data) {
         var options = {
             'title': '미분양차트',                 
             'legend': 'none',             
-            'width': 1000, 
+            'width': getRowWidth(), 
             'height': 300,
             vAxis: {                
                 viewWindow: {
@@ -511,9 +591,7 @@ function rendermiboonyang(data) {
 
     //         chartData[data[i][j]['C1_NM']].push([data[i][j]['PRD_DE'], parseInt(data[i][j]['DT'])]);
     //     }
-    // }       
-
-    // chartColumn = 1;
+    // }           
     
     // chartType = 'ColumnChart';
 
@@ -527,7 +605,7 @@ function rendermiboonyang(data) {
     //         'title': key,                 
     //         'legend': 'none',             
     //         'width': 1000, 
-    //         'height': 300,                
+    //         'height': 300,,                
     //     };
 
     //     drawChart(data, options);
@@ -548,9 +626,7 @@ function rendermiboonyangDetail(data) {
         }
 
         chartData[data[i]['C1_NM']].push([data[i]['PRD_DE'], parseInt(data[i]['DT'])]);        
-    }       
-
-    chartColumn = 1;
+    }           
     
     chartType = 'ColumnChart';
 
@@ -563,8 +639,8 @@ function rendermiboonyangDetail(data) {
         var options = {
             'title': key,                 
             'legend': 'none',             
-            'width': 1500, 
-            'height': 300,                
+            'width': getRowWidth(), 
+            'height': 300,               
         };
 
         drawChart(data, options);
@@ -604,8 +680,6 @@ function renderingoo(data) {
     }          
     
     // console.log(chartData);    
-
-    chartColumn = 1;
     
     chartType = 'ColumnChart';
 
@@ -618,7 +692,7 @@ function renderingoo(data) {
         var options = {
             'title': '인구수',                 
             'legend': 'none',             
-            'width': 1000, 
+            'width': getRowWidth(), 
             'height': 300,
             vAxis: {                
                 viewWindow: {
@@ -644,9 +718,7 @@ function renderingooDetail(data) {
         }
 
         chartData[data['ingoo'][i]['C1_NM']].push([data['ingoo'][i]['PRD_DE'], parseInt(data['ingoo'][i]['DT']), parseInt(data['sedae'][i]['DT'])]);        
-    }       
-
-    chartColumn = 1;
+    }           
     
     chartType = 'LineChart';
 
@@ -660,7 +732,7 @@ function renderingooDetail(data) {
         var options = {
             'title': key,                 
             'legend': 'none',             
-            'width': 1000, 
+            'width': getRowWidth(), 
             'height': 300, 
             'series': {                
                 1: { 
@@ -705,9 +777,7 @@ function renderingooidong(data) {
         if (i > 0 && i % 20 == 0) index++;
     }          
     
-    // console.log(chartData);    
-
-    chartColumn = 1;
+    // console.log(chartData);        
     
     chartType = 'ColumnChart';
 
@@ -720,7 +790,7 @@ function renderingooidong(data) {
         var options = {
             'title': '인구이동차트(최근3개월)',                 
             'legend': 'none',             
-            'width': 1000, 
+            'width': getRowWidth(), 
             'height': 300,
             vAxis: {                
                 viewWindow: {
@@ -746,9 +816,7 @@ function renderingooidongDetail(data) {
         }
 
         chartData[data[i]['C1_NM']].push([data[i]['PRD_DE'], parseInt(data[i]['DT'])]);        
-    }       
-
-    chartColumn = 1;
+    }           
     
     chartType = 'ColumnChart';
 
@@ -761,8 +829,8 @@ function renderingooidongDetail(data) {
         var options = {
             'title': key,                 
             'legend': 'none',             
-            'width': 1500, 
-            'height': 300,                
+            'width': getRowWidth(), 
+            'height': 300,              
         };
 
         drawChart(data, options);
@@ -827,9 +895,7 @@ function renderage(data) {
         }
     }          
     
-    // console.log(chartData);    
-
-    chartColumn = 1;
+    // console.log(chartData);        
     
     chartType = 'ColumnChart';   
 
@@ -857,7 +923,7 @@ function renderage(data) {
         var options = {
             'title': title + ' 평균연령 (' + date + ')',                 
             'legend': 'none',             
-            'width': 1000, 
+            'width': getRowWidth(), 
             'height': 300,
             vAxis: {                
                 viewWindow: {
@@ -903,9 +969,7 @@ function renderaptSiRank(data) {
         }
 
         chartData.push([aptName, parseInt(data[i]['price'])]);        
-    }       
-
-    chartColumn = 1;
+    }           
     
     chartType = 'ColumnChart';
     
@@ -917,8 +981,8 @@ function renderaptSiRank(data) {
     var options = {
         'title': '평당가격 순위',                 
         'legend': 'none',             
-        'width': 1500, 
-        'height': 300,                
+        'width': getRowWidth(), 
+        'height': 300,               
     };
 
     drawChart(data, options);
@@ -950,19 +1014,19 @@ function renderaptDetail(data) {
         priceDates[data.price[i]['size']][data.price[i]['date']] = data.price[i];
     }
 
-    console.log(priceDefault);
+    // console.log(priceDefault);
 
-    var yms = getYmArrayAfterYm(startYm);    
-    var chartData = {};
+    var yms = getYmArrayAfterYm(startYm);        
 
     for (var size in priceDefault) {
         var titlePrice = data.info.name_apt + ' 매매/전세' + '(' + size + ')';
         var titleCount = data.info.name_apt + ' 거래횟수' + '(' + size + ')';
-        var titleEnergy = data.info.name_apt + ' 충전차트' + '(' + size + ')';
+        var titleEnergy = data.info.name_apt + ' 가치차트' + '(' + size + ')';
         var energies = [];
-        chartData[titlePrice] = [];
-        chartData[titleCount] = [];
-        chartData[titleEnergy] = [];
+        priceDefault[size]['chartData'] = {};
+        priceDefault[size]['chartData'][titlePrice] = [];
+        priceDefault[size]['chartData'][titleCount] = [];
+        priceDefault[size]['chartData'][titleEnergy] = [];
 
         for (var i = 0; i < yms.length; i++) {             
             if (priceDates[size][yms[i]]) {
@@ -974,20 +1038,20 @@ function renderaptDetail(data) {
                 if (priceDates[size][yms[i]]['sale_price_min'] > 0) priceDefault[size]['sale_price_min'] = priceDates[size][yms[i]]['sale_price_min'];
             }
 
-            chartData[titlePrice].push([
+            priceDefault[size]['chartData'][titlePrice].push([
                 yms[i], 
-                priceDefault[size]['jeonse_price'],
-                priceDefault[size]['jeonse_price_max'],
-                priceDefault[size]['jeonse_price_min'],
-                priceDefault[size]['sale_price'],
-                priceDefault[size]['sale_price_max'],
-                priceDefault[size]['sale_price_min'],
+                parseInt(priceDefault[size]['jeonse_price']),
+                // parseInt(priceDefault[size]['jeonse_price_max']),
+                // parseInt(priceDefault[size]['jeonse_price_min']),
+                parseInt(priceDefault[size]['sale_price']),
+                // parseInt(priceDefault[size]['sale_price_max']),
+                // parseInt(priceDefault[size]['sale_price_min']),
             ]);
 
-            chartData[titleCount].push([
+            priceDefault[size]['chartData'][titleCount].push([
                 yms[i], 
-                (priceDates[size][yms[i]] && priceDates[size][yms[i]]['sale_count'] || 0),
-                (priceDates[size][yms[i]] && priceDates[size][yms[i]]['jeonse_count'] || 0), 
+                parseInt((priceDates[size][yms[i]] && priceDates[size][yms[i]]['sale_count'] || 0)),
+                parseInt((priceDates[size][yms[i]] && priceDates[size][yms[i]]['jeonse_count'] || 0)), 
             ]);
             
             // 이번 달과 같다면 가격 추출
@@ -996,19 +1060,104 @@ function renderaptDetail(data) {
                 var energy = getEnergy(year, priceDefault[size]['sale_price']);
                 
                 if (energy) {
-                    chartData[titleEnergy].push([
-                        year, 
-                        priceDefault[size]['sale_price'],
+                    energy = parseFloat(energy);
+
+                    priceDefault[size]['chartData'][titleEnergy].push([
+                        year,                         
                         energy,
                     ]);
 
-                    energies.push(energy)
+                    energies.push(energy);
                 }                
             }
         }
-    }
 
-    console.log(chartData);
+        if (energies.length > 0) {
+            var sumEnergy = energies.reduce(function(a, b) { return a + b; });
+            var averageEnergy = (sumEnergy / energies.length).toFixed(2);
+
+            // console.log(energies);
+            // console.log(sumEnergy);
+            // console.log(averageEnergy);
+            
+            for (var i = 0; i < priceDefault[size]['chartData'][titleEnergy].length; i++) {  
+                priceDefault[size]['chartData'][titleEnergy][i][2] = parseFloat(averageEnergy);
+            }        
+        }
+    }
+    
+    console.log(priceDefault);    
+
+    for (var size in priceDefault) {
+        var index = 0;
+        console.log(priceDefault[size]);
+        for (var title in priceDefault[size]['chartData']) {            
+            console.log(priceDefault[size]['chartData'][title]);
+            // 거래빈도
+            if (title.indexOf('거래횟수') != -1) {
+                chartType = 'ColumnChart';
+                       
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Date');                
+                data.addColumn('number', '매매거래');
+                data.addColumn('number', '전세거래');                
+                data.addRows(priceDefault[size]['chartData'][title]);
+
+                var options = {
+                    'title': title,                                     
+                    'width': getRowWidth(), 
+                    'height': 300,                 
+                };
+
+                drawChart(data, options);  
+            // 매매/전세
+            } else if (title.indexOf('매매/전세') != -1) {
+                chartType = 'LineChart';
+                       
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Date');
+                data.addColumn('number', '전세평균');
+                // data.addColumn('number', '전세상위');
+                // data.addColumn('number', '전세하위');                                
+                data.addColumn('number', '매매평균');
+                // data.addColumn('number', '매매상위');                
+                // data.addColumn('number', '매매하위');                                
+                data.addRows(priceDefault[size]['chartData'][title]);
+
+                var options = {
+                    'title': title,                                     
+                    'width': getRowWidth(), 
+                    'height': 300, 
+                    'series': {                
+                        2: { 
+                            'targetAxisIndex': 1
+                        }
+                    },
+                };
+
+                drawChart(data, options);                        
+            // 가치
+            } else if (title.indexOf('가치차트') != -1) {
+                chartType = 'LineChart';
+                       
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Date');                
+                data.addColumn('number', '가치');
+                data.addColumn('number', '평균');                
+                data.addRows(priceDefault[size]['chartData'][title]);
+
+                var options = {
+                    'title': title,                                     
+                    'width': getRowWidth(), 
+                    'height': 300,                      
+                };
+
+                drawChart(data, options);  
+            }
+
+            index++;
+        }
+    }
 }
 
 // breadcrumb sample
@@ -1091,12 +1240,8 @@ function insertChart() {
 
     var html = '';
     
-    html += '<div class="row mt-2 mb-2">';    
-    
-    for (var i = 0; i < chartColumn; i++) {        
-        html += '<div class="col-sm"><div class="chart chart-empty"></div></div>';        
-    }
-    
+    html += '<div class="row">';    
+    html += '<div class="mt-2 mb-2 col-sm"><div class="chart chart-empty"></div></div>';        
     html += '</div> ';    
 
     $('.wrap-chart').append(html);
@@ -1150,6 +1295,10 @@ function getEnergy(year, price) {
     else if (year = '2019') energy = price / 63070153;
     
     return (energy * 10000).toFixed(1)
+}
+
+function getRowWidth() {
+    return $('.row:eq(0)').width();
 }
 
 // function getYArrayAfterY(startY) {

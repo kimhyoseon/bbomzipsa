@@ -8,8 +8,8 @@ try {
 
     // include_once($_SERVER['DOCUMENT_ROOT'].'/class/yoona.php');
     // $yoona = new Yoona(); 
-    // $data = $yoona->getAptDetail('7');
-
+    // $data = $yoona->getArrayFromExcel('kb.xlsx', 10);
+    
     // echo '<pre>';
     // print_r($data);
     // echo '</pre>';
@@ -33,6 +33,11 @@ try {
         $data = array();
         $data['maemae'] = $yoona->getArrayFromExcel('kbmonth.xlsx', 25);
         $data['jeonse'] = $yoona->getArrayFromExcel('kbmonth.xlsx', 26);
+        $data = json_encode($data); 
+    } else if (MENU == 'jeonmang2') {
+        $data = array();
+        $data['maemae'] = $yoona->getArrayFromExcel('kb.xlsx', 2);
+        $data['jeonse'] = $yoona->getArrayFromExcel('kb.xlsx', 3);
         $data = json_encode($data);    
     } else if (MENU == 'choongjeon') {
         $data = array();

@@ -11,10 +11,10 @@ class Yoona {
     /**
      * 엑셀데이터를 JSON으로 얻기
      */
-    public function getArrayFromExcel($inputFile, $sheetIndex = 0) {
+    public function getArrayFromExcel($inputFile, $sheetIndex = 0) {        
         if (empty($inputFile)) {                        
             return false;
-        }    
+        }            
         
         $inputFile = $_SERVER['DOCUMENT_ROOT'].'/data/yoona/'.$inputFile;
 
@@ -29,11 +29,15 @@ class Yoona {
             return false;
         }                
         
-        $inputFileType = PHPExcel_IOFactory::identify($inputFile);
-        $objReader = PHPExcel_IOFactory::createReader($inputFileType);
-        $objPHPExcel = $objReader->load($inputFile);
-        $objPHPExcel->setActiveSheetIndex($sheetIndex);
-        $inputSheetData = $objPHPExcel->getActiveSheet()->toArray();        
+        try {
+            $inputFileType = PHPExcel_IOFactory::identify($inputFile);                
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);            
+            $objPHPExcel = $objReader->load($inputFile);                        
+            $objPHPExcel->setActiveSheetIndex($sheetIndex);                         
+            $inputSheetData = $objPHPExcel->getActiveSheet()->toArray();                
+        } catch (Exception $e) {
+            echo "PARSER ERROR: ".$e->getMessage()."<br />\n";                    
+        } 
 
         if (empty($inputSheetData)) {
             return false;
@@ -188,7 +192,7 @@ class Yoona {
         require_once $_SERVER['DOCUMENT_ROOT'].'/class/pdo.php';
         $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
-        $list = $db->query("SELECT sigoongoo, code_sigoongoo FROM yoona_apt GROUP BY sigoongoo, code_sigoongoo");
+        $list = $db->query("SELECT code_sigoongoo, sigoongoo FROM yoona_apt GROUP BY code_sigoongoo, sigoongoo");
 
         $db->CloseConnection(); 
 
@@ -220,7 +224,7 @@ class Yoona {
 
         $list = $db->query("SELECT yoona_apt_id, MAX(sale_price) as price, size FROM yoona_apt_deal WHERE yoona_apt_id IN (:ids) GROUP BY yoona_apt_id, size", array('ids' => $ids));
 
-        if (empty($list)) return false;
+        if (empty($list)) return false;        
 
         foreach ($list as $value) {
             $pyeong = floor(($value['size'] / 3.3) + 10);
@@ -229,7 +233,7 @@ class Yoona {
             if (empty($apts[$value['yoona_apt_id']]['price']) || $apts[$value['yoona_apt_id']]['price'] < $pricePerPyeong) {
                 $apts[$value['yoona_apt_id']]['price'] = $pricePerPyeong;
                 $apts[$value['yoona_apt_id']]['pyeong'] = $pyeong;
-                $apts[$value['yoona_apt_id']]['size'] = $value['size'];
+                $apts[$value['yoona_apt_id']]['size'] = $value['size'];                
             }            
         }        
 
@@ -246,7 +250,7 @@ class Yoona {
 
         array_multisort($sort, SORT_DESC, $apts);
 
-        $apts = array_slice($apts, 0, 20);
+        $apts = array_slice($apts, 0, 40);
 
         $db->CloseConnection(); 
 

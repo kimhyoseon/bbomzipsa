@@ -11,6 +11,10 @@ try {
 
     if (DEBUG == true) define('KEYWORD', (filter_input(INPUT_GET, 'keyword', FILTER_SANITIZE_STRING)));
     else define('KEYWORD', (filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING)));
+    
+    // define('KEYWORD', '리프팅밴드');
+    // define('DEBUG', 0);      
+    // define('REFRESH', 0);          
 
     $db = null;
 
@@ -20,11 +24,11 @@ try {
 
     // 계정
     $accountNaver = parse_ini_file("../config/naver.ini");
-    $accountDb = parse_ini_file("../config/db.ini");
+    $accountDb = parse_ini_file("../config/db.ini");    
 
     require_once '../class/pdo.php';
     require_once './naver/restapi.php';
-    require_once './naver/NaverShopping.php';
+    require_once './naver/NaverShopping.php';    
 
     $apiNaver = new RestApi($accountNaver['API_KEY'], $accountNaver['SECRET_KEY'], $accountNaver['CUSTOMER_ID'], $accountNaver['CLIENT_ID'], $accountNaver['CLIENT_SECRET']);
 
@@ -33,12 +37,12 @@ try {
     $oNaverShopping->setDebug(DEBUG);
     $oNaverShopping->setRefresh(REFRESH);
 
-    $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+    $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);    
 
     // DB 조회
     $row = $db->row("SELECT * FROM keywords WHERE keyword=?", array(KEYWORD));
-    $oNaverShopping->setData($row);
-
+    $oNaverShopping->setData($row);    
+    
     // 상세보기 여부
     if (!empty($row)) {
         $hasDetail = $db->row("SELECT * FROM keywords_rel WHERE keywords_id=? LIMIT 1", array($row['id']));
@@ -52,19 +56,19 @@ try {
         echo json_encode($oNaverShopping->getData());
         $db->CloseConnection();
         exit();
-    }
+    }        
 
     // 키워드 검색량 api
     if (!$oNaverShopping->requestKeywordSearchAd($apiNaver)) throw new Exception(null, $oNaverShopping->getCode());
 
     // 키워드 트렌드 api
-    if (!$oNaverShopping->requestKeywordTrend($apiNaver)) throw new Exception(null, $oNaverShopping->getCode());
+    if (!$oNaverShopping->requestKeywordTrend($apiNaver)) throw new Exception(null, $oNaverShopping->getCode());    
 
     // 네이버쇼핑 크롤링
     if (!$oNaverShopping->crawlingNaverShopping()) throw new Exception(null, $oNaverShopping->getCode());
 
     // 수집된 정보 획득
-    $result = $oNaverShopping->getData();
+    $result = $oNaverShopping->getData();    
 
     // 쇼핑연관 키워드 수집
     if (!empty($result['relKeywords'])) {
@@ -87,7 +91,7 @@ try {
     $result['modDate'] = date('Y-m-d H:i:s');
     $resultForDb = array_filter($result);
     unset($resultForDb['hasDetail']);
-
+    
     // 업데이트
     if (!empty($row) && !empty($row['id'])) {
         // raceIndex 증감량

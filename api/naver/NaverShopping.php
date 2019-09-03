@@ -306,7 +306,7 @@ class NaverShopping
             return false;
         }
         
-        $xPath = $this->getXpath(self::URL_NAVER_SHOPPING.$this->data['keyword']);
+        $xPath = $this->getXpath(self::URL_NAVER_SHOPPING.urlencode($this->data['keyword']));
 
         if (!$xPath) {
             $this->setCode(400);
@@ -327,7 +327,7 @@ class NaverShopping
         if ($nodeTotalItems->length == 0) {
             $this->setCode(204);
             return false;
-        }
+        }        
 
         $this->data['totalItems'] = filter_var(trim($nodeTotalItems[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
         $this->data['raceIndex'] = @round($this->data['totalItems'] / $this->data['monthlyQcCnt'], 4);        
@@ -476,11 +476,11 @@ class NaverShopping
     }
 
     private function getXpath($url)
-    {
+    {        
         if (empty($url)) {
             $this->setCode(400);
             return false;
-        }        
+        }                
 
         $ch = curl_init();
         $timeout = 5;
@@ -492,7 +492,11 @@ class NaverShopping
 
         $dom = new DOMDocument();
 
-        @$dom->loadHTML($html);        
+        @$dom->loadHTML($html);  
+        
+        // print_r($url);
+        // print_r($html);      
+        // print_r($dom);      
 
         return new DOMXPath($dom);
     }
