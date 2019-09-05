@@ -20,6 +20,8 @@ if (!empty($_POST)) {
         } else {
             $excel->sendall($_FILES['input'], $_FILES['output'], null);
         }
+    } else if ($_POST['type'] == 'jshk_basket') {                
+        $excel->jshkBasket($_FILES['input']);
     }    
 }
 ?>
@@ -92,11 +94,11 @@ body {
         
         <div class="form-group">
             <select id="type" name="type" class="form-control">                
-                <option value="cj">CJ택배</option>                
-                <!-- <option value="hanjin">한진택배</option>                 -->
+                <option value="cj">CJ택배</option>                                
                 <option value="sendall">엑셀일괄발송</option>
                 <option value="korspo">코리아스포츠</option>
                 <option value="korspo_price">코리아스포츠(계산서)</option>
+                <option value="jshk_basket">정성한끼 재료구입</option>
             </select>
         </div>
 
