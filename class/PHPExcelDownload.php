@@ -131,7 +131,7 @@ class PHPExcelDownload {
 
             foreach ($prices as $k => $v) {            
                 if (strpos($item, $k) !== false) {
-                    $priceProduct = $v[0] * $value[11];
+                    $priceProduct = $v[0] * $value[6];
                     $priceDelivery = $v[1];  
                     break;              
                 }
@@ -157,11 +157,11 @@ class PHPExcelDownload {
             }
     
             if (!empty($bodyPrice[$item])) {
-                $bodyPrice[$item][1] = $bodyPrice[$item][1] + $value[11];
+                $bodyPrice[$item][1] = $bodyPrice[$item][1] + $value[6];
                 $bodyPrice[$item][3] = $bodyPrice[$item][3] + $priceProduct;
                 $bodyPrice[$item][4] = $bodyPrice[$item][4].' '.$value[1];            
             } else {
-                $bodyPrice[$item] = array($item, $value[11], $priceProduct, $priceProduct, $value[1]);
+                $bodyPrice[$item] = array($item, $value[6], $priceProduct, $priceProduct, $value[1]);
             }      
         }
 
