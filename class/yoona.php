@@ -405,17 +405,24 @@ class Yoona {
         if (empty($aptData)) return false;                
         if (empty($sigoongoo)) return false;                  
 
-        // 아파트 조회
-        $row = $db->row("SELECT * FROM yoona_apt WHERE code_sigoongoo=? AND name_apt=?", array($aptData['법정동시군구코드'], $aptData['아파트']));
+        // 매매정보
+        if (!empty($aptData['법정동시군구코드'])) $isMaemae = true;
+        else if (!empty($aptData['지역코드'])) $isMaemae = false;
+        else return false;
+
+        // 아파트 조회                
+        $row = $db->row("SELECT * FROM yoona_apt WHERE code_sigoongoo=? AND name_apt=?", array($aptData['지역코드'], $aptData['아파트']));        
         
         // 있다면 id 리턴
         if (!empty($row)) {
             $aptData['id'] = $row['id'];
             return $aptData;
         }
+
+        // 전세정보라면 저장하지 말고 return false
+        if ($isMaemae == false) return false;
         
         // 없다면 insert 후 id 리턴
-
         $aptData['법정동코드'] = $aptData['법정동시군구코드'].$aptData['법정동읍면동코드'];
 
         // 시군구가 동일하게 유지되기 위해서 DB에서 기존 시군구 가져오기

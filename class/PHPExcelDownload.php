@@ -872,11 +872,12 @@ class PHPExcelDownload {
     }
 
     /**
-     * 정성한끼 재료구입
+     * 정성한끼 엑셀정보 획득
      */
-    public function jshkBasket($files) {
+    public function jshkDataFilter($files) {
         if (empty($files)) return false;  
 
+        $body = array();
         $inputFile = $files['tmp_name'];
         $inputFileType = PHPExcel_IOFactory::identify($inputFile);
         $objReader = PHPExcel_IOFactory::createReader($inputFileType);
@@ -894,11 +895,7 @@ class PHPExcelDownload {
 
         $filterArray = array();
         $filterIndex = array();
-        $filterIndexReverse = array();        
-
-        $basket = array();
-        $receipe = array();
-        $receipeTotal = array();
+        $filterIndexReverse = array();                
 
         if (empty($sheetData)) {
             echo '엑셀 데이터를 확인할 수 없습니다.';
@@ -932,16 +929,51 @@ class PHPExcelDownload {
             }
         }
 
+        if (empty($body)) {            
+            return false;
+        }
+
+        return array($filterMerged, $body);
+    }
+
+    /**
+     * 정성한끼 조리표
+     */
+    public function jshkBasket($files) {        
+        list($filterMerged, $body) = $this->jshkDataFilter($files);
+
         if (empty($body)) {
             echo '내역이 존재하지 않습니다.';
             return false;
         }
 
+        $basket = array();
+        $receipe = array();        
+        $receipeTotal = array();        
+        $source = array();
+        $sourceTotal = array();
+
         /**
-         * 정성한끼 재료
-         * 구조 (양, 단위, 매일구매)
+         * 정성한끼 재료        
          */
-        $jshkData = include 'PHPExcelDataJshk.php';          
+        $jshkData = include 'PHPExcelDataJshk.php';         
+        
+        // foreach ($jshkData as $cookName => $ingredients) {
+        //     echo("[{$cookName}]"); 
+        //     echo '</br>';                           
+        //     foreach ($ingredients as $ingredientName => $ingredientData) {
+        //         if (substr($ingredientName, 0, 1) == '_') continue;  
+        //         if (strpos($ingredientName, '깨') !== false) continue;  
+        //         echo($ingredientName);echo '</br>';
+        //     }            
+
+        //     echo '</br>';            
+        // }
+
+        // echo '<pre>';                            
+        // print_r($jshkData);                    
+        // echo '</pre>';   
+        // exit();
 
         $optionIndex = array_search('옵션정보', array_keys($filterMerged));
         $amountIndex = array_search('수량', array_keys($filterMerged));               
@@ -953,7 +985,7 @@ class PHPExcelDownload {
             $cookName = $this->getShortOption($items[$optionIndex]);
             $amount = $items[$amountIndex];
             
-            foreach ($jshkData as $cookNamePart => $ingredients) {                
+            foreach ($jshkData as $cookNamePart => $ingredients) {
                 if (strpos($cookName, $cookNamePart) !== false) {
                     // 레시피 작성                    
                     if (empty($receipe[$cookName])) {
@@ -964,30 +996,79 @@ class PHPExcelDownload {
                     $receipeTotal[$cookName] += $amount;
 
                     foreach ($ingredients as $ingredientName => $ingredientData) {
-                        // 2번 값이 true 면 구매내역에 포함
-                        if ($ingredientData[2] == true) {
-                            if (empty($basket[$ingredientName])) $basket[$ingredientName] = array();
-                            if (empty($basket[$ingredientName][$ingredientData[1]])) $basket[$ingredientName][$ingredientData[1]] = 0;
+                        if (substr($ingredientName, 0, 1) == '_') continue;
 
-                            $basket[$ingredientName][$ingredientData[1]] += $ingredientData[0] * $amount;                        
+                        // 2번 값이 true 면 구매내역에 포함
+                        if ($ingredientData[2] == true || 1) {
+                            // 모듬인 경우 모든재료 넣기
+                            if (!empty($jshkData[$ingredientName])) {
+                                foreach ($jshkData[$ingredientName] as $ingredientName2 => $ingredientData2) {
+                                    if (empty($basket[$ingredientName2])) $basket[$ingredientName2] = array();
+                                    if (empty($basket[$ingredientName2][$ingredientData2[1]])) $basket[$ingredientName2][$ingredientData2[1]] = 0;
+
+                                    $basket[$ingredientName2][$ingredientData2[1]] += $ingredientData[0] * $ingredientData2[0] * $amount;
+                                }
+                            } else {
+                                if (empty($basket[$ingredientName])) $basket[$ingredientName] = array();
+                                if (empty($basket[$ingredientName][$ingredientData[1]])) $basket[$ingredientName][$ingredientData[1]] = 0;
+
+                                $basket[$ingredientName][$ingredientData[1]] += $ingredientData[0] * $amount;
+                            }                                                  
                         }
 
                         if (empty($receipe[$cookName][$ingredientName])) $receipe[$cookName][$ingredientName] = array();                        
                         if (empty($receipe[$cookName][$ingredientName][$ingredientData[1]])) $receipe[$cookName][$ingredientName][$ingredientData[1]] = 0;
                         
                         $receipe[$cookName][$ingredientName][$ingredientData[1]] += $ingredientData[0] * $amount;                        
+                        
+                        // 소스
+                        if (!empty($jshkData[$ingredientName])) {                            
+                            if (empty($sourceTotal[$ingredientName])) {
+                                $source[$ingredientName] = array();                                
+                                $sourceTotal[$ingredientName] = 0;
+                            }                                
+                            
+                            // 필요한 소스중량 합계
+                            $sourceTotal[$ingredientName] = $sourceTotal[$ingredientName] + ($amount * $ingredientData[0]);                                
+                        }
                     }
 
                     // echo '<pre>';                    
-                    // print_r($ingredient);                    
+                    // print_r($receipe);                    
+                    // print_r($source);                    
                     // echo '</pre>';   
+                    // exit();
+
+                    // break;
                 }
             }
-        }      
+        }             
+        
+        // 소스상세 계산
+        foreach ($sourceTotal as $ingredientName => $weight) {
+            $weightNew = 0;
+            foreach ($jshkData[$ingredientName] as $sourceName => $sourceData) {
+                if (empty($source[$ingredientName][$sourceName][$sourceData[1]])) $source[$ingredientName][$sourceName][$sourceData[1]] = 0;                                
+                
+                $sourceWeight = $sourceData[0] * $weight;
+                $sourceWeight = round($sourceWeight * 1.2, -1); // 20% 소스 여유분
+                $source[$ingredientName][$sourceName][$sourceData[1]] += $sourceWeight;                
+                $weightNew += $sourceWeight;
+            }
+
+            $sourceTotal[$ingredientName] = $weightNew;
+        }
+
+        // echo '<pre>';                    
+        // print_r($sourceTotal);                            
+        // print_r($source);                            
+        // echo '</pre>';   
+        // exit();
         
         $data = array();        
-        $ReceipeMerge = array();
-        $data[] = array('구매내역', '', '', '');
+        $receipeMerge = $sourceMerge = array();
+        $receipeRow = $sourceRow = 0;
+        $data[] = array('재료표', '', '', '');
 
         foreach ($basket as $ingredientName => $ingredientData) {
             $data[] = array($ingredientName, '', '', $ingredientData[key($ingredientData)].key($ingredientData));
@@ -997,76 +1078,86 @@ class PHPExcelDownload {
         $data[] = array('조리표', '', '', '');
 
         foreach ($receipe as $cookName => $ingredientDatas) {
-            $ReceipeMerge[] = sizeOf($ingredientDatas);
+            $receipeMerge[] = sizeOf($ingredientDatas);            
             foreach ($ingredientDatas as $ingredientName => $ingredientData) {                
                 $data[] = array($cookName, $receipeTotal[$cookName].'인분', $ingredientName, $ingredientData[key($ingredientData)].key($ingredientData));
+                $receipeRow++;
+            }
+        }
+
+        $data[] = array('', '', '', '');
+        $data[] = array('소스', '', '', '');
+
+        foreach ($source as $cookName => $ingredientDatas) {
+            $sourceMerge[] = sizeOf($ingredientDatas);            
+            $sourceOverload = 0;
+            foreach ($ingredientDatas as $ingredientName => $ingredientData) {                
+                $sourceOverload += $ingredientData[key($ingredientData)];
+                $data[] = array($cookName, $sourceTotal[$cookName].'g', $ingredientName, $ingredientData[key($ingredientData)].key($ingredientData).' ('.$sourceOverload.key($ingredientData).')');
+                $sourceRow++;
             }
         }
 
         $indexStartBasket = 1;
         $indexEndBasket = sizeof($basket) + 1;
-        $indexStartReceipe = sizeof($basket) + 3;
-        $indexEndReceipe = sizeof($data);
+        
+        $indexStartReceipe = $indexEndBasket + 2;
         $indexStartReceipeMerge = $indexStartReceipe + 1;
+        $indexEndReceipe = $indexStartReceipe + $receipeRow;        
+        
+        $indexStartSource = $indexEndReceipe + 2;
+        $indexStartSourceMerge = $indexStartSource + 1;
+        $indexEndSource = $indexStartSource + $sourceRow;        
 
-        // echo '<pre>';        
-        // print_r($ReceipeMerge);
-        // print_r($indexEndBasket);
-        // print_r($indexStartReceipe);
-        // print_r($indexEndReceipe);        
+        $indexLast = sizeOf($data);
+
+        // echo '<pre>';                        
         // print_r($data);
-        // print_r($basket);        
+        // print_r($basket);                
         // print_r($receipe);        
         // print_r($receipeTotal);        
         // print_r($body);        
         // print_r($filterArray);
         // print_r($filterIndex);
         // print_r($filterIndexReverse);
+        // print_r($receipeMerge);
+        // print_r($indexEndBasket);echo '<br/>'; 
+        // print_r($indexStartReceipe);echo '<br/>'; 
+        // print_r($indexEndReceipe);echo '<br/>'; 
+        // print_r($indexStartSource);echo '<br/>'; 
+        // print_r($indexEndSource);echo '<br/>'; 
         // echo '</pre>';
         // exit();                
         
+        $divideHorizontalLines = array();
         $bgColor = 'FFD8D8D8';                
         $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($data[0]) - 1));
 
         $excel = new PHPExcel();
 
         // 폰트크기
-        $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$indexEndReceipe}")->getFont()->setSize(14);
+        $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$indexLast}")->getFont()->setSize(14);
         
         // 헤더 진하게 & 정렬
         $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}1")->getFont()->setBold(true);
         $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartReceipe}:{$lastChar}{$indexStartReceipe}")->getFont()->setBold(true);
         $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartReceipe}:{$lastChar}{$indexStartReceipe}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexStartSource}")->getFont()->setBold(true);
+        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexStartSource}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
         // 계량 정렬
-        $excel->setActiveSheetIndex(0)->getStyle("D1:D{$indexEndReceipe}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
-
-        // 머지
-        $excel->setActiveSheetIndex(0)->mergeCells("A1:{$lastChar}1");        
-        $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartReceipe}:{$lastChar}{$indexStartReceipe}");
-
-        for ($i = 2; $i <= $indexEndBasket; $i++) { 
-            $excel->setActiveSheetIndex(0)->mergeCells("A{$i}:C{$i}");
-            $excel->setActiveSheetIndex(0)->getStyle("A{$i}:C{$i}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        }    
-        
-        foreach ($ReceipeMerge as $value) {
-            $rowNum = $indexStartReceipeMerge + $value - 1;
-            $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartReceipeMerge}:A{$rowNum}");
-            $excel->setActiveSheetIndex(0)->mergeCells("B{$indexStartReceipeMerge}:B{$rowNum}");
-            $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartReceipeMerge}:A{$rowNum}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $excel->setActiveSheetIndex(0)->getStyle("B{$indexStartReceipeMerge}:B{$rowNum}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartReceipeMerge}:A{$rowNum}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $excel->setActiveSheetIndex(0)->getStyle("B{$indexStartReceipeMerge}:B{$rowNum}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $indexStartReceipeMerge = $rowNum + 1;
-        }
+        $excel->setActiveSheetIndex(0)->getStyle("D1:D{$indexEndReceipe}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);        
+        $excel->setActiveSheetIndex(0)->getStyle("D1:D{$indexEndSource}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
 
         // 셀 구분선
         $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$indexEndBasket}")->applyFromArray(array(
             'borders' => array(
                 'allborders' => array(
                     'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THICK
                 )
             )
         ));
@@ -1076,12 +1167,104 @@ class PHPExcelDownload {
             'borders' => array(
                 'allborders' => array(
                     'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THICK
+                )
+            )
+        ));
+
+        // 셀 구분선
+        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexEndSource}")->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THICK
+                )
+            )
+        ));
+
+        // 머지
+        $excel->setActiveSheetIndex(0)->mergeCells("A1:{$lastChar}1");        
+        $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartReceipe}:{$lastChar}{$indexStartReceipe}");
+        $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartSource}:{$lastChar}{$indexStartSource}");
+
+        for ($i = 2; $i <= $indexEndBasket; $i++) { 
+            $excel->setActiveSheetIndex(0)->mergeCells("A{$i}:C{$i}");
+            $excel->setActiveSheetIndex(0)->getStyle("A{$i}:C{$i}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        }  
+        
+        // 셀 구분선
+        $excel->setActiveSheetIndex(0)->getStyle("A2:{$lastChar}2")->applyFromArray(array(
+            'borders' => array(                    
+                'top' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_MEDIUM
                 )
             )
         ));
         
+        // 셀 구분선
+        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartReceipeMerge}:{$lastChar}{$indexStartReceipeMerge}")->applyFromArray(array(
+            'borders' => array(                    
+                'top' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_MEDIUM
+                )
+            )
+        ));
+        
+        foreach ($receipeMerge as $value) {
+            $rowNum = $indexStartReceipeMerge + $value - 1;
+            $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartReceipeMerge}:A{$rowNum}");
+            $excel->setActiveSheetIndex(0)->mergeCells("B{$indexStartReceipeMerge}:B{$rowNum}");
+            $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartReceipeMerge}:A{$rowNum}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $excel->setActiveSheetIndex(0)->getStyle("B{$indexStartReceipeMerge}:B{$rowNum}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartReceipeMerge}:A{$rowNum}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $excel->setActiveSheetIndex(0)->getStyle("B{$indexStartReceipeMerge}:B{$rowNum}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $indexStartReceipeMerge = $rowNum + 1;
+
+            // 셀 구분선
+            $excel->setActiveSheetIndex(0)->getStyle("A{$rowNum}:{$lastChar}{$rowNum}")->applyFromArray(array(
+                'borders' => array(                    
+                    'bottom' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_MEDIUM
+                    )
+                )
+            ));
+        }
+
+        // 셀 구분선
+        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSourceMerge}:{$lastChar}{$indexStartSourceMerge}")->applyFromArray(array(
+            'borders' => array(                    
+                'top' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_MEDIUM
+                )
+            )
+        ));
+
+        foreach ($sourceMerge as $value) {
+            $rowNum = $indexStartSourceMerge + $value - 1;
+            $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartSourceMerge}:A{$rowNum}");
+            $excel->setActiveSheetIndex(0)->mergeCells("B{$indexStartSourceMerge}:B{$rowNum}");
+            $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSourceMerge}:A{$rowNum}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $excel->setActiveSheetIndex(0)->getStyle("B{$indexStartSourceMerge}:B{$rowNum}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSourceMerge}:A{$rowNum}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $excel->setActiveSheetIndex(0)->getStyle("B{$indexStartSourceMerge}:B{$rowNum}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $indexStartSourceMerge = $rowNum + 1;
+
+            // 셀 구분선
+            $excel->setActiveSheetIndex(0)->getStyle("A{$rowNum}:{$lastChar}{$rowNum}")->applyFromArray(array(
+                'borders' => array(                    
+                    'bottom' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_MEDIUM
+                    )
+                )
+            ));
+        }        
+        
         // 셀 폭 최적화     
-        $widths = array(30, 15, 30, 15);
+        $widths = array(30, 15, 30, 30);
         foreach ($widths as $i => $w) {
             $excel->setActiveSheetIndex(0)->getColumnDimension($this->columnChar($i))->setWidth($w);
         }
@@ -1095,6 +1278,163 @@ class PHPExcelDownload {
 
         header('Content-type: application/vnd.ms-excel');
         header('Content-Disposition: attachment; filename="정성한끼_재료표_'.date('Ymd').'.xlsx"');
+        header('Cache-Control: max-age=0');
+        
+        // 다운로드
+        $writer->save('php://output');
+        die();
+    }
+
+    /**
+     * 정성한끼 스티커
+     */
+    public function jshkSticker($files) {        
+        list($filterMerged, $body) = $this->jshkDataFilter($files);
+
+        if (empty($body)) {
+            echo '내역이 존재하지 않습니다.';
+            return false;
+        }        
+
+        /**
+         * 정성한끼 재료
+         */
+        $jshkData = include 'PHPExcelDataJshk.php';          
+
+        $optionIndex = array_search('옵션정보', array_keys($filterMerged));
+        $amountIndex = array_search('수량', array_keys($filterMerged));   
+        $week = array('일', '월', '화', '수', '목', '금', '토');
+        $rows = array();
+        $sort = array();
+
+        foreach ($body as $items) {
+            if (empty($items)) continue;   
+            if (empty($items[$optionIndex])) continue;
+
+            $cookName = $this->getShortOption($items[$optionIndex]);
+            $amount = $items[$amountIndex];
+            
+            foreach ($jshkData as $cookNamePart => $ingredients) {                
+                if (strpos($cookName, $cookNamePart) !== false) {                    
+                    $row = array();                    
+                    $ingredientsSum = array();
+                    $contents = array();
+                    
+                    // 제품명 (중량)
+                    $itemName = $cookName.' ('.$ingredients['_total'][0].$ingredients['_total'][1].')';
+                    
+                    // 1개 이상인 경우
+                    if (!empty($amount) && $amount > 1) {
+                        $itemName = $itemName.' '.$amount.'개';
+                    }
+                    
+                    $row[] = $itemName;
+
+                    foreach ($ingredients as $ingredientName => $ingredientData) {
+                        if (substr($ingredientName, 0, 1) == '_') continue;                        
+                        
+                        // 소스인 경우 소스재료로 넣기
+                        if (!empty($jshkData[$ingredientName])) {
+                            foreach ($jshkData[$ingredientName] as $sourceName => $sourceData) {
+                                if (!empty($jshkData[$sourceName])) { 
+                                    foreach ($jshkData[$sourceName] as $sourceName2 => $sourceData2) {
+                                        // 재료명(원산지)
+                                        $ingredientsText = $sourceName2.'('.$sourceData2[3].')';
+                                        if (!in_array($ingredientsText, $ingredientsSum)) {                                            
+                                            $ingredientsSum[] = $ingredientsText;
+                                        }  
+                                    }
+                                } else {
+                                    // 재료명(원산지)
+                                    $ingredientsText = $sourceName.'('.$sourceData[3].')';
+                                    if (!in_array($ingredientsText, $ingredientsSum)) {
+                                        $ingredientsSum[] = $ingredientsText;
+                                    }       
+                                }                         
+                            }
+                        // 일반재료
+                        } else {
+                            // 재료명(원산지)
+                            $ingredientsText = $ingredientName.'('.$ingredientData[3].')';
+                            if (!in_array($ingredientsText, $ingredientsSum)) {
+                                $ingredientsSum[] = $ingredientsText;
+                            } 
+                        }
+                    }
+                    
+                    // 재료
+                    $row[] = '사용재료 : '.implode(', ', $ingredientsSum);
+
+                    // 내용
+                    $nextTime = strtotime('+'.$ingredients['_expired'][0].' '.$ingredients['_expired'][1]);
+                    $contents[] = '만든날짜 : '.date('Y년 m월 d일').' ('.$week[date("w")].')';                       
+                    $contents[] = '유통기한 : '.date('Y년 m월 d일', $nextTime).' ('.$week[date("w", $nextTime)].')';
+                    $contents[] = '보관방법 : 냉장보관';
+                    $contents[] = '판매업체 : 정성한끼';                    
+                    $row[] = implode('\r', $contents);
+
+                    // 안내
+                    $row[] = '전자레인지를 이용해서 간편하게 데워서 드시기 바랍니다';
+                    // 신고
+                    $row[] = '부정/불량식품 신고는 국번없이 1399';
+
+                    // echo '<pre>';                    
+                    // print_r($row);                                        
+                    // echo '</pre>';   
+                    // exit();
+                    $sort[] = $itemName;
+                    $rows[] = $row;
+
+                    break;
+                }
+            }
+        }  
+        
+        // 재료별로 정렬
+        array_multisort($sort, SORT_ASC, $rows);
+
+        $data = array();                
+        $data[] = array('제품명', '재료', '내용', '안내1', '안내2');                
+
+        foreach ($rows as $value) {
+            $data[] = $value;
+        }
+        
+        // echo '<pre>';                
+        // print_r($data);        
+        // echo '</pre>';
+        // exit();                
+    
+        $bgColor = 'FFD8D8D8';                
+        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($data[0]) - 1));
+        $cntRow = sizeof($data);
+
+        $excel = new PHPExcel();                
+
+        // 셀 구분선
+        $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$cntRow}")->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));         
+        
+        // 셀 폭 최적화     
+        $widths = array(30, 100, 50, 30);
+        foreach ($widths as $i => $w) {
+            $excel->setActiveSheetIndex(0)->getColumnDimension($this->columnChar($i))->setWidth($w);
+        }
+
+        // 데이터 적용
+        $excel->getActiveSheet()->fromArray($data, NULL, 'A1');
+
+        // 양식 설정
+        ob_end_clean();        
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');        
+
+        header('Content-type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="정성한끼_스티커_'.date('Ymd').'.xlsx"');
         header('Cache-Control: max-age=0');
         
         // 다운로드

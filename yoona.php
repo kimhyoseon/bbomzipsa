@@ -1040,12 +1040,12 @@ function renderaptDetail(data) {
 
             priceDefault[size]['chartData'][titlePrice].push([
                 yms[i], 
-                parseInt(priceDefault[size]['jeonse_price']),
-                // parseInt(priceDefault[size]['jeonse_price_max']),
-                // parseInt(priceDefault[size]['jeonse_price_min']),
                 parseInt(priceDefault[size]['sale_price']),
                 // parseInt(priceDefault[size]['sale_price_max']),
                 // parseInt(priceDefault[size]['sale_price_min']),
+                // parseInt(priceDefault[size]['jeonse_price']),
+                parseInt(priceDefault[size]['jeonse_price_max']),
+                // parseInt(priceDefault[size]['jeonse_price_min']),                
             ]);
 
             priceDefault[size]['chartData'][titleCount].push([
@@ -1054,9 +1054,9 @@ function renderaptDetail(data) {
                 parseInt((priceDates[size][yms[i]] && priceDates[size][yms[i]]['jeonse_count'] || 0)), 
             ]);
             
-            // 이번 달과 같다면 가격 추출
+            // 이번 달과 같다면 가격 추출            
             if (yms[i].substring(4, 6) == month) {
-                var year = yms[i].substring(0, 4);
+                var year = yms[i].substring(0, 4);                
                 var energy = getEnergy(year, priceDefault[size]['sale_price']);
                 
                 if (energy) {
@@ -1099,8 +1099,8 @@ function renderaptDetail(data) {
                        
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Date');                
-                data.addColumn('number', '매매거래');
-                data.addColumn('number', '전세거래');                
+                data.addColumn('number', '매매거래');                
+                data.addColumn('number', '전세거래');                                
                 data.addRows(priceDefault[size]['chartData'][title]);
 
                 var options = {
@@ -1116,12 +1116,12 @@ function renderaptDetail(data) {
                        
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Date');
-                data.addColumn('number', '전세평균');
-                // data.addColumn('number', '전세상위');
-                // data.addColumn('number', '전세하위');                                
                 data.addColumn('number', '매매평균');
                 // data.addColumn('number', '매매상위');                
                 // data.addColumn('number', '매매하위');                                
+                data.addColumn('number', '전세평균');
+                // data.addColumn('number', '전세상위');
+                // data.addColumn('number', '전세하위');                                                
                 data.addRows(priceDefault[size]['chartData'][title]);
 
                 var options = {
@@ -1277,22 +1277,22 @@ function getEnergy(year, price) {
     energy = 0;
 
     // 연평균소득
-    if (year = '2004') energy = price / 37349688;
-    else if (year = '2005') energy = price / 39025080;
-    else if (year = '2006') energy = price / 41328648;
-    else if (year = '2007') energy = price / 43874412;
-    else if (year = '2008') energy = price / 46807464;
-    else if (year = '2009') energy = price / 46238268;
-    else if (year = '2010') energy = price / 48092052;
-    else if (year = '2011') energy = price / 50983428;
-    else if (year = '2012') energy = price / 53908368;
-    else if (year = '2013') energy = price / 55274592;
-    else if (year = '2014') energy = price / 56815236;
-    else if (year = '2015') energy = price / 57799980;
-    else if (year = '2016') energy = price / 58613376;
+    if (year == '2004') energy = price / 37349688;
+    else if (year == '2005') energy = price / 39025080;
+    else if (year == '2006') energy = price / 41328648;
+    else if (year == '2007') energy = price / 43874412;
+    else if (year == '2008') energy = price / 46807464;
+    else if (year == '2009') energy = price / 46238268;
+    else if (year == '2010') energy = price / 48092052;
+    else if (year == '2011') energy = price / 50983428;
+    else if (year == '2012') energy = price / 53908368;
+    else if (year == '2013') energy = price / 55274592;
+    else if (year == '2014') energy = price / 56815236;
+    else if (year == '2015') energy = price / 57799980;
+    else if (year == '2016') energy = price / 58613376;
     else if (year = '2017') energy = price / 60031080;
-    else if (year = '2018') energy = price / 61531857;
-    else if (year = '2019') energy = price / 63070153;
+    else if (year == '2018') energy = price / 61531857;
+    else if (year == '2019') energy = price / 63070153;    
     
     return (energy * 10000).toFixed(1)
 }

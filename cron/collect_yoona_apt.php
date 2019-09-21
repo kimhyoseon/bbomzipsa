@@ -11,12 +11,11 @@ try {
     $_SERVER['DOCUMENT_ROOT'] = dirname(dirname(__FILE__));    
     
     // 지역코드 5자리 (시군구), 인구수 차트로 확인 가능    
-    $lawdCd = '44133';
-    $sigoongoo = '천안시 서북구';
+    $lawdCd = '30170';
+    $sigoongoo = '대전광역시 서구';
 
     // 수집시작일 (이번달)
-    $date = date('Ym');    
-    // $date = '201501';    
+    $date = date('Ym');        
     $dateEnd = null;
     // $dateEnd = '201501';    
 
@@ -33,12 +32,12 @@ try {
     include_once($_SERVER['DOCUMENT_ROOT'].'/class/yoona.php');
     $yoona = new Yoona();        
 
-    // // 지역이 수집된 가장 최근 년월 가져오기
-    // $row = $db->row("SELECT yoona_apt_deal.date FROM yoona_apt_deal JOIN yoona_apt ON yoona_apt_deal.yoona_apt_id = yoona_apt.id AND yoona_apt.code_sigoongoo = ? ORDER BY yoona_apt_deal.date DESC", array($lawdCd));
+    // 지역이 수집된 가장 최근 년월 가져오기
+    $row = $db->row("SELECT yoona_apt_deal.date FROM yoona_apt_deal JOIN yoona_apt ON yoona_apt_deal.yoona_apt_id = yoona_apt.id AND yoona_apt.code_sigoongoo = ? ORDER BY yoona_apt_deal.date DESC", array($lawdCd));
 
-    // if (!empty($row)) {
-    //     $dateEnd = $row['date'];
-    // }    
+    if (!empty($row)) {
+        $dateEnd = $row['date'];
+    }    
     
     echo "$sigoongoo ({$dateEnd} ~ {$date}) 까지 수집시작.".PHP_EOL;      
 
@@ -66,13 +65,20 @@ try {
         /**
          * 전세
          */
-        $jeonse = $yoona->getAptJeonse($lawdCd, $date);
+        $jeonse = $yoona->getAptJeonse($lawdCd, $date);        
         
         // 데이터가 없다면 끝.
         if ($jeonse == false) break;
 
         foreach ($jeonse as $value) {
             $data = $yoona->setAptData($data, $value, 'jeonse', $date);        
+
+            // 아파트 id 획득
+            $code = "{$value['지역코드']}||{$value['아파트']}";
+
+            if (empty($apt[$code])) {            
+                $apt[$code] = $yoona->getAptId($db, $value, $sigoongoo);
+            }
         }
 
         /**

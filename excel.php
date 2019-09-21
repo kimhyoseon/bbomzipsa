@@ -22,6 +22,8 @@ if (!empty($_POST)) {
         }
     } else if ($_POST['type'] == 'jshk_basket') {                
         $excel->jshkBasket($_FILES['input']);
+    } else if ($_POST['type'] == 'jshk_sticker') {                
+        $excel->jshkSticker($_FILES['input']);
     }    
 }
 ?>
@@ -98,7 +100,8 @@ body {
                 <option value="sendall">엑셀일괄발송</option>
                 <option value="korspo">코리아스포츠</option>
                 <option value="korspo_price">코리아스포츠(계산서)</option>
-                <option value="jshk_basket">정성한끼 재료구입</option>
+                <option value="jshk_basket">정성한끼 조리표</option>
+                <option value="jshk_sticker">정성한끼 스티커</option>
             </select>
         </div>
 
