@@ -958,13 +958,21 @@ class PHPExcelDownload {
          */
         $jshkData = include 'PHPExcelDataJshk.php';         
         
+        // 테스트 출력
         // foreach ($jshkData as $cookName => $ingredients) {
-        //     echo("[{$cookName}]"); 
-        //     echo '</br>';                           
+        //     if (empty($ingredients['_total'])) continue;
+
+        //     echo "{$cookName}";
+        //     echo(' ('.$ingredients['_total'][0].$ingredients['_total'][1].')');
+        //     echo '</br>';
+        //     echo(' - (총무게: '.$ingredients['_total'][0].$ingredients['_total'][1].')');            
+            
+        //     echo '</br>';
         //     foreach ($ingredients as $ingredientName => $ingredientData) {
-        //         if (substr($ingredientName, 0, 1) == '_') continue;  
-        //         if (strpos($ingredientName, '깨') !== false) continue;  
-        //         echo($ingredientName);echo '</br>';
+        //         if (substr($ingredientName, 0, 1) == '_') continue;                  
+        //         echo($ingredientName);                
+        //         echo(' '.$ingredientData[0].$ingredientData[1]);                
+        //         echo '</br>';
         //     }            
 
         //     echo '</br>';            
