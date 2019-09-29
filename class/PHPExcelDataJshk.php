@@ -90,17 +90,18 @@ return array(
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
-    '간장고사리볶음' => array(
+    '간장고사리볶음' => array( // 2019-09-29
         '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '고사리' => array(300, 'g', true, '중국'),         
-        '맛기름' => array(2, 'g', true, '국산'),
-        '들기름' => array(2, 'g', true, '국산'),
+        '고사리' => array(200, 'g', true, '중국'),                 
+        '맛기름' => array(6, 'g', true, '국산'),
+        '들기름' => array(17, 'g', true, '국산'),
         '모듬야채' => array(20, 'g', true, '국산'),
-        '간장볶음소스' => array(12, 'g', false, ''),
-        '무침소스' => array(6, 'g', false, ''),
-        '다시마육수' => array(3, 'g', true, '국산'),
+        '국간장' => array(10, 'g', true, '국산'),
+        '간장볶음소스' => array(10, 'g', false, ''),
+        '무침소스' => array(4, 'g', false, ''),
+        '다시마육수' => array(15, 'g', true, '국산'),
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
@@ -235,10 +236,9 @@ return array(
         '_total' => array(180, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '검은콩' => array(180, 'g', false, '국산'),                 
-        '간장조림소스' => array(180, 'g', false, ''),
-        '다시마육수' => array(130, 'g', true, '국산'),
-        '물엿' => array(20, 'g', true, '국산'),
+        '검은콩' => array(110, 'g', false, '국산'),                 
+        '간장조림소스' => array(165, 'g', false, ''),        
+        '물엿' => array(10, 'g', true, '국산'),
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
@@ -358,12 +358,18 @@ return array(
         
         '깻잎' => array(35, 'g', true, '국산'),                         
     ),
-    '오이부추무침' => array(
+    '오이부추무침' => array( // 2019-09-29
         '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
         '오이' => array(100, 'g', true, '국산'),                         
-        '부추' => array(40, 'g', true, '국산'),                         
+        '부추' => array(40, 'g', true, '국산'),
+        '양파' => array(4, 'g', true, '국산'),
+        '마늘' => array(3, 'g', true, '중국'),
+        '매실청' => array(2, 'g', true, '국산'),
+        '고춧가루' => array(3, 'g', true, '베트남'),
+        '설탕' => array(1, 'g', true, '국산'),
+        '맛간장' => array(1, 'g', true, '국산'),        
     ),
 
     // 부침
