@@ -24,6 +24,8 @@ class PHPExcelDownload {
         '귀지압패치' => '귀지압패치',
         '니플패치' => '실리콘패치',
         '헤어끈통' => '머리끈세트',
+        'MTS' => 'MTS롤러',
+        '가정식반찬' => '신선식품',
     );
 
     public function __construct() {
@@ -446,18 +448,35 @@ class PHPExcelDownload {
                         }
 
                         if ($filterIndexReverse[$k] == '옵션정보') {      
-                            $_v = $this->getShortOption($v);
-                            $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' ['.$_v.']';   
+                            // 정성한끼 
+                            if ($row[array_search('상품명', array_keys($filterMerged))] == '신선식품') {
+                                $_v = $this->getShortOption($v);
+                                $_v = explode('/', $_v)[1];
+                                $row[array_search('상품명', array_keys($filterMerged))] = '['.$row[array_search('상품명', array_keys($filterMerged))].'] '.$_v;   
+                            } else {
+                                $_v = $this->getShortOption($v);
+                                $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' ['.$_v.']';   
+                            }                            
                         }
 
                         if ($filterIndexReverse[$k] == '수량') {      
-                            if ($v > 1) {
-                                $_v = '*'.$v.'개';
+                            if (strpos([array_search('상품명', array_keys($filterMerged))], '신선식품') !== false) {
+                                if ($v > 1) {
+                                    $_v = $v.'*';
+                                } else {
+                                    $_v = $v;
+                                }
+
+                                $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].''.$_v;
                             } else {
-                                $_v = $v.'개';
+                                if ($v > 1) {
+                                    $_v = '*'.$v.'개';
+                                } else {
+                                    $_v = $v.'개';
+                                }
+
+                                $row[array_search('상품명', array_keys($filterMerged))] = $_v.' '.$row[array_search('상품명', array_keys($filterMerged))];
                             }
-                            
-                            $row[array_search('상품명', array_keys($filterMerged))] = $_v.' '.$row[array_search('상품명', array_keys($filterMerged))];
                             
                             // 택배박스는 무조건 1개로..
                             $v = 1;
@@ -478,7 +497,11 @@ class PHPExcelDownload {
                         $index4 = array_search('수량', array_keys($filterMerged));
 
                         if ($row[$index1] == $v[$index1] && $row[$index2] == $v[$index2]) {
-                            $isOverwrite = true;                            
+                            $isOverwrite = true;           
+                            
+                            if (strpos($row[$index3], '신선식품') !== false) {
+                                $row[$index3] = str_replace('[신선식품] ', '', $row[$index3]);
+                            }
                             
                             $body[$k][$index3] = $body[$k][$index3].' / '.$row[$index3];
                             $body[$k][$index4] = 1;
@@ -562,6 +585,8 @@ class PHPExcelDownload {
             $nameIndex = array_search('상품명', array_keys($filter));
 
             if (strpos($value[$nameIndex], '가정용대야') !== false) {                            ;
+                $bodyOptimized[$key][$prevIndex] = '2';
+            } else if (strpos($value[$nameIndex], '신선식품') !== false) {                            ;
                 $bodyOptimized[$key][$prevIndex] = '2';
             } else {            
                 $bodyOptimized[$key][$prevIndex] = '1';
