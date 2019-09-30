@@ -460,7 +460,7 @@ class PHPExcelDownload {
                         }
 
                         if ($filterIndexReverse[$k] == '수량') {      
-                            if (strpos([array_search('상품명', array_keys($filterMerged))], '신선식품') !== false) {
+                            if (strpos(array_search('상품명', array_keys($filterMerged)), '신선식품') !== false) {
                                 if ($v > 1) {
                                     $_v = $v.'*';
                                 } else {
