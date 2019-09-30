@@ -447,11 +447,9 @@ class PHPExcelDownload {
                             $v = $this->getShortName($v);
                         }
 
-                        if ($filterIndexReverse[$k] == '옵션정보') {      
-                            // 정성한끼 
+                        if ($filterIndexReverse[$k] == '옵션정보') {                                                              
                             if ($row[array_search('상품명', array_keys($filterMerged))] == '신선식품') {
-                                $_v = $this->getShortOption($v);
-                                $_v = explode('/', $_v)[1];
+                                $_v = $this->getShortOptionJshk($v);                                
                                 $row[array_search('상품명', array_keys($filterMerged))] = '['.$row[array_search('상품명', array_keys($filterMerged))].'] '.$_v;   
                             } else {
                                 $_v = $this->getShortOption($v);
@@ -459,8 +457,8 @@ class PHPExcelDownload {
                             }                            
                         }
 
-                        if ($filterIndexReverse[$k] == '수량') {      
-                            if (strpos(array_search('상품명', array_keys($filterMerged)), '신선식품') !== false) {
+                        if ($filterIndexReverse[$k] == '수량') {                                  
+                            if (strpos($row[array_search('상품명', array_keys($filterMerged))], '신선식품') !== false) {
                                 if ($v > 1) {
                                     $_v = $v.'*';
                                 } else {
@@ -965,7 +963,7 @@ class PHPExcelDownload {
      * 정성한끼 조리표
      */
     public function jshkBasket($files) {        
-        list($filterMerged, $body) = $this->jshkDataFilter($files);
+        list($filterMerged, $body) = $this->jshkDataFilter($files);        
 
         if (empty($body)) {
             echo '내역이 존재하지 않습니다.';
@@ -1015,11 +1013,13 @@ class PHPExcelDownload {
             if (empty($items)) continue;   
             if (empty($items[$optionIndex])) continue;
 
-            $cookName = $this->getShortOption($items[$optionIndex]);
+            $cookName = $this->getShortOptionJshk($items[$optionIndex]);                                  
             $amount = $items[$amountIndex];
             
             foreach ($jshkData as $cookNamePart => $ingredients) {
-                if (strpos($cookName, $cookNamePart) !== false) {
+                // strpos는 위험..
+                // if (strpos($cookName, $cookNamePart) !== false) {
+                if ($cookName == $cookNamePart) {
                     // 레시피 작성                    
                     if (empty($receipe[$cookName])) {
                         $receipe[$cookName] = array();
@@ -1029,25 +1029,30 @@ class PHPExcelDownload {
                     $receipeTotal[$cookName] += $amount;
 
                     foreach ($ingredients as $ingredientName => $ingredientData) {
-                        if (substr($ingredientName, 0, 1) == '_') continue;
+                        if (substr($ingredientName, 0, 1) == '_') continue;                                                
 
                         // 2번 값이 true 면 구매내역에 포함
-                        if ($ingredientData[2] == true || 1) {
-                            // 모듬인 경우 모든재료 넣기
-                            if (!empty($jshkData[$ingredientName])) {
-                                foreach ($jshkData[$ingredientName] as $ingredientName2 => $ingredientData2) {
-                                    if (empty($basket[$ingredientName2])) $basket[$ingredientName2] = array();
-                                    if (empty($basket[$ingredientName2][$ingredientData2[1]])) $basket[$ingredientName2][$ingredientData2[1]] = 0;
+                        if ($ingredientData[2] == true || 1) {                            
+                            // 장바구니에 넣지 않을 재료   
+                            if (!in_array($ingredientName, array('물'))) {
+                                // 모듬인 경우 모든재료 넣기
+                                if (!empty($jshkData[$ingredientName])) {
+                                    foreach ($jshkData[$ingredientName] as $ingredientName2 => $ingredientData2) {                                    
+                                        if (!in_array($ingredientName2, array('물'))) {
+                                            if (empty($basket[$ingredientName2])) $basket[$ingredientName2] = array();
+                                            if (empty($basket[$ingredientName2][$ingredientData2[1]])) $basket[$ingredientName2][$ingredientData2[1]] = 0;
 
-                                    $basket[$ingredientName2][$ingredientData2[1]] += $ingredientData[0] * $ingredientData2[0] * $amount;
-                                }
-                            } else {
-                                if (empty($basket[$ingredientName])) $basket[$ingredientName] = array();
-                                if (empty($basket[$ingredientName][$ingredientData[1]])) $basket[$ingredientName][$ingredientData[1]] = 0;
+                                            $basket[$ingredientName2][$ingredientData2[1]] += $ingredientData[0] * $ingredientData2[0] * $amount;
+                                        }
+                                    }
+                                } else {                                
+                                    if (empty($basket[$ingredientName])) $basket[$ingredientName] = array();
+                                    if (empty($basket[$ingredientName][$ingredientData[1]])) $basket[$ingredientName][$ingredientData[1]] = 0;
 
-                                $basket[$ingredientName][$ingredientData[1]] += $ingredientData[0] * $amount;
-                            }                                                  
-                        }
+                                    $basket[$ingredientName][$ingredientData[1]] += $ingredientData[0] * $amount;
+                                }                                                  
+                            }
+                        }                        
 
                         if (empty($receipe[$cookName][$ingredientName])) $receipe[$cookName][$ingredientName] = array();                        
                         if (empty($receipe[$cookName][$ingredientName][$ingredientData[1]])) $receipe[$cookName][$ingredientName][$ingredientData[1]] = 0;
@@ -1072,7 +1077,7 @@ class PHPExcelDownload {
                     // echo '</pre>';   
                     // exit();
 
-                    // break;
+                    break;
                 }
             }
         }             
@@ -1084,7 +1089,11 @@ class PHPExcelDownload {
                 if (empty($source[$ingredientName][$sourceName][$sourceData[1]])) $source[$ingredientName][$sourceName][$sourceData[1]] = 0;                                
                 
                 $sourceWeight = $sourceData[0] * $weight;
-                $sourceWeight = round($sourceWeight * 1.2, -1); // 20% 소스 여유분
+                if (strpos($ingredientName, '소스') !== false) {
+                    $sourceWeight = round($sourceWeight * 1.5, -1); // 50% 소스 여유분
+                } else {
+                    $sourceWeight = round($sourceWeight);
+                }
                 $source[$ingredientName][$sourceName][$sourceData[1]] += $sourceWeight;                
                 $weightNew += $sourceWeight;
             }
@@ -1112,8 +1121,8 @@ class PHPExcelDownload {
 
         foreach ($receipe as $cookName => $ingredientDatas) {
             $receipeMerge[] = sizeOf($ingredientDatas);            
-            foreach ($ingredientDatas as $ingredientName => $ingredientData) {                
-                $data[] = array($cookName, $receipeTotal[$cookName].'인분', $ingredientName, $ingredientData[key($ingredientData)].key($ingredientData));
+            foreach ($ingredientDatas as $ingredientName => $ingredientData) {                                
+                $data[] = array($cookName.'('.$jshkData[$cookName]['_total'][0].$jshkData[$cookName]['_total'][1].')', $receipeTotal[$cookName].'인분', $ingredientName, $ingredientData[key($ingredientData)].key($ingredientData));
                 $receipeRow++;
             }
         }
@@ -1344,7 +1353,7 @@ class PHPExcelDownload {
             if (empty($items)) continue;   
             if (empty($items[$optionIndex])) continue;
 
-            $cookName = $this->getShortOption($items[$optionIndex]);
+            $cookName = $this->getShortOptionJshk($items[$optionIndex]);
             $amount = $items[$amountIndex];
             
             foreach ($jshkData as $cookNamePart => $ingredients) {                
@@ -1372,14 +1381,18 @@ class PHPExcelDownload {
                                 if (!empty($jshkData[$sourceName])) { 
                                     foreach ($jshkData[$sourceName] as $sourceName2 => $sourceData2) {
                                         // 재료명(원산지)
-                                        $ingredientsText = $sourceName2.'('.$sourceData2[3].')';
+                                        if (in_array($sourceName2, array('물'))) continue;
+                                        $ingredientsText = $sourceName2;
+                                        if (!empty($sourceData2[3])) $ingredientsText .= '('.$sourceData2[3].')';
                                         if (!in_array($ingredientsText, $ingredientsSum)) {                                            
                                             $ingredientsSum[] = $ingredientsText;
                                         }  
                                     }
                                 } else {
                                     // 재료명(원산지)
-                                    $ingredientsText = $sourceName.'('.$sourceData[3].')';
+                                    if (in_array($sourceName, array('물'))) continue;
+                                    $ingredientsText = $sourceName;
+                                    if (!empty($sourceData[3])) $ingredientsText .= '('.$sourceData[3].')';
                                     if (!in_array($ingredientsText, $ingredientsSum)) {
                                         $ingredientsSum[] = $ingredientsText;
                                     }       
@@ -1388,7 +1401,9 @@ class PHPExcelDownload {
                         // 일반재료
                         } else {
                             // 재료명(원산지)
-                            $ingredientsText = $ingredientName.'('.$ingredientData[3].')';
+                            if (in_array($ingredientName, array('물'))) continue;
+                            $ingredientsText = $ingredientName;
+                            if (!empty($ingredientData[3])) $ingredientsText .= '('.$ingredientData[3].')';                            
                             if (!in_array($ingredientsText, $ingredientsSum)) {
                                 $ingredientsSum[] = $ingredientsText;
                             } 
@@ -1402,17 +1417,22 @@ class PHPExcelDownload {
                     $nextTime = strtotime('+'.$ingredients['_expired'][0].' '.$ingredients['_expired'][1]);
                     $contents[] = '만든날짜 : '.date('Y년 m월 d일').' ('.$week[date("w")].')';                       
                     $contents[] = '유통기한 : '.date('Y년 m월 d일', $nextTime).' ('.$week[date("w", $nextTime)].')';
-                    $contents[] = '보관방법 : 냉장보관';
+                    $contents[]  = '보관방법 : 냉장보관';
                     $contents[] = '판매업체 : 정성한끼';                    
-                    $row[] = implode('\r', $contents);
+                    $row[] = implode(chr(10), $contents);
 
                     // 안내
-                    $row[] = '전자레인지를 이용해서 간편하게 데워서 드시기 바랍니다';
+                    if (mb_substr($cookName, -1) == '국') {
+                        $row[] = '냄비나 용기에 담아 데워서 드시기 바랍니다.';
+                    } else {
+                        $row[] = '전자레인지를 이용해서 간편하게 데워서 드시기 바랍니다';
+                    }
+
                     // 신고
                     $row[] = '부정/불량식품 신고는 국번없이 1399';
 
                     // echo '<pre>';                    
-                    // print_r($row);                                        
+                    // print_r(mb_substr($cookName, -1));                                        
                     // echo '</pre>';   
                     // exit();
                     $sort[] = $itemName;
@@ -1462,6 +1482,9 @@ class PHPExcelDownload {
         // 데이터 적용
         $excel->getActiveSheet()->fromArray($data, NULL, 'A1');
 
+        // \r 줄내림 처리
+        $excel->getActiveSheet()->getStyle("C2:C{$cntRow}")->getAlignment()->setWrapText(true);
+
         // 양식 설정
         ob_end_clean();        
         $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');        
@@ -1497,6 +1520,26 @@ class PHPExcelDownload {
         } else {
             return trim(explode(':', $option)[1]);
         }
+    }
+
+    /**
+     * 정성한끼 전용 옵션
+     */
+    public function getShortOptionJshk($option) {
+        if (empty($option)) return '';        
+
+        $option = explode('/', $option)[1];
+        $option = explode(':', $option)[1]; 
+        $option = trim($option);       
+
+        if ($option == '오늘의국') {
+            array('일', '월', '화', '수', '목', '금', '토');
+            if (in_array(date("w"), array(0, 1, 6, 4))) $option = '소고기미역국';
+            else if (in_array(date("w"), array(2, 5))) $option = '근대된장국';
+            else if (in_array(date("w"), array(3))) $option = '황태국';
+        }
+        
+        return $option;       
     }
 
     public function columnChar($i) {
