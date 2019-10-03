@@ -1089,7 +1089,7 @@ class PHPExcelDownload {
                 if (empty($source[$ingredientName][$sourceName][$sourceData[1]])) $source[$ingredientName][$sourceName][$sourceData[1]] = 0;                                
                 
                 $sourceWeight = $sourceData[0] * $weight;
-                if (strpos($ingredientName, '소스') !== false) {
+                if (strpos($ingredientName, '소스') !== false) {                    
                     $sourceWeight = round($sourceWeight * 1.5, -1); // 50% 소스 여유분
                 } else {
                     $sourceWeight = round($sourceWeight);
