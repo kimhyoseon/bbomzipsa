@@ -250,7 +250,7 @@ class Yoona {
 
         array_multisort($sort, SORT_DESC, $apts);
 
-        $apts = array_slice($apts, 0, 100);
+        $apts = array_slice($apts, 0, 50);
 
         $db->CloseConnection(); 
 
