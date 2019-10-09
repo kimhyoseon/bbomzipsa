@@ -1534,9 +1534,9 @@ class PHPExcelDownload {
 
         if ($option == '오늘의국') {
             array('일', '월', '화', '수', '목', '금', '토');
-            if (in_array(date("w"), array(0, 1, 6, 4))) $option = '소고기미역국';
-            else if (in_array(date("w"), array(2, 5))) $option = '근대된장국';
-            else if (in_array(date("w"), array(3))) $option = '황태국';
+            if (in_array(date("w"), array(0, 1, 6))) $option = '소고기미역국';
+            else if (in_array(date("w"), array(2, 4))) $option = '근대된장국';
+            else if (in_array(date("w"), array(3, 5))) $option = '황태국';
         }
         
         return $option;       

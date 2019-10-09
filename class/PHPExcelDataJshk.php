@@ -30,22 +30,23 @@ return array(
         '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '명엽채' => array(150, 'g', false, '칠레'),          
+        '명엽채' => array(110, 'g', false, '칠레'),          
         '설탕' => array(2, 'g', false, '국산'),      
         '맛기름' => array(5, 'g', false, '국산'),        
-        '간장볶음소스' => array(60, 'g', false, ''),
+        '간장볶음소스' => array(40, 'g', false, ''),
         '깨' => array(1, 'g', false, '수입'),
+        '물엿' => array(12, 'g', false, '국산'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
-    '간장어묵볶음' => array(
-        '_total' => array(150, 'g', false, ''),
+    '간장어묵볶음' => array( // 210g 2019-10-09
+        '_total' => array(200, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '어묵' => array(150, 'g', true, '국산'),         
+        '어묵' => array(130, 'g', true, '국산'),         
         '설탕' => array(2, 'g', false, '국산'),
         '맛기름' => array(5, 'g', false, '국산'),        
         '모듬야채' => array(30, 'g', true, '국산'),
-        '간장볶음소스' => array(40, 'g', false, ''),
+        '간장볶음소스' => array(50, 'g', false, ''),
         '깨' => array(1, 'g', false, '수입'),
         '물엿' => array(5, 'g', false, '국산'),
         '참기름' => array(1, 'g', false, '수입'),
@@ -99,23 +100,23 @@ return array(
         '들기름' => array(17, 'g', true, '국산'),
         '모듬야채' => array(20, 'g', true, '국산'),
         '국간장' => array(10, 'g', true, '국산'),
-        '간장볶음소스' => array(10, 'g', false, ''),
+        '간장볶음소스' => array(15, 'g', false, ''),
         '무침소스' => array(4, 'g', false, ''),
         '다시마육수' => array(15, 'g', true, '국산'),
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
-    '간장미역줄기볶음' => array( // 170g 2019-09-30
+    '간장미역줄기볶음' => array( // 160g 2019-10-09
         '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '미역줄기' => array(350, 'g', true, '국산'),         
+        '미역줄기' => array(200, 'g', true, '국산'),         
         '맛기름' => array(3, 'g', true, '국산'),
         '들기름' => array(3, 'g', true, '국산'),
-        '모듬야채' => array(40, 'g', true, '국산'),        
-        '간장볶음소스' => array(20, 'g', false, ''),        
+        '모듬야채' => array(30, 'g', true, '국산'),        
+        '간장볶음소스' => array(15, 'g', false, ''),        
         '무침소스' => array(5, 'g', false, ''),        
-        '다시마육수' => array(20, 'g', true, '국산'),
+        '다시마육수' => array(10, 'g', true, '국산'),
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
@@ -155,26 +156,26 @@ return array(
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ), 
-    '매콤건새우볶음' => array( // 85g 2019-10-06
-        '_total' => array(80, 'g', false, ''),
+    '매콤건새우볶음' => array( // 100g 2019-10-09
+        '_total' => array(100, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '건새우' => array(40, 'g', false, '중국'),         
+        '건새우' => array(45, 'g', false, '중국'),         
         '설탕' => array(2, 'g', false, '국산'),     
         '고추장볶음소스' => array(45, 'g', false, ''),
         '물엿' => array(5, 'g', false, '국산'),
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),     
-    '매콤어묵볶음' => array(
-        '_total' => array(150, 'g', false, ''),
+    '매콤어묵볶음' => array( // 210g 2019-10-09
+        '_total' => array(200, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '어묵' => array(150, 'g', true, '국산'),   
+        '어묵' => array(130, 'g', true, '국산'),   
         '설탕' => array(2, 'g', false, '국산'),      
         '맛기름' => array(5, 'g', false, '국산'),        
         '모듬야채' => array(30, 'g', true, '국산'),
-        '고추장볶음소스' => array(50, 'g', false, ''),
+        '고추장볶음소스' => array(60, 'g', false, ''),
         '물엿' => array(5, 'g', false, '국산'),
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
@@ -195,7 +196,7 @@ return array(
         
         '비엔나소세지' => array(150, 'g', true, '국산'), 
         '맛기름' => array(3, 'g', false, '국산'),                
-        '모듬야채' => array(30, 'g', true, '국산'),
+        '모듬야채' => array(50, 'g', true, '국산'),
         '고추장볶음소스' => array(20, 'g', false, ''),
         '케찹' => array(20, 'g', false, ''),
         '깨' => array(1, 'g', false, '수입'),
@@ -250,12 +251,12 @@ return array(
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
-    '메추리알조림' => array(
+    '메추리알조림' => array( // 200g 2019-10-09
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
-        '메추리알' => array(450, 'g', true, '국산'),                 
-        '간장조림소스' => array(180, 'g', false, ''),
+        '메추리알' => array(230, 'g', true, '국산'),                 
+        '간장조림소스' => array(150, 'g', false, ''),
         '물엿' => array(12, 'g', true, '국산'),
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
@@ -309,23 +310,23 @@ return array(
     ),
 
     // 나물
-    '콩나물무침' => array( // 220g 2019-10-06
+    '콩나물무침' => array( // 220g 2019-10-09
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
         '콩나물' => array(200, 'g', true, '국산'),                 
         '모듬야채' => array(18, 'g', true, '국산'),
-        '무침소스' => array(10, 'g', false, ''),
+        '무침소스' => array(15, 'g', false, ''),
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
-    '숙주나물무침' => array( // 220g 2019-10-06
+    '숙주나물무침' => array( // 220g 2019-10-09
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
         '숙주나물' => array(220, 'g', true, '국산'),  
         '모듬야채' => array(12, 'g', true, '국산'),
-        '무침소스' => array(10, 'g', false, ''),
+        '무침소스' => array(15, 'g', false, ''),
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
@@ -338,17 +339,17 @@ return array(
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
-    '건파래무침' => array(
+    '건파래무침' => array( // 160g 2019-10-09
         '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '건파래' => array(50, 'g', true, '국산'),                 
-        '조림소스' => array(100, 'g', false, ''),
+        '건파래' => array(35, 'g', true, '국산'),                 
+        '조림소스' => array(120, 'g', false, ''),
         '다시마육수' => array(15, 'g', true, '국산'),
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(2, 'g', false, '수입'),
     ),
-    '새우젓애호박볶음' => array( // 170g 2019-09-30
+    '새우젓애호박볶음' => array( // 170g 2019-10-09
         '_total' => array(150, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
@@ -356,24 +357,24 @@ return array(
         '모듬야채' => array(20, 'g', true, '국산'),
         '맛기름' => array(1, 'g', true, '국산'),
         '들기름' => array(1, 'g', true, '국산'),
-        '소금' => array(1, 'g', false, '국산'),
+        '무침소스' => array(4, 'g', false, ''),
         '마늘' => array(3, 'g', false, '중국'),
         '새우젓' => array(3, 'g', false, '중국'),                
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
-    '들깨무나물' => array( // 220g 2019-09-30
+    '들깨무나물' => array( // 210g 2019-10-09
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
-        '무' => array(270, 'g', true, '국산'),        
-        '무침소스' => array(13, 'g', false, ''),
+        '무' => array(230, 'g', true, '국산'),        
+        '무침소스' => array(11, 'g', false, ''),
         '들깨가루' => array(3, 'g', true, '중국'),
-        '대파' => array(6, 'g', true, '국산'),                
+        '대파' => array(5, 'g', true, '국산'),                
         '맛기름' => array(2, 'g', true, '국산'),
         '들기름' => array(2, 'g', true, '국산'),        
-        '마늘' => array(4, 'g', true, '중국'),
-        '다시마육수' => array(10, 'g', true, '국산'),        
+        '마늘' => array(3, 'g', true, '중국'),
+        '다시마육수' => array(8, 'g', true, '국산'),        
     ),
     '무나물' => array( // 220g 2019-09-30
         '_total' => array(200, 'g', false, ''),
