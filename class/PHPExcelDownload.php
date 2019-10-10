@@ -1347,7 +1347,7 @@ class PHPExcelDownload {
         $amountIndex = array_search('수량', array_keys($filterMerged));   
         $week = array('일', '월', '화', '수', '목', '금', '토');
         $rows = array();
-        $sort = array();
+        $sort = array();        
 
         foreach ($body as $items) {
             if (empty($items)) continue;   
@@ -1364,11 +1364,6 @@ class PHPExcelDownload {
                     
                     // 제품명 (중량)
                     $itemName = $cookName.' ('.$ingredients['_total'][0].$ingredients['_total'][1].')';
-                    
-                    // 1개 이상인 경우
-                    if (!empty($amount) && $amount > 1) {
-                        $itemName = $itemName.' '.$amount.'개';
-                    }
                     
                     $row[] = $itemName;
 
@@ -1437,6 +1432,14 @@ class PHPExcelDownload {
                     // exit();
                     $sort[] = $itemName;
                     $rows[] = $row;
+
+                    // 1개 이상인 경우 반복
+                    if (!empty($amount) && $amount > 1) {
+                        for ($i = 1; $i < $amount; $i++) { 
+                            $rows[] = $row;
+                            $sort[] = $itemName;
+                        }
+                    }
 
                     break;
                 }
