@@ -30,10 +30,10 @@ return array(
         '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '명엽채' => array(110, 'g', false, '칠레'),          
+        '명엽채' => array(100, 'g', false, '칠레'),          
         '설탕' => array(2, 'g', false, '국산'),      
         '맛기름' => array(5, 'g', false, '국산'),        
-        '간장볶음소스' => array(40, 'g', false, ''),
+        '간장볶음소스' => array(30, 'g', false, ''),
         '깨' => array(1, 'g', false, '수입'),
         '물엿' => array(12, 'g', false, '국산'),
         '참기름' => array(1, 'g', false, '수입'),
@@ -124,10 +124,10 @@ return array(
         '_total' => array(80, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '오징어실채' => array(60, 'g', true, '수입'), 
+        '오징어실채' => array(55, 'g', true, '수입'), 
         '설탕' => array(2, 'g', false, '국산'), 
         '맛기름' => array(2, 'g', true, '국산'),               
-        '간장볶음소스' => array(25, 'g', false, ''),                
+        '간장볶음소스' => array(22, 'g', false, ''),                
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
@@ -310,7 +310,7 @@ return array(
     ),
 
     // 나물
-    '콩나물무침' => array( // 220g 2019-10-09
+    '콩나물무침' => array( // 200g 2019-10-10
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
@@ -320,11 +320,11 @@ return array(
         '깨' => array(1, 'g', false, '수입'),
         '참기름' => array(1, 'g', false, '수입'),
     ),
-    '숙주나물무침' => array( // 220g 2019-10-09
+    '숙주나물무침' => array( // 220g 2019-10-10
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
-        '숙주나물' => array(220, 'g', true, '국산'),  
+        '숙주나물' => array(200, 'g', true, '국산'),  
         '모듬야채' => array(12, 'g', true, '국산'),
         '무침소스' => array(15, 'g', false, ''),
         '깨' => array(1, 'g', false, '수입'),
@@ -472,7 +472,8 @@ return array(
         
         '소고기' => array(200, 'g', true, '호주'),                
         '모듬야채' => array(50, 'g', true, '국산'),         
-        '진간장' => array(6, 'g', false, '국산'), 
+        '간장조림소스' => array(20, 'g', false, ''),
+        '진간장' => array(6, 'g', false, '국산'),         
         '맛간장' => array(10, 'g', false, '국산'),
         '매실청' => array(3, 'g', false, '국산'),                
         '맛술' => array(3, 'g', false, '국산'), 
@@ -578,9 +579,8 @@ return array(
     // 소스류
     '간장볶음소스' => array( // 1g 기준 비율        
         '맛술' => array(0.21, 'g', false, '국산'), 
-        '마늘' => array(0.20, 'g', false, '중국'),         
-        '간장' => array(0.06, 'g', false, '국산'),        
-        '맛간장' => array(0.24, 'g', false, '국산'),
+        '마늘' => array(0.20, 'g', false, '중국'),                 
+        '맛간장' => array(0.3, 'g', false, '국산'),
         '노두유' => array(0.03, 'g', false, '홍콩'),
         '굴소스' => array(0.03, 'g', false, '홍콩'),
         '물엿' => array(0.15, 'g', false, '국산'),
