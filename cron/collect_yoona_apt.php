@@ -11,8 +11,10 @@ try {
     $_SERVER['DOCUMENT_ROOT'] = dirname(dirname(__FILE__));    
     
     // 지역코드 5자리 (시군구), 인구수 차트로 확인 가능    
-    $lawdCd = '31200';
-    $sigoongoo = '울산광역시 북구';
+    // $lawdCd = '31200';
+    // $sigoongoo = '울산광역시 북구';
+    $lawdCd = '44133';
+    $sigoongoo = '천안시 서북구';
 
     // 수집시작일 (이번달)
     $date = date('Ym');        

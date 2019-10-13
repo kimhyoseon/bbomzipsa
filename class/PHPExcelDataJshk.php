@@ -114,7 +114,7 @@ return array(
         '맛기름' => array(3, 'g', true, '국산'),
         '들기름' => array(3, 'g', true, '국산'),
         '모듬야채' => array(30, 'g', true, '국산'),        
-        '간장볶음소스' => array(15, 'g', false, ''),        
+        '간장볶음소스' => array(20, 'g', false, ''),        
         '무침소스' => array(5, 'g', false, ''),        
         '다시마육수' => array(10, 'g', true, '국산'),
         '깨' => array(1, 'g', false, '수입'),
@@ -208,7 +208,7 @@ return array(
         '_total' => array(180, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '우엉' => array(240, 'g', true, '중국'),
+        '우엉' => array(240, 'g', true, '국내'),
         '간장조림소스' => array(70, 'g', false, ''),
         '식초' => array(2, 'g', true, '국산'),
         '진간장' => array(10, 'g', false, '국산'),
@@ -222,7 +222,7 @@ return array(
         '_total' => array(180, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '연근' => array(260, 'g', true, '중국'),                 
+        '연근' => array(260, 'g', true, '국내'),                 
         '간장조림소스' => array(150, 'g', false, ''),        
         '식초' => array(3, 'g', true, '국산'),
         '맛기름' => array(4, 'g', true, '국산'),
@@ -456,37 +456,38 @@ return array(
     ),
 
     // 고기
-    '버터바싹불고기' => array(
-        '_total' => array(150, 'g', false, ''),
+    '버터바싹불고기' => array( // 180g 2019-10-12
+        '_total' => array(180, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
-        '소고기' => array(150, 'g', true, '호주'),                 
-        '맛기름' => array(4, 'g', false, '국산'),                
-        '간장볶음소스' => array(40, 'g', false, ''),
+        '소고기' => array(180, 'g', true, '호주'),                         
+        '간장볶음소스' => array(50, 'g', false, ''),
+        '간장조림소스' => array(10, 'g', false, ''),
         '버터' => array(8, 'g', false, '국산'),
-        '깨' => array(1, 'g', false, '수입'),   
+        '깨' => array(1, 'g', false, '수입'),
+        '참기름' => array(2, 'g', false, '수입'),
     ), 
-    '소불고기' => array( // 170g 2019-10-03
-        '_total' => array(150, 'g', false, ''),
+    '소불고기' => array( // 200g 2019-10-12
+        '_total' => array(180, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
         '소고기' => array(200, 'g', true, '호주'),                
         '모듬야채' => array(50, 'g', true, '국산'),         
-        '간장조림소스' => array(20, 'g', false, ''),
-        '진간장' => array(6, 'g', false, '국산'),         
-        '맛간장' => array(10, 'g', false, '국산'),
-        '매실청' => array(3, 'g', false, '국산'),                
-        '맛술' => array(3, 'g', false, '국산'), 
-        '설탕' => array(2, 'g', false, '국산'),         
-        '마늘' => array(6, 'g', false, '중국'), 
-        '참기름' => array(1, 'g', true, '수입'),        
-        '후추' => array(1, 'g', false, '국산'),                  
+        '간장볶음소스' => array(50, 'g', false, ''),
+        '간장조림소스' => array(20, 'g', false, ''),                
+        '깨' => array(1, 'g', false, '수입'),
+        '참기름' => array(2, 'g', false, '수입'),
     ), 
-    '매콤돼지불고기' => array(
-        '_total' => array(150, 'g', false, ''),
+    '매콤돼지불고기' => array( // 200g 2019-10-12
+        '_total' => array(200, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
-        '돼지고기' => array(150, 'g', true, '국산'),                         
+        '돼지고기' => array(180, 'g', true, '국산'),        
+        '모듬야채' => array(50, 'g', true, '국산'), 
+        '간장볶음소스' => array(10, 'g', false, ''),
+        '고추장볶음소스' => array(80, 'g', false, ''),                                 
+        '깨' => array(1, 'g', false, '수입'),
+        '참기름' => array(2, 'g', false, '수입'),
     ), 
 
     

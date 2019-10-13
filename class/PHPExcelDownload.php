@@ -25,7 +25,7 @@ class PHPExcelDownload {
         '니플패치' => '실리콘패치',
         '헤어끈통' => '머리끈세트',
         'MTS' => 'MTS롤러',
-        '가정식반찬' => '신선식품',
+        '반찬' => '신선식품',
     );
 
     public function __construct() {
@@ -956,7 +956,56 @@ class PHPExcelDownload {
             return false;
         }
 
+        // 세트메뉴 추출
+        
+        $setMenuMerge = array();
+
+        foreach ($body as $key => $items) {            
+            $setMenus = $this->getDailySetMenu($items, $filterMerged);            
+            
+            if ($setMenus !== false) {
+                $setMenuMerge = array_merge($setMenuMerge, $setMenus);
+                unset($body[$key]);
+            }
+        }
+
+        if (!empty($body)) {
+            $body = array_merge($setMenuMerge, $body);
+        }        
+
         return array($filterMerged, $body);
+    }
+
+    /**
+     * 정성한끼 세트메뉴
+     */
+    public function getDailySetMenu($items, $filterMerged) {               
+        $amountIndex = array_search('수량', array_keys($filterMerged));               
+        $optionIndex = array_search('옵션정보', array_keys($filterMerged));         
+        
+        if (strpos($items[$optionIndex], '매일반찬5종세트') === false) return false;
+
+        $setMenus = array();
+
+        // array('일', '월', '화', '수', '목', '금', '토');
+        if (in_array(date("w"), array(0, 1, 6))) $option = array('간장멸치볶음', '간장새송이버섯볶음', '메추리알조림', '콩나물무침', '계란말이');
+        else if (in_array(date("w"), array(2))) $option = array('매콤건새우볶음', '간장어묵볶음', '땅콩조림', '건파래무침', '계란말이');
+        else if (in_array(date("w"), array(3))) $option = array('간장오징어실채볶음', '매콤어묵볶음', '메추리알조림', '새우젓애호박볶음', '계란말이');        
+        else if (in_array(date("w"), array(4))) $option = array('간장명엽채볶음', '소세지야채볶음', '검은콩조림', '콩나물무침', '계란말이');        
+        else if (in_array(date("w"), array(5))) $option = array('매콤진미채무침', '간장어묵볶음', '간장새송이버섯볶음', '연근조림', '계란말이');        
+
+        foreach ($option as $menu) {
+            $newItems = $items;
+            $newItems[$optionIndex] = '/:'.$menu;
+            $setMenus[] = $newItems;
+        }
+
+        // echo '<pre>';                            
+        // print_r($items);        
+        // print_r($setMenus);        
+        // echo '</pre>'; 
+
+        return $setMenus;
     }
 
     /**
@@ -964,6 +1013,12 @@ class PHPExcelDownload {
      */
     public function jshkBasket($files) {        
         list($filterMerged, $body) = $this->jshkDataFilter($files);        
+
+        // echo '<pre>';                            
+        // print_r($filterMerged);
+        // print_r($body);
+        // echo '</pre>';   
+        // exit();
 
         if (empty($body)) {
             echo '내역이 존재하지 않습니다.';
@@ -1530,16 +1585,18 @@ class PHPExcelDownload {
      */
     public function getShortOptionJshk($option) {
         if (empty($option)) return '';        
-
-        $option = explode('/', $option)[1];
-        $option = explode(':', $option)[1]; 
+        
+        if (strpos($option, '/') !== false) $option = explode('/', $option)[1];
+        if (strpos($option, ':') !== false) $option = explode(':', $option)[1]; 
         $option = trim($option);       
 
         if ($option == '오늘의국') {
-            array('일', '월', '화', '수', '목', '금', '토');
+            // array('일', '월', '화', '수', '목', '금', '토');
             if (in_array(date("w"), array(0, 1, 6))) $option = '소고기미역국';
             else if (in_array(date("w"), array(2, 4))) $option = '근대된장국';
             else if (in_array(date("w"), array(3, 5))) $option = '황태국';
+        } else if (strpos($option, '매일반찬5종세트') !== false) {
+            $option = '매일반찬5종세트';
         }
         
         return $option;       
