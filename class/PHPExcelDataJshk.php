@@ -265,7 +265,7 @@ return array(
         '_total' => array(180, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
-        '소고기' => array(70, 'g', true, '호주'),                 
+        '소고기(장조림)' => array(70, 'g', true, '호주'),                 
         '메추리알' => array(120, 'g', false, '국산'),
         '간장조림소스' => array(110, 'g', false, ''),
         '대파' => array(4, 'g', true, '국산'),        
@@ -278,7 +278,7 @@ return array(
         '_total' => array(180, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
-        '돼지고기' => array(70, 'g', true, '국산'),                 
+        '돼지고기(장조림)' => array(70, 'g', true, '국산'),                 
         '메추리알' => array(120, 'g', false, '국산'),
         '간장조림소스' => array(110, 'g', false, ''),
         '꽈리고추' => array(15, 'g', true, '국산'),             
@@ -460,7 +460,7 @@ return array(
         '_total' => array(180, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
-        '소고기' => array(180, 'g', true, '호주'),                         
+        '소고기(불고기)' => array(180, 'g', true, '호주'),                         
         '간장볶음소스' => array(50, 'g', false, ''),
         '간장조림소스' => array(10, 'g', false, ''),
         '버터' => array(8, 'g', false, '국산'),
@@ -471,7 +471,7 @@ return array(
         '_total' => array(180, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
-        '소고기' => array(200, 'g', true, '호주'),                
+        '소고기(불고기)' => array(200, 'g', true, '호주'),                
         '모듬야채' => array(50, 'g', true, '국산'),         
         '간장볶음소스' => array(50, 'g', false, ''),
         '간장조림소스' => array(20, 'g', false, ''),                
@@ -482,7 +482,7 @@ return array(
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
-        '돼지고기' => array(180, 'g', true, '국산'),        
+        '돼지고기(불고기)' => array(180, 'g', true, '국산'),        
         '모듬야채' => array(50, 'g', true, '국산'), 
         '간장볶음소스' => array(10, 'g', false, ''),
         '고추장볶음소스' => array(80, 'g', false, ''),                                 
@@ -496,7 +496,7 @@ return array(
         '_total' => array(700, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         
-        '소고기' => array(50, 'g', true, '국산'),                 
+        '소고기(국거리)' => array(50, 'g', true, '국산'),                 
         '참기름' => array(5, 'g', true, '수입'),        
         '미역' => array(15, 'g', false, '국산'),
         '물' => array(480, 'g', true, ''),
