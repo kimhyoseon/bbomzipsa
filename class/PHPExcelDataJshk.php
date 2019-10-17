@@ -496,7 +496,7 @@ return array(
         '_expired' => array(4, 'days', false, ''),
         
         '소고기(국거리)' => array(50, 'g', true, '국산'),                 
-        '참기름' => array(5, 'g', true, '수입'),        
+        '참기름' => array(5, 'g', true, '국산'),        
         '미역' => array(15, 'g', false, '국산'),
         '물' => array(480, 'g', true, ''),
         '국간장' => array(25, 'g', false, '국산'),                
@@ -577,7 +577,7 @@ return array(
         '마늘' => array(0.15, 'g', false, '국산'),
         '소금' => array(0.15, 'g', false, '국산'),
         '깨' => array(0.3, 'g', false, '국산'),   
-        '참기름' => array(0.15, 'g', false, '수입'),        
+        '참기름' => array(0.15, 'g', false, '국산'),        
     ),
     /*'맛간장' => array(
         '양파' => array(1, 'g', false, '국산'),
