@@ -1177,7 +1177,35 @@ class PHPExcelDownload {
         foreach ($receipe as $cookName => $ingredientDatas) {
             $receipeMerge[] = sizeOf($ingredientDatas);            
             foreach ($ingredientDatas as $ingredientName => $ingredientData) {                                
-                $data[] = array($cookName.'('.$jshkData[$cookName]['_total'][0].$jshkData[$cookName]['_total'][1].')', $receipeTotal[$cookName].'인분', $ingredientName, $ingredientData[key($ingredientData)].key($ingredientData));
+                // 소스는 계량을 국자로 변경
+                $weightCookname = '';
+                $weightCook = $ingredientData[key($ingredientData)];                                
+
+                if (strpos($ingredientName, '소스') !== false) {                    
+                    
+                    if ($weightCook >= 90) {
+                        $ladle = floor($weightCook / 90);
+                        $weightCook = $weightCook % 90;
+                        $weightCookname .= $ladle.'(대)';
+                    }
+
+                    if ($weightCook > 0) {
+                        $ladle = $weightCook / 15;
+                        $ladle = round($ladle * 2) / 2;
+
+                        if (!empty($weightCookname)) {
+                            $weightCookname .= ' + ';                                                                                
+                        }
+
+                        $weightCookname .= $ladle.'(소)';                                                
+                    }
+
+                    $weightCookname .= ' ('.$ingredientData[key($ingredientData)].key($ingredientData).')';
+                } else {
+                    $weightCookname = $ingredientData[key($ingredientData)].key($ingredientData);
+                }
+
+                $data[] = array($cookName.'('.$jshkData[$cookName]['_total'][0].$jshkData[$cookName]['_total'][1].')', $receipeTotal[$cookName].'인분', $ingredientName, $weightCookname);
                 $receipeRow++;
             }
         }
