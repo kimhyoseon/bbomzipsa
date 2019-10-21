@@ -471,7 +471,7 @@ return array(
         '설탕' => array(1, 'g', true, '국산'),
         '맛간장' => array(1, 'g', true, '국산'),        
     ),
-    '아삭고추된장' => array( // 150g 2019-10-21
+    '아삭이된장무침' => array( // 150g 2019-10-21
         '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
@@ -518,7 +518,7 @@ return array(
         '멸치액젓' => array(1, 'g', true, '수입'),
         'L-글루탐산나트륨' => array(1, 'g', false, '수입'),
     ),
-    '간장깻잎' => array( // 2019-10-21
+    '깻잎장아찌' => array( // 2019-10-21
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
@@ -532,7 +532,7 @@ return array(
         '소브산칼륨' => array(1, 'g', false, '수입'),
         '구연산' => array(1, 'g', false, '수입'),
     ),
-    '오징어젓' => array( // 2019-10-21
+    '오징어젓갈' => array( // 2019-10-21
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
@@ -546,7 +546,7 @@ return array(
         '소금' => array(1, 'g', false, '중국'),
         '멸치액젓' => array(1, 'g', true, '수입'),
     ),
-    '낙지젓' => array( // 2019-10-21
+    '낙지젓갈' => array( // 2019-10-21
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
