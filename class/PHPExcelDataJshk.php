@@ -146,7 +146,7 @@ return array(
         
         '마늘쫑' => array(150, 'g', true, '중국'), 
         '베이컨' => array(30, 'g', false, '수입'),         
-        '간장볶음소스' => array(20, 'g', false, ''),                
+        '간장볶음소스' => array(40, 'g', false, ''),                
         '깨' => array(1, 'g', false, '국산'),        
     ),    
 
