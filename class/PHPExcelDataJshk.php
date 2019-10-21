@@ -131,6 +131,24 @@ return array(
         '깨' => array(1, 'g', false, '국산'),
         '참기름' => array(1, 'g', false, '국산'),
     ),
+    '감자베이컨볶음' => array( // 150 2019-10-21
+        '_total' => array(150, 'g', false, ''),
+        '_expired' => array(7, 'days', false, ''),
+        
+        '감자' => array(150, 'g', true, '국산'), 
+        '베이컨' => array(30, 'g', false, '수입'),         
+        '간장볶음소스' => array(40, 'g', false, ''),                
+        '깨' => array(1, 'g', false, '국산'),        
+    ),    
+    '마늘쫑베이컨볶음' => array( // 180 2019-10-21
+        '_total' => array(180, 'g', false, ''),
+        '_expired' => array(7, 'days', false, ''),
+        
+        '마늘쫑' => array(150, 'g', true, '중국'), 
+        '베이컨' => array(30, 'g', false, '수입'),         
+        '간장볶음소스' => array(20, 'g', false, ''),                
+        '깨' => array(1, 'g', false, '국산'),        
+    ),    
 
     // 고추장 볶음
     '매콤멸치견과류볶음' => array( // 110g 2019-09-30
@@ -201,6 +219,19 @@ return array(
         '케찹' => array(20, 'g', false, ''),
         '깨' => array(1, 'g', false, '국산'),
         '참기름' => array(1, 'g', false, '국산'),
+    ),
+    '마파두부' => array( // 250g 2019-10-21
+        '_total' => array(250, 'g', false, ''),
+        '_expired' => array(7, 'days', false, ''),
+        
+        '두부' => array(150, 'g', true, '국산'), 
+        '고추기름' => array(4, 'g', false, '국산'),                
+        '돼지고기' => array(25, 'g', true, '국산'),
+        '고추장볶음소스' => array(30, 'g', false, ''),
+        '두반장' => array(10, 'g', false, '홍콩'),
+        '굴소스' => array(5, 'g', false, '홍콩'),
+        '다시육수' => array(50, 'g', false, '국산'),
+        '감자전분' => array(2, 'g', false, '국산'),
     ),
 
     // 조림
@@ -439,6 +470,94 @@ return array(
         '고춧가루' => array(3, 'g', true, '국산'),
         '설탕' => array(1, 'g', true, '국산'),
         '맛간장' => array(1, 'g', true, '국산'),        
+    ),
+    '아삭고추된장' => array( // 150g 2019-10-21
+        '_total' => array(150, 'g', false, ''),
+        '_expired' => array(7, 'days', false, ''),
+        
+        '오이고추' => array(150, 'g', true, '국산'),
+        '된장' => array(25, 'g', false, '국산'),        
+        '고추장' => array(10, 'g', false, '국산'),
+        '들깨가루' => array(4, 'g', true, '중국'),
+        '매실청' => array(5, 'g', true, '국산'),  
+        '설탕' => array(2, 'g', false, '국산'),
+        '고춧가루' => array(3, 'g', true, '국산'),
+        '마늘' => array(8, 'g', true, '국산'),
+        '호박씨' => array(7, 'g', false, '중국'), 
+        '해바라기씨' => array(8, 'g', false, '중국'),    
+    ),
+    '무말랭이무침' => array( // 2019-10-21
+        '_total' => array(180, 'g', false, ''),
+        '_expired' => array(7, 'days', false, ''),
+        
+        '무말랭이' => array(100, 'g', true, '중국'),
+        '고춧잎' => array(30, 'g', true, '중국'),
+        '참기름' => array(1, 'g', false, '국산'),
+        '고추장볶음소스' => array(5, 'g', false, ''), 
+        'L-글루탐산나트륨' => array(1, 'g', false, '수입'),               
+        '멸치액젓' => array(1, 'g', true, '수입'),
+    ),
+    '더덕무침' => array( // 2019-10-21
+        '_total' => array(200, 'g', false, ''),
+        '_expired' => array(7, 'days', false, ''),
+        
+        '더덕' => array(100, 'g', true, '중국'),        
+        '참기름' => array(1, 'g', false, '국산'),  
+        '깨' => array(1, 'g', false, '국산'),        
+        '고추장볶음소스' => array(5, 'g', false, ''),   
+        'L-글루탐산나트륨' => array(1, 'g', false, '수입'),                     
+    ),
+    '고들빼기무침' => array( // 2019-10-21
+        '_total' => array(200, 'g', false, ''),
+        '_expired' => array(7, 'days', false, ''),
+        
+        '고들빼기' => array(100, 'g', true, '중국'),  
+        '참기름' => array(1, 'g', false, '국산'),      
+        '깨' => array(1, 'g', false, '국산'),
+        '고추장볶음소스' => array(5, 'g', false, ''),                        
+        '멸치액젓' => array(1, 'g', true, '수입'),
+        'L-글루탐산나트륨' => array(1, 'g', false, '수입'),
+    ),
+    '간장깻잎' => array( // 2019-10-21
+        '_total' => array(200, 'g', false, ''),
+        '_expired' => array(7, 'days', false, ''),
+        
+        '깻잎' => array(100, 'g', true, '중국'),        
+        '간장' => array(5, 'g', false, '수입'),   
+        '물엿' => array(1, 'g', false, '국산'),
+        '정제수' => array(1, 'g', false, '중국'),
+        '식초' => array(1, 'g', false, '중국'),
+        '설탕' => array(1, 'g', false, '중국'),
+        'L-글루탐산나트륨' => array(1, 'g', false, '수입'),
+        '소브산칼륨' => array(1, 'g', false, '수입'),
+        '구연산' => array(1, 'g', false, '수입'),
+    ),
+    '오징어젓' => array( // 2019-10-21
+        '_total' => array(200, 'g', false, ''),
+        '_expired' => array(7, 'days', false, ''),
+        
+        '오징어' => array(100, 'g', true, '중국'),    
+        '참기름' => array(1, 'g', false, '국산'),   
+        '깨' => array(1, 'g', false, '국산'),         
+        '물엿' => array(1, 'g', false, '중국'),        
+        '마늘' => array(1, 'g', false, '중국'),
+        '고춧가루' => array(1, 'g', false, '중국'),
+        '설탕' => array(1, 'g', false, '중국'),
+        '소금' => array(1, 'g', false, '중국'),
+        '멸치액젓' => array(1, 'g', true, '수입'),
+    ),
+    '낙지젓' => array( // 2019-10-21
+        '_total' => array(200, 'g', false, ''),
+        '_expired' => array(7, 'days', false, ''),
+        
+        '낙지' => array(100, 'g', true, '중국'),  
+        '참기름' => array(1, 'g', false, '국산'),  
+        '깨' => array(1, 'g', false, '국산'),            
+        '물엿' => array(1, 'g', false, '중국'),        
+        '마늘' => array(1, 'g', false, '중국'),
+        '고춧가루' => array(1, 'g', false, '중국'),        
+        '멸치액젓' => array(1, 'g', true, '수입'),
+        'L-글루탐산나트륨' => array(1, 'g', false, '수입'),
     ),
 
     // 부침

@@ -367,6 +367,11 @@ class Yoona {
         if (empty($type)) return false;
         if (empty($date)) return false;        
 
+        // 1, 2층이라면 continue
+        if (!empty($data['층'])) {
+            if ($data['층'] == 1 || $data['층'] == 2) return $result;
+        }
+
         // 월세라면 continue
         if ($type == 'jeonse') {
             if ($data['월세금액'] > 0) return $result;
@@ -374,8 +379,7 @@ class Yoona {
             $price = $data['보증금액'];         
         } else {
             $price = $data['거래금액'];        
-        } 
-            
+        }     
         
         $code = "{$data['지역코드']}||{$data['아파트']}";
         $data['전용면적'] = floor($data['전용면적']);

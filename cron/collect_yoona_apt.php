@@ -13,8 +13,12 @@ try {
     // 지역코드 5자리 (시군구), 인구수 차트로 확인 가능    
     // $lawdCd = '31200';
     // $sigoongoo = '울산광역시 북구';
-    $lawdCd = '44133';
-    $sigoongoo = '천안시 서북구';
+    // $lawdCd = '44133';
+    // $sigoongoo = '천안시 서북구';
+    // $lawdCd = '41273';
+    // $sigoongoo = '안산시 단원구';
+    $lawdCd = '41430';
+    $sigoongoo = '의왕시';    
 
     // 수집시작일 (이번달)
     $date = date('Ym');        
@@ -38,7 +42,7 @@ try {
     $row = $db->row("SELECT yoona_apt_deal.date FROM yoona_apt_deal JOIN yoona_apt ON yoona_apt_deal.yoona_apt_id = yoona_apt.id AND yoona_apt.code_sigoongoo = ? ORDER BY yoona_apt_deal.date DESC", array($lawdCd));
 
     if (!empty($row)) {
-        $dateEnd = $row['date'];
+        $dateEnd = date('Ym', strtotime('-2 months', strtotime($row['date'])));        
     }    
     
     echo "$sigoongoo ({$dateEnd} ~ {$date}) 까지 수집시작.".PHP_EOL;      
@@ -48,7 +52,7 @@ try {
         /**
          * 매매
         */
-        $sale = $yoona->getAptSale($lawdCd, $date);
+        $sale = $yoona->getAptSale($lawdCd, $date);        
 
         // 데이터가 없다면 끝.
         if ($sale == false) break;

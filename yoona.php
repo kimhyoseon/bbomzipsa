@@ -330,7 +330,7 @@ function renderjeonmang(data) {
             maemae = parseFloat(maemae.toFixed(2));
             jeonse = parseFloat(jeonse.toFixed(2));
             
-            chartData[key].push([data['maemae'][i][0], jeonse, maemae]);
+            chartData[key].push([data['maemae'][i][0], maemae, jeonse]);
         }
     }
     
@@ -343,8 +343,8 @@ function renderjeonmang(data) {
     for (key in chartTitle) {        
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Date');        
-        data.addColumn('number', '전세');
         data.addColumn('number', '매매');
+        data.addColumn('number', '전세');        
         data.addRows(chartData[key]);
 
         var options = {
@@ -533,7 +533,7 @@ function rendermiboonyang(data) {
     for (var i = 0; i < data.length; i++) {    
         if (!chartData[index]) chartData[index] = [];
 
-        data[i]['DT'] = parseInt(data[i]['DT'])
+        data[i]['DT'] = parseInt(data[i]['DT']) + 100
         data[i]['C1_NM'] = data[i]['C1_NM'] + ' ' + data[i]['C2_NM'];
         
         // 추가 데이터
@@ -1043,9 +1043,10 @@ function renderaptDetail(data) {
                 parseInt(priceDefault[size]['sale_price']),
                 // parseInt(priceDefault[size]['sale_price_max']),
                 // parseInt(priceDefault[size]['sale_price_min']),
-                // parseInt(priceDefault[size]['jeonse_price']),
-                parseInt(priceDefault[size]['jeonse_price_max']),
+                parseInt(priceDefault[size]['jeonse_price']),
+                // parseInt(priceDefault[size]['jeonse_price_max']),
                 // parseInt(priceDefault[size]['jeonse_price_min']),                
+                (parseInt(priceDefault[size]['sale_price']) - parseInt(priceDefault[size]['jeonse_price'])),
             ]);
 
             priceDefault[size]['chartData'][titleCount].push([
@@ -1100,7 +1101,7 @@ function renderaptDetail(data) {
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Date');                
                 data.addColumn('number', '매매거래');                
-                data.addColumn('number', '전세거래');                                
+                data.addColumn('number', '전세거래');                
                 data.addRows(priceDefault[size]['chartData'][title]);
 
                 var options = {
@@ -1122,6 +1123,7 @@ function renderaptDetail(data) {
                 data.addColumn('number', '전세평균');
                 // data.addColumn('number', '전세상위');
                 // data.addColumn('number', '전세하위');                                                
+                data.addColumn('number', '갭');
                 data.addRows(priceDefault[size]['chartData'][title]);
 
                 var options = {
@@ -1130,7 +1132,8 @@ function renderaptDetail(data) {
                     'height': 300, 
                     'series': {                
                         2: { 
-                            'targetAxisIndex': 1
+                            'targetAxisIndex': 1,
+                            'lineDashStyle': [1, 3]
                         }
                     },
                 };
