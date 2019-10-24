@@ -968,21 +968,43 @@ function renderaptSiRank(data) {
             chartDetail[aptName] = data[i]['id'];
         }
 
-        chartData.push([aptName, parseInt(data[i]['price'])]);        
+        // 아파트 상세정보
+        var detailText = data[i]['name_apt'] + ' (' + numberWithCommas(data[i]['price']) + ') \n';        
+        var isValueColor = true;
+        for (var j = 0; j < data[i]['detail'].length; j++) {            
+            detailText += '*' + data[i]['detail'][j]['pyeong'] + '평' + ' (' + data[i]['detail'][j]['date'] + ') ';
+            detailText += numberWithCommas(data[i]['detail'][j]['sale_price']) + '-' + numberWithCommas(data[i]['detail'][j]['jeonse_price']) + '=' + numberWithCommas(parseInt(data[i]['detail'][j]['sale_price']) - parseInt(data[i]['detail'][j]['jeonse_price']));             
+            if (data[i]['detail'][j]['values'] && data[i]['detail'][j]['values'][0] > 0) {                
+                detailText +=  ' 가치 (' + data[i]['detail'][j]['values'][0] + '/' + data[i]['detail'][j]['values'][1] + ')';            
+                if (data[i]['detail'][j]['values'][0] > data[i]['detail'][j]['values'][1]) {
+                    isValueColor = false;
+                }
+            }
+            detailText += '\n';                                
+        }
+        
+        var valueColor = '';
+        
+        if (isValueColor == true) valueColor = 'green';
+
+        chartData.push([aptName, parseInt(data[i]['price']), detailText, valueColor]);        
     }           
     
     chartType = 'ColumnChart';
     
     var data = new google.visualization.DataTable();
     data.addColumn('string', '아파트');
-    data.addColumn('number', '평당가격');       
+    data.addColumn('number', '평당가격');           
+    data.addColumn({type: 'string', role: 'tooltip'});
+    data.addColumn({type: 'string', role: 'style'});
     data.addRows(chartData);
 
     var options = {
         'title': '평당가격 순위',                 
         'legend': 'none',             
         'width': getRowWidth(), 
-        'height': 300,               
+        'height': 300,  
+        // 'focusTarget': 'category'
     };
 
     drawChart(data, options);
@@ -1293,7 +1315,7 @@ function getEnergy(year, price) {
     else if (year == '2014') energy = price / 56815236;
     else if (year == '2015') energy = price / 57799980;
     else if (year == '2016') energy = price / 58613376;
-    else if (year = '2017') energy = price / 60031080;
+    else if (year == '2017') energy = price / 60031080;
     else if (year == '2018') energy = price / 61531857;
     else if (year == '2019') energy = price / 63070153;    
     
@@ -1302,6 +1324,11 @@ function getEnergy(year, price) {
 
 function getRowWidth() {
     return $('.row:eq(0)').width();
+}
+
+function numberWithCommas(x) {
+    if (!x) return x;
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 // function getYArrayAfterY(startY) {

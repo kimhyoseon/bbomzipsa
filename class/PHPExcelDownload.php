@@ -1027,8 +1027,9 @@ class PHPExcelDownload {
         }
 
         $basket = array();
-        $receipe = array();        
-        $receipeTotal = array();        
+        $basketTotal = array();
+        $receipe = array();                
+        $receipeTotal = array();
         $source = array();
         $sourceTotal = array();
 
@@ -1088,24 +1089,32 @@ class PHPExcelDownload {
                         if (substr($ingredientName, 0, 1) == '_') continue;                                                
 
                         // 2번 값이 true 면 구매내역에 포함
-                        if ($ingredientData[2] == true || 1) {                            
+                        if ($ingredientData[2] == true) {                            
                             // 장바구니에 넣지 않을 재료   
                             if (!in_array($ingredientName, array('물'))) {
                                 // 모듬인 경우 모든재료 넣기
                                 if (!empty($jshkData[$ingredientName])) {
                                     foreach ($jshkData[$ingredientName] as $ingredientName2 => $ingredientData2) {                                    
                                         if (!in_array($ingredientName2, array('물'))) {
-                                            if (empty($basket[$ingredientName2])) $basket[$ingredientName2] = array();
+                                            if (empty($basket[$ingredientName2])) {
+                                                $basket[$ingredientName2] = array();
+                                                $basketTotal[$ingredientName2] = array();
+                                            }
                                             if (empty($basket[$ingredientName2][$ingredientData2[1]])) $basket[$ingredientName2][$ingredientData2[1]] = 0;
 
                                             $basket[$ingredientName2][$ingredientData2[1]] += $ingredientData[0] * $ingredientData2[0] * $amount;
+                                            $basketTotal[$ingredientName2][$cookName] = $receipeTotal[$cookName];
                                         }
                                     }
                                 } else {                                
-                                    if (empty($basket[$ingredientName])) $basket[$ingredientName] = array();
+                                    if (empty($basket[$ingredientName])) {
+                                        $basket[$ingredientName] = array();
+                                        $basketTotal[$ingredientName] = array();
+                                    }
                                     if (empty($basket[$ingredientName][$ingredientData[1]])) $basket[$ingredientName][$ingredientData[1]] = 0;
 
                                     $basket[$ingredientName][$ingredientData[1]] += $ingredientData[0] * $amount;
+                                    $basketTotal[$ingredientName][$cookName] = $receipeTotal[$cookName];
                                 }                                                  
                             }
                         }                        
@@ -1169,11 +1178,41 @@ class PHPExcelDownload {
         $data[] = array('재료표', '', '', '');
 
         foreach ($basket as $ingredientName => $ingredientData) {
-            $data[] = array($ingredientName, '', '', $ingredientData[key($ingredientData)].key($ingredientData));
+            $basketDetail = '';
+            
+            if (!empty($basketTotal[$ingredientName]) && !in_array($ingredientName, array('다시육수', '당근', '양파', '쪽파'))) {
+                foreach ($basketTotal[$ingredientName] as $cookName => $amount) {
+                    $basketDetail .= $cookName.'('.$amount.') ';
+                }
+            }
+
+            $data[] = array($ingredientName, $basketDetail, '', $ingredientData[key($ingredientData)].key($ingredientData));
         }
         
+        // 조리표 순서
         $data[] = array('', '', '', '');
         $data[] = array('조리표', '', '', '');
+       
+        $receipeSort = array();
+        foreach ($receipe as $cookName => $ingredientDatas) {
+            if (in_array($cookName, array('콩나물무침', '숙주나물무침', '시금치무침', '건파래무침', '새우젓애호박볶음', '들깨무나물', '무나물', '간장미역줄기볶음')) == true) $receipeSort[] = 100;                        
+            else if (strpos($cookName, '국') !== false) $receipeSort[] = 2;
+            else if (strpos($cookName, '조림') !== false) $receipeSort[] = 3;
+            else if (strpos($cookName, '간장') !== false) $receipeSort[] = 4;
+            else if (strpos($cookName, '두부') !== false) $receipeSort[] = 5;            
+            else if (strpos($cookName, '매콤') !== false) $receipeSort[] = 6;
+            else if (strpos($cookName, '볶음') !== false) $receipeSort[] = 7;            
+            else if (strpos($cookName, '고기') !== false) $receipeSort[] = 9;
+            else if (strpos($cookName, '계란') !== false) $receipeSort[] = 10;
+            else $receipeSort[] = 11;
+        }
+
+        array_multisort($receipeSort, SORT_ASC, $receipe);
+
+        // echo '<pre>';                    
+        // print_r($receipe);                            
+        // echo '</pre>';   
+        // exit();
 
         foreach ($receipe as $cookName => $ingredientDatas) {
             $receipeMerge[] = sizeOf($ingredientDatas);            
@@ -1239,7 +1278,8 @@ class PHPExcelDownload {
 
         // echo '<pre>';                        
         // print_r($data);
-        // print_r($basket);                
+        // print_r($basket);   
+        // print_r($basketTotal);           
         // print_r($receipe);        
         // print_r($receipeTotal);        
         // print_r($body);        
@@ -1318,8 +1358,8 @@ class PHPExcelDownload {
         $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartSource}:{$lastChar}{$indexStartSource}");
 
         for ($i = 2; $i <= $indexEndBasket; $i++) { 
-            $excel->setActiveSheetIndex(0)->mergeCells("A{$i}:C{$i}");
-            $excel->setActiveSheetIndex(0)->getStyle("A{$i}:C{$i}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $excel->setActiveSheetIndex(0)->mergeCells("B{$i}:C{$i}");
+            $excel->setActiveSheetIndex(0)->getStyle("A{$i}:A{$i}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         }  
         
         // 셀 구분선

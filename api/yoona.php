@@ -8,7 +8,7 @@ try {
 
     // include_once($_SERVER['DOCUMENT_ROOT'].'/class/yoona.php');
     // $yoona = new Yoona(); 
-    // $data = $yoona->getArrayFromExcel('kb.xlsx', 10);
+    // $data = json_encode($yoona->getAptRank('44133'));
     
     // echo '<pre>';
     // print_r($data);

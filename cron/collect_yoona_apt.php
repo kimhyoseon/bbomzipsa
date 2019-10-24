@@ -17,8 +17,16 @@ try {
     // $sigoongoo = '천안시 서북구';
     // $lawdCd = '41273';
     // $sigoongoo = '안산시 단원구';
-    $lawdCd = '41430';
-    $sigoongoo = '의왕시';    
+    // $lawdCd = '41430';
+    // $sigoongoo = '의왕시';    
+    // $lawdCd = '41465';
+    // $sigoongoo = '용인시 수지구';
+    // $lawdCd = '41410';
+    // $sigoongoo = '군포시';
+    $lawdCd = '41190';
+    $sigoongoo = '부천시';
+    
+    
 
     // 수집시작일 (이번달)
     $date = date('Ym');        
@@ -42,7 +50,7 @@ try {
     $row = $db->row("SELECT yoona_apt_deal.date FROM yoona_apt_deal JOIN yoona_apt ON yoona_apt_deal.yoona_apt_id = yoona_apt.id AND yoona_apt.code_sigoongoo = ? ORDER BY yoona_apt_deal.date DESC", array($lawdCd));
 
     if (!empty($row)) {
-        $dateEnd = date('Ym', strtotime('-2 months', strtotime($row['date'])));        
+        $dateEnd = date('Ym', strtotime('-5 months', strtotime($row['date'])));        
     }    
     
     echo "$sigoongoo ({$dateEnd} ~ {$date}) 까지 수집시작.".PHP_EOL;      

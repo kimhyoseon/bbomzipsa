@@ -220,15 +220,42 @@ class Yoona {
         foreach ($list as $value) {
             $ids[] = $value['id'];
             $apts[$value['id']] = $value;
+            $apts[$value['id']]['detail'] = array();
         }
 
-        $list = $db->query("SELECT yoona_apt_id, MAX(sale_price) as price, size FROM yoona_apt_deal WHERE yoona_apt_id IN (:ids) GROUP BY yoona_apt_id, size", array('ids' => $ids));
+        $list = $db->query("SELECT yoona_apt_id, size FROM yoona_apt_deal WHERE yoona_apt_id IN (:ids) GROUP BY yoona_apt_id, size", array('ids' => $ids));                        
+        
 
         if (empty($list)) return false;        
 
-        foreach ($list as $value) {
+        foreach ($list as $key => $value) {
+            $row = $db->row("SELECT sale_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND sale_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $value['size']));                    
+            $row2 = $db->row("SELECT jeonse_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND jeonse_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $value['size']));                                
+            $values = $db->query("SELECT avg(sale_price) as year_price, year FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND sale_count > 0 GROUP BY yoona_apt_id, size, year", array($value['yoona_apt_id'], $value['size']));                                            
+
+            if (!empty($values)) {
+                $energies = array();
+                $energyThisYear = 0;
+                foreach ($values as $v) {
+                    if ($v['year'] == date('Y')) {
+                        $energyThisYear = $this->getEnergy($v['year'], $row['sale_price']);
+                        $energies[] = $energyThisYear;
+                        
+                    } else {
+                        $energies[] = $this->getEnergy($v['year'], $v['year_price']);
+                    }                    
+                }                
+                
+                $value['values'] = array($energyThisYear, round(array_sum($energies) / count($energies), 1));
+            }            
+
             $pyeong = floor(($value['size'] / 3.3) + 10);
-            $pricePerPyeong = floor($value['price'] / $pyeong);            
+            $pricePerPyeong = floor($row['sale_price'] / $pyeong);
+            $value['date'] = max(array($row['date'], $row2['date']));
+            $value['pyeong'] = $pyeong;
+            $value['sale_price'] = $row['sale_price'];
+            $value['jeonse_price'] = $row2['jeonse_price'];
+            $apts[$value['yoona_apt_id']]['detail'][] = $value;
             
             if (empty($apts[$value['yoona_apt_id']]['price']) || $apts[$value['yoona_apt_id']]['price'] < $pricePerPyeong) {
                 $apts[$value['yoona_apt_id']]['price'] = $pricePerPyeong;
@@ -250,7 +277,7 @@ class Yoona {
 
         array_multisort($sort, SORT_DESC, $apts);
 
-        $apts = array_slice($apts, 0, 50);
+        $apts = array_slice($apts, 0, 70);
 
         $db->CloseConnection(); 
 
@@ -287,6 +314,32 @@ class Yoona {
         return $apt;
     }
 
+    /**
+     * 아파트 가치 획득
+     */
+    public function getEnergy($year, $price) {        
+        $energy = 0;
+
+        // 연평균소득
+        if ($year == '2004') $energy = $price / 37349688;
+        else if ($year == '2005') $energy = $price / 39025080;
+        else if ($year == '2006') $energy = $price / 41328648;
+        else if ($year == '2007') $energy = $price / 43874412;
+        else if ($year == '2008') $energy = $price / 46807464;
+        else if ($year == '2009') $energy = $price / 46238268;
+        else if ($year == '2010') $energy = $price / 48092052;
+        else if ($year == '2011') $energy = $price / 50983428;
+        else if ($year == '2012') $energy = $price / 53908368;
+        else if ($year == '2013') $energy = $price / 55274592;
+        else if ($year == '2014') $energy = $price / 56815236;
+        else if ($year == '2015') $energy = $price / 57799980;
+        else if ($year == '2016') $energy = $price / 58613376;
+        else if ($year == '2017') $energy = $price / 60031080;
+        else if ($year == '2018') $energy = $price / 61531857;
+        else if ($year == '2019') $energy = $price / 63070153;    
+        
+        return round($energy * 10000, 1);
+    }
     
     
     
@@ -542,5 +595,5 @@ class Yoona {
         }     
         
         return true;
-    }
+    }    
 }
