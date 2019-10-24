@@ -638,7 +638,14 @@ return array(
         '_total' => array(700, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         
-        '황태' => array(100, 'g', true, '러시아'),                                         
+        '황태' => array(20, 'g', true, '러시아'),
+        '무' => array(2, 'g', true, '국산'),
+        '계란' => array(1, '개', true, '국산'),
+        '파' => array(2, 'g', true, '국산'),
+        '마늘' => array(2, 'g', true, '중국'),
+        '들기름' => array(2, 'g', true, '국산'),
+        '국간장' => array(2, 'g', true, '국산'),
+        '멸치액젓' => array(2, 'g', true, '국산'),        
     ),     
 
     // 부재료
