@@ -366,6 +366,8 @@ class Yoona {
         $queryParams .= '&' . urlencode('DEAL_YMD') . '=' . urlencode($date); /*계약월*/
         $queryParams .= '&' . urlencode('_type') . '=' . urlencode('json'); /*타입*/    
 
+        // print_r($url.$queryParams);        
+
         curl_setopt($ch, CURLOPT_URL, $url . $queryParams);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($ch, CURLOPT_HEADER, FALSE);

@@ -13,8 +13,8 @@ try {
     // 지역코드 5자리 (시군구), 인구수 차트로 확인 가능    
     // $lawdCd = '31200';
     // $sigoongoo = '울산광역시 북구';
-    // $lawdCd = '44133';
-    // $sigoongoo = '천안시 서북구';
+    $lawdCd = '44133';
+    $sigoongoo = '천안시 서북구';
     // $lawdCd = '41273';
     // $sigoongoo = '안산시 단원구';
     // $lawdCd = '41430';
@@ -23,10 +23,8 @@ try {
     // $sigoongoo = '용인시 수지구';
     // $lawdCd = '41410';
     // $sigoongoo = '군포시';
-    $lawdCd = '41190';
-    $sigoongoo = '부천시';
-    
-    
+    // $lawdCd = '41190';
+    // $sigoongoo = '부천시';
 
     // 수집시작일 (이번달)
     $date = date('Ym');        

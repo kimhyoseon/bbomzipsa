@@ -1199,7 +1199,9 @@ class PHPExcelDownload {
             else if (strpos($cookName, '국') !== false) $receipeSort[] = 2;
             else if (strpos($cookName, '조림') !== false) $receipeSort[] = 3;
             else if (strpos($cookName, '간장') !== false) $receipeSort[] = 4;
-            else if (strpos($cookName, '두부') !== false) $receipeSort[] = 5;            
+            else if (strpos($cookName, '두부') !== false) $receipeSort[] = 5;
+            else if (strpos($cookName, '멸치') !== false) $receipeSort[] = 5;
+            else if (strpos($cookName, '어묵') !== false) $receipeSort[] = 5;            
             else if (strpos($cookName, '매콤') !== false) $receipeSort[] = 6;
             else if (strpos($cookName, '볶음') !== false) $receipeSort[] = 7;            
             else if (strpos($cookName, '고기') !== false) $receipeSort[] = 9;
