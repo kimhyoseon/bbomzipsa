@@ -24,21 +24,32 @@ try {
 
     include_once($_SERVER['DOCUMENT_ROOT'].'/class/yoona.php');
     $yoona = new Yoona();    
-
+    
     if (MENU == 'simri') {            
-        $data = json_encode($yoona->getArrayFromExcel('kb.xlsx', 10));    
+        $data = array();
+        // 주간 KB 주간 매수우위
+        $data['simri'] = $yoona->getArrayFromExcel('kb.xlsx', 10);    
+        // 주간 KB 주간 전세수급
+        $data['jeonse'] = $yoona->getArrayFromExcel('kb.xlsx', 12);
+        // 주간 KB 주간 매매증감, 전세증감
+        $data['maemae1'] = $yoona->getArrayFromExcel('kb.xlsx', 2);
+        $data['jeonse1'] = $yoona->getArrayFromExcel('kb.xlsx', 3);
+        $data = json_encode($data);     
     } else if (MENU == 'm1m2') {
         $data = json_encode($yoona->getM1M2());    
+    // 월간 KB부동산 매매가격 전망지수, 전세가격 전망지수(2016~)
     } else if (MENU == 'jeonmang') {
         $data = array();
         $data['maemae'] = $yoona->getArrayFromExcel('kbmonth.xlsx', 25);
         $data['jeonse'] = $yoona->getArrayFromExcel('kbmonth.xlsx', 26);
-        $data = json_encode($data); 
+        $data = json_encode($data);     
+    // 주간 KB 주간 매매증감, 전세증감
     } else if (MENU == 'jeonmang2') {
         $data = array();
         $data['maemae'] = $yoona->getArrayFromExcel('kb.xlsx', 2);
         $data['jeonse'] = $yoona->getArrayFromExcel('kb.xlsx', 3);
-        $data = json_encode($data);    
+        $data = json_encode($data);   
+    // 주간 KB 주간 매매지수, 전세지수
     } else if (MENU == 'choongjeon') {
         $data = array();
         $data['maemae'] = $yoona->getArrayFromExcel('kb.xlsx', 4);

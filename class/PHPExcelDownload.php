@@ -5,9 +5,10 @@ class PHPExcelDownload {
     CONST SHORTNAME = array(
         '두피마사지기' => '샴푸브러쉬',
         '페이스롤러' => '마사지롤러',
+        '마사지롤러' => '마사지롤러',
         '바른자세밴드' => '바른자세밴드',
         '토삭스' => '요가양말',
-        '리프팅' => '리프팅밴드',
+        '리프팅' => '리프팅밴드',        
         '요가링' => '요가링',
         '땅콩볼' => '땅콩볼',    
         '롤빗' => '롤빗',
@@ -540,36 +541,36 @@ class PHPExcelDownload {
                 }
             }     
             
-            // 지난 주문 조회
-            $dbData = array(
-                'user_key' => $value[array_search('구매자명', array_keys($filterMerged))].'|'.$value[array_search('구매자ID', array_keys($filterMerged))],
-                'order_id' => $value[array_search('주문번호', array_keys($filterMerged))],
-                'price' => str_replace(',', '', $value[array_search('상품별 총 주문금액', array_keys($filterMerged))]),
-            );                        
+            // // 지난 주문 조회
+            // $dbData = array(
+            //     'user_key' => $value[array_search('구매자명', array_keys($filterMerged))].'|'.$value[array_search('구매자ID', array_keys($filterMerged))],
+            //     'order_id' => $value[array_search('주문번호', array_keys($filterMerged))],
+            //     'price' => str_replace(',', '', $value[array_search('상품별 총 주문금액', array_keys($filterMerged))]),
+            // );                        
             
-            if (!empty($dbData['user_key']) && !empty($dbData['order_id'])) {
-                $row = $db->row("SELECT COUNT(*) AS total, SUM(price) AS total_price FROM smartstore_order WHERE user_key=? AND order_id!=?", array($dbData['user_key'], $dbData['order_id']));
+            // if (!empty($dbData['user_key']) && !empty($dbData['order_id'])) {
+            //     $row = $db->row("SELECT COUNT(*) AS total, SUM(price) AS total_price FROM smartstore_order WHERE user_key=? AND order_id!=?", array($dbData['user_key'], $dbData['order_id']));
                 
-                // 지난 주문횟수 포함                
-                if (!empty($row) && $row['total'] > 0) {
-                    $indexName = array_search('상품명', array_keys($filterMerged));
-                    $bodyRow[$indexName] = $bodyRow[$indexName]." ({$row['total']})";
-                }                
+            //     // 지난 주문횟수 포함                
+            //     if (!empty($row) && $row['total'] > 0) {
+            //         $indexName = array_search('상품명', array_keys($filterMerged));
+            //         $bodyRow[$indexName] = $bodyRow[$indexName]." ({$row['total']})";
+            //     }                
 
-                // 주문정보 삽입
-                $rowExist = $db->row("SELECT * FROM smartstore_order WHERE order_id=?", array($dbData['order_id']));
+            //     // 주문정보 삽입
+            //     $rowExist = $db->row("SELECT * FROM smartstore_order WHERE order_id=?", array($dbData['order_id']));
                 
-                if (empty($rowExist)) {
-                    $dbName = array_keys($dbData, true);
-                    $dbValues = array_map(function ($val) {
-                        return ':'.$val;
-                    }, $dbName);
-                    $dbName = implode(',', $dbName);
-                    $dbValues = implode(',', $dbValues);                
+            //     if (empty($rowExist)) {
+            //         $dbName = array_keys($dbData, true);
+            //         $dbValues = array_map(function ($val) {
+            //             return ':'.$val;
+            //         }, $dbName);
+            //         $dbName = implode(',', $dbName);
+            //         $dbValues = implode(',', $dbValues);                
 
-                    $db->query("INSERT INTO smartstore_order ({$dbName}) VALUES({$dbValues})", $dbData);
-                }                                
-            }            
+            //         $db->query("INSERT INTO smartstore_order ({$dbName}) VALUES({$dbValues})", $dbData);
+            //     }                                
+            // }            
 
             $bodyOptimized[] = $bodyRow;            
         }
@@ -632,7 +633,7 @@ class PHPExcelDownload {
         $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');        
 
         header('Content-type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment; filename="CJ대한통운_운송장출력폼_'.date('Ymd').'.xlsx"');
+        header('Content-Disposition: attachment; filename="CJ대한통운_운송장출력폼_'.date('YmdH').'.xlsx"');
         header('Cache-Control: max-age=0');
         
         // 다운로드
@@ -880,7 +881,7 @@ class PHPExcelDownload {
         $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');        
 
         header('Content-type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment; filename="엑셀일괄발송_'.date('Ymd').'.xlsx"');
+        header('Content-Disposition: attachment; filename="엑셀일괄발송_'.date('YmdH').'.xlsx"');
         header('Cache-Control: max-age=0');
         
         // 다운로드
@@ -1252,18 +1253,19 @@ class PHPExcelDownload {
             }
         }
 
-        $data[] = array('', '', '', '');
-        $data[] = array('소스', '', '', '');
+        // 소스 없앰
+        // $data[] = array('', '', '', '');
+        // $data[] = array('소스', '', '', '');
 
-        foreach ($source as $cookName => $ingredientDatas) {
-            $sourceMerge[] = sizeOf($ingredientDatas);            
-            $sourceOverload = 0;
-            foreach ($ingredientDatas as $ingredientName => $ingredientData) {                
-                $sourceOverload += $ingredientData[key($ingredientData)];
-                $data[] = array($cookName, $sourceTotal[$cookName].'g', $ingredientName, $ingredientData[key($ingredientData)].key($ingredientData).' ('.$sourceOverload.key($ingredientData).')');
-                $sourceRow++;
-            }
-        }
+        // foreach ($source as $cookName => $ingredientDatas) {
+        //     $sourceMerge[] = sizeOf($ingredientDatas);            
+        //     $sourceOverload = 0;
+        //     foreach ($ingredientDatas as $ingredientName => $ingredientData) {                
+        //         $sourceOverload += $ingredientData[key($ingredientData)];
+        //         $data[] = array($cookName, $sourceTotal[$cookName].'g', $ingredientName, $ingredientData[key($ingredientData)].key($ingredientData).' ('.$sourceOverload.key($ingredientData).')');
+        //         $sourceRow++;
+        //     }
+        // }
 
         $indexStartBasket = 1;
         $indexEndBasket = sizeof($basket) + 1;
@@ -1272,9 +1274,10 @@ class PHPExcelDownload {
         $indexStartReceipeMerge = $indexStartReceipe + 1;
         $indexEndReceipe = $indexStartReceipe + $receipeRow;        
         
-        $indexStartSource = $indexEndReceipe + 2;
-        $indexStartSourceMerge = $indexStartSource + 1;
-        $indexEndSource = $indexStartSource + $sourceRow;        
+        // 소스 없앰
+        // $indexStartSource = $indexEndReceipe + 2;
+        // $indexStartSourceMerge = $indexStartSource + 1;
+        // $indexEndSource = $indexStartSource + $sourceRow;        
 
         $indexLast = sizeOf($data);
 
@@ -1311,12 +1314,12 @@ class PHPExcelDownload {
         $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartReceipe}:{$lastChar}{$indexStartReceipe}")->getFont()->setBold(true);
         $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartReceipe}:{$lastChar}{$indexStartReceipe}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexStartSource}")->getFont()->setBold(true);
-        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexStartSource}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        // $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexStartSource}")->getFont()->setBold(true);
+        // $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexStartSource}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
         // 계량 정렬
         $excel->setActiveSheetIndex(0)->getStyle("D1:D{$indexEndReceipe}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);        
-        $excel->setActiveSheetIndex(0)->getStyle("D1:D{$indexEndSource}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+        // $excel->setActiveSheetIndex(0)->getStyle("D1:D{$indexEndSource}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
 
         // 셀 구분선
         $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$indexEndBasket}")->applyFromArray(array(
@@ -1343,21 +1346,21 @@ class PHPExcelDownload {
         ));
 
         // 셀 구분선
-        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexEndSource}")->applyFromArray(array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN
-                ),
-                'outline' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THICK
-                )
-            )
-        ));
+        // $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexEndSource}")->applyFromArray(array(
+        //     'borders' => array(
+        //         'allborders' => array(
+        //             'style' => PHPExcel_Style_Border::BORDER_THIN
+        //         ),
+        //         'outline' => array(
+        //             'style' => PHPExcel_Style_Border::BORDER_THICK
+        //         )
+        //     )
+        // ));
 
         // 머지
         $excel->setActiveSheetIndex(0)->mergeCells("A1:{$lastChar}1");        
         $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartReceipe}:{$lastChar}{$indexStartReceipe}");
-        $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartSource}:{$lastChar}{$indexStartSource}");
+        // $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartSource}:{$lastChar}{$indexStartSource}");
 
         for ($i = 2; $i <= $indexEndBasket; $i++) { 
             $excel->setActiveSheetIndex(0)->mergeCells("B{$i}:C{$i}");
@@ -1403,33 +1406,33 @@ class PHPExcelDownload {
         }
 
         // 셀 구분선
-        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSourceMerge}:{$lastChar}{$indexStartSourceMerge}")->applyFromArray(array(
-            'borders' => array(                    
-                'top' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_MEDIUM
-                )
-            )
-        ));
+        // $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSourceMerge}:{$lastChar}{$indexStartSourceMerge}")->applyFromArray(array(
+        //     'borders' => array(                    
+        //         'top' => array(
+        //             'style' => PHPExcel_Style_Border::BORDER_MEDIUM
+        //         )
+        //     )
+        // ));
 
-        foreach ($sourceMerge as $value) {
-            $rowNum = $indexStartSourceMerge + $value - 1;
-            $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartSourceMerge}:A{$rowNum}");
-            $excel->setActiveSheetIndex(0)->mergeCells("B{$indexStartSourceMerge}:B{$rowNum}");
-            $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSourceMerge}:A{$rowNum}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $excel->setActiveSheetIndex(0)->getStyle("B{$indexStartSourceMerge}:B{$rowNum}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSourceMerge}:A{$rowNum}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $excel->setActiveSheetIndex(0)->getStyle("B{$indexStartSourceMerge}:B{$rowNum}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $indexStartSourceMerge = $rowNum + 1;
+        // foreach ($sourceMerge as $value) {
+        //     $rowNum = $indexStartSourceMerge + $value - 1;
+        //     $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartSourceMerge}:A{$rowNum}");
+        //     $excel->setActiveSheetIndex(0)->mergeCells("B{$indexStartSourceMerge}:B{$rowNum}");
+        //     $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSourceMerge}:A{$rowNum}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        //     $excel->setActiveSheetIndex(0)->getStyle("B{$indexStartSourceMerge}:B{$rowNum}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        //     $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSourceMerge}:A{$rowNum}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        //     $excel->setActiveSheetIndex(0)->getStyle("B{$indexStartSourceMerge}:B{$rowNum}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        //     $indexStartSourceMerge = $rowNum + 1;
 
-            // 셀 구분선
-            $excel->setActiveSheetIndex(0)->getStyle("A{$rowNum}:{$lastChar}{$rowNum}")->applyFromArray(array(
-                'borders' => array(                    
-                    'bottom' => array(
-                        'style' => PHPExcel_Style_Border::BORDER_MEDIUM
-                    )
-                )
-            ));
-        }        
+        //     // 셀 구분선
+        //     $excel->setActiveSheetIndex(0)->getStyle("A{$rowNum}:{$lastChar}{$rowNum}")->applyFromArray(array(
+        //         'borders' => array(                    
+        //             'bottom' => array(
+        //                 'style' => PHPExcel_Style_Border::BORDER_MEDIUM
+        //             )
+        //         )
+        //     ));
+        // }        
         
         // 셀 폭 최적화     
         $widths = array(30, 15, 30, 30);
@@ -1646,8 +1649,10 @@ class PHPExcelDownload {
                 $op[] = trim(explode(':', $value)[1]);
             }
             return implode('/', $op);
-        } else {
+        } else if (strpos($option, ':') !== false) {
             return trim(explode(':', $option)[1]);
+        } else {
+            return $option;
         }
     }
 

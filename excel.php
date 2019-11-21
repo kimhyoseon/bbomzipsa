@@ -102,6 +102,8 @@ body {
                 <option value="korspo_price">코리아스포츠(계산서)</option>
                 <option value="jshk_basket">정성한끼 조리표</option>
                 <option value="jshk_sticker">정성한끼 스티커</option>
+                <option value="wmp">위메프</option>                                
+                <!-- <option value="wmp_sendall">위메프일괄발송</option>                                 -->
             </select>
         </div>
 

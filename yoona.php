@@ -41,7 +41,7 @@ body {
                 <a href="#" class="list-menu" data-menu="simri"><li class="list-group-item" title="매주 금요일 업데이트(KB주간)">1. 심리차트(광역시,도)</li></a>
                 <a href="#" class="list-menu" data-menu="m1m2"><li class="list-group-item">2. M1/M2차트</li></a>
                 <a href="#" class="list-menu" data-menu="jeonmang"><li class="list-group-item" title="매달 말일 업데이트(KB월간)">3. 전망차트(광역시,도)</li></a>
-                <a href="#" class="list-menu" data-menu="jeonmang2"><li class="list-group-item" title="매주 금요일 업데이트(KB주간)">3-1. 전망차트(시군구)</li></a>
+                <a href="#" class="list-menu" data-menu="jeonmang2"><li class="list-group-item" title="매주 금요일 업데이트(KB주간)">3-1. 전망차트(시군구)</li></a>                
                 <a href="#" class="list-menu" data-menu="choongjeon"><li class="list-group-item" title="매주 금요일 업데이트(KB주간)">4. 충전차트(시군구)</li></a>
                 <a href="#" class="list-menu" data-menu="miboonyang"><li class="list-group-item">5. 미분양차트</li></a>
                 <a href="#" class="list-menu" data-menu="ingoo"><li class="list-group-item">6. 인구수차트</li></a>
@@ -61,6 +61,7 @@ body {
 var menu = null;
 var chartType = 'LineChart';
 var chartDetail = {};
+var region = '';
 
 function clickMenu(e) {    
     menu = $(e.currentTarget).data('menu');    
@@ -155,60 +156,183 @@ function callApi(data, callback) {
     return false;  
 }
 
-// 1. 심리차트
+// 1. 심리차트 + 전세수급
 function rendersimri(data) {    
     // 데이터 준비
     if (data) {
         var chartData = {};
+        var chartDataJeonse = {};
+        var chartDataMaeJeon = {};
         var chartTitle = {};
+        var chartTitleJeonse = {};
+        var chartTitleMaeJeon = {};        
         var year = null;
         var lastDate = null;
         
-        for (var i = 0; i < data.length; i++) {
+        // 심리차트
+        for (var i = 0; i < data['simri'].length; i++) {
             if (i == 0) continue;
             if (i == 2) continue;
             if (i == 3) continue;
             
             if (i == 1) {
-                for (var j = 0; j < data[i].length; j++) {                                    
-                    if (data[i][j]) {
-                        chartTitle[j] = data[i][j];
+                for (var j = 0; j < data['simri'][i].length; j++) {                                    
+                    if (data['simri'][i][j]) {
+                        // 오래 걸려서 특정 지역만 보기
+                        if (region && data['simri'][i][j].indexOf(region) == -1) continue;
+                        
+                        chartTitle[j] = data['simri'][i][j];                        
                     }
                 }
 
                 continue;
             }
             
-            if (!data[i][0]) continue;
+            if (!data['simri'][i][0]) continue;
             
             // 연도 생성
-            var date = data[i][0].split('/');
+            var date = data['simri'][i][0].split('/');            
             
             if (date.length == 3) {
                 year = date[0];
             } else {
-                data[i][0] = year + '/' + data[i][0];
-            }
+                data['simri'][i][0] = year + '/' + data['simri'][i][0];
+            }            
+
+            if (year < 8) continue;
+            else if (year == 8 && date[0] < 4) continue;
 
             for (key in chartTitle) {
                 if (!chartData[key]) {
                     chartData[key] = [];
                 }
                 
-                chartData[key].push([data[i][0], parseFloat(data[i][key]), parseFloat(data[i][(parseInt(key) + 1)])]);
+                chartData[key].push([data['simri'][i][0], parseFloat(data['simri'][i][key]), parseFloat(data['simri'][i][(parseInt(key) + 1)])]);
             }
 
-            lastDate = data[i][0];
+            lastDate = data['simri'][i][0];
         }
+
+        // 전세수급차트
+        for (var i = 0; i < data['jeonse'].length; i++) {
+            if (i == 0) continue;
+            if (i == 2) continue;
+            if (i == 3) continue;
+            
+            if (i == 1) {
+                for (var j = 0; j < data['jeonse'][i].length; j++) {                                    
+                    if (data['jeonse'][i][j]) {
+                        // 오래 걸려서 특정 지역만 보기
+                        if (region && data['jeonse'][i][j].indexOf(region) == -1) continue;
+
+                        chartTitleJeonse[j] = data['jeonse'][i][j];
+                    }
+                }
+
+                continue;
+            }
+            
+            if (!data['jeonse'][i][0]) continue;
+            
+            // 연도 생성
+            var date = data['jeonse'][i][0].split('/');
+            
+            if (date.length == 3) {
+                year = date[0];
+            } else {
+                data['jeonse'][i][0] = year + '/' + data['jeonse'][i][0];
+            }
+
+            if (year < 8) continue;
+            else if (year == 8 && date[0] < 4) continue;
+
+            for (key in chartTitleJeonse) {
+                if (!chartDataJeonse[key]) {
+                    chartDataJeonse[key] = [];
+                }
+                
+                chartDataJeonse[key].push([data['jeonse'][i][0], parseFloat(data['jeonse'][i][key]), parseFloat(data['jeonse'][i][(parseInt(key) + 1)]), parseFloat(data['jeonse'][i][(parseInt(key) + 2)])]);
+            }            
+        }
+        
+        // 매매, 전세 증감
+        // for (var i = 0; i < data['maemae1'].length; i++) {
+        //     if (i == 0) continue;
+        //     if (i == 2) continue;                
+
+        //     if (i == 1) {            
+        //         for (var j = 1; j < data['maemae1'][i].length; j++) {                                    
+        //             if (data['maemae1'][i][j]) {                                        
+        //                 // 오래 걸려서 특정 지역만 보기
+        //                 if (region && data['maemae1'][i][j].indexOf(region) == -1) continue;
+                        
+        //                 chartTitleMaeJeon[j] = data['maemae1'][i][j];                        
+        //             }
+        //         }
+
+        //         continue;
+        //     }
+            
+        //     if (!data['maemae1'][i][0]) continue;
+
+        //     // 연도 생성
+        //     var date = data['maemae1'][i][0].split('/');
+            
+        //     if (date.length == 3) {
+        //         year = date[0];
+        //     } else {
+        //         data['maemae1'][i][0] = year + '/' + data['maemae1'][i][0];
+        //     }        
+
+        //     for (key in chartTitleMaeJeon) {
+        //         if (!chartDataMaeJeon[key]) {
+        //             chartDataMaeJeon[key] = [];
+        //         }
+                
+        //         var jeonse = parseFloat(data['jeonse1'][i][key]);
+        //         var maemae = parseFloat(data['maemae1'][i][key]);           
+                
+        //         chartDataMaeJeon[key].push([data['maemae1'][i][0], maemae, jeonse]);
+        //     }
+        // }
     }
         
-    // console.log(chartTitle);
-    // console.log(chartData);
-    // return false;  
-
-    chartType = 'LineChart';
+    // console.log(chartTitleJeonse);
+    // console.log(chartDataJeonse);
+    // console.log(chartTitleMaeJeon);
+    // console.log(chartDataMaeJeon);
+    // return false;     
     
-    for (key in chartTitle) {        
+    // for (key in chartTitleMaeJeon) {
+    //     console.log('?');
+    //     chartType = 'ColumnChart';
+    
+    //     var data = new google.visualization.DataTable();
+    //     data.addColumn('string', 'Date');
+    //     data.addColumn('number', '매매');
+    //     data.addColumn('number', '전세');
+    //     data.addRows(chartDataMaeJeon[key]);        
+
+    //     var options = {
+    //         'title': chartTitleMaeJeon[key],                 
+    //         'legend': 'none', 
+    //         'width': getRowWidth(), 
+    //         'height': 300, 
+    //         vAxis: {                
+    //             viewWindow: {
+    //                 max: 0.5,
+    //                 min: -0.5
+    //             }
+    //         }           
+    //     };        
+
+    //     drawChart(data, options);       
+    // }
+    
+    for (key in chartTitle) {
+        chartType = 'LineChart';
+
+        // 심리차트 그리기        
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Date');
         data.addColumn('number', '매도');
@@ -223,7 +347,38 @@ function rendersimri(data) {
         };
 
         drawChart(data, options);
-    }
+
+        // 전세수급차트 그리기        
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Date');
+        data.addColumn('number', '수요');
+        data.addColumn('number', '공급');
+        data.addColumn('number', '전세수급지수');
+        data.addRows(chartDataJeonse[key]);
+
+        var options = {
+            'title': chartTitleJeonse[key] + ' (' + lastDate + ')',                 
+            'legend': 'none', 
+            'width': getRowWidth(), 
+            'height': 300,
+            'series': {                
+                2: { 
+                    'targetAxisIndex': 1                    
+                }                
+            }, 
+            // 오른쪽 축만 별도로 옵션
+            'vAxes': { 
+                1: {               
+                    viewWindow: {
+                        max: 200,
+                        min: 0
+                    }
+                }
+            }    
+        };
+
+        drawChart(data, options);        
+    }        
 }
 
 // 2. m1m2 차트
@@ -352,6 +507,12 @@ function renderjeonmang(data) {
             'legend': 'none', 
             'width': getRowWidth(), 
             'height': 300,
+            vAxis: {                
+                viewWindow: {
+                    max: 100,
+                    min: -100
+                }
+            }
         };
 
         drawChart(data, options);   
@@ -368,11 +529,14 @@ function renderjeonmang2(data) {
     
     for (var i = 0; i < data['maemae'].length; i++) {
         if (i == 0) continue;
-        if (i == 2) continue;        
-        
-        if (i == 1) {
+        if (i == 2) continue;                
+
+        if (i == 1) {            
             for (var j = 1; j < data['maemae'][i].length; j++) {                                    
-                if (data['maemae'][i][j]) {
+                if (data['maemae'][i][j]) {                                        
+                    // 오래 걸려서 특정 지역만 보기
+                    if (region && data['maemae'][i][j].indexOf(region) == -1) continue;
+                    
                     chartTitle[j] = data['maemae'][i][j];
                 }
             }
@@ -392,7 +556,7 @@ function renderjeonmang2(data) {
         }
 
         // 데이터가 많아서 올해 데이터만
-        if (year < 19) continue;
+        // if (year < 19) continue;
         
         // // 연도 생성
         // if (typeof data['maemae'][i][0] == 'string' && data['maemae'][i][0].indexOf('.') !== -1) {
@@ -435,7 +599,13 @@ function renderjeonmang2(data) {
             'title': chartTitle[key],                 
             'legend': 'none', 
             'width': getRowWidth(), 
-            'height': 300,
+            'height': 300, 
+            vAxis: {                
+                viewWindow: {
+                    max: 0.5,
+                    min: -0.5
+                }
+            }           
         };
 
         drawChart(data, options);   
@@ -458,6 +628,9 @@ function renderchoongjeon(data) {
         if (i == 1) {
             for (var j = 1; j < data['jeonse'][i].length; j++) {                                    
                 if (data['jeonse'][i][j]) {
+                    // 오래 걸려서 특정 지역만 보기
+                    if (region && data['jeonse'][i][j].indexOf(region) == -1) continue;
+                    
                     chartTitle[j] = data['jeonse'][i][j];
                 }
             }
@@ -574,7 +747,7 @@ function rendermiboonyang(data) {
                     max: max,
                     min: min
                 }
-            }                                    
+            }
         };
 
         drawChart(data, options);        
@@ -858,22 +1031,22 @@ function renderage(data) {
         var name = '';
         var parent = 0;
         
-        data[i][0] = data[i][0].substring(0, codes['index']);
-        data[i][0] = data[i][0].split(' ').map(function(item) {
+        data[i][0] = data[i][0].substring(0, codes['index']);        
+        data[i][0] = data[i][0].split(' ').map(function(item) {            
             if (item) {
-                // 부모
-                if (name) {
-                    parent = name;
-                }
+                // 부모                
+                // console.log('parent', parent);
+                // console.log('name', name);
+                if (parent == 0) parent = name;
+                else parent = parent + ' ' + name;
 
                 name = item.trim();
                 return name;
             }
-        });
+        });        
         
         // console.log(codes[1]);
-        // console.log(name);
-        // return false;
+        // console.log(name);        
 
         data[i][3] = parseFloat(data[i][3])
         
@@ -882,6 +1055,8 @@ function renderage(data) {
         //     chartDetail[data[i]['C1_NM']] = data[i]['C1'];
         // }
 
+        // console.log(parent);
+        // console.log(name);    
 
         if (!chartData[parent]) chartData[parent] = [];
         chartData[parent].push([name, data[i][3]]);
@@ -893,9 +1068,12 @@ function renderage(data) {
         if (max < data[i][3]) {
             max = data[i][3];
         }
+
+        // if (i > 100) return false;
     }          
     
-    // console.log(chartData);        
+    // console.log(chartData);  
+    // return false;      
     
     chartType = 'ColumnChart';   
 
