@@ -61,7 +61,7 @@ body {
 var menu = null;
 var chartType = 'LineChart';
 var chartDetail = {};
-var region = '';
+var region = '울산';
 
 function clickMenu(e) {    
     menu = $(e.currentTarget).data('menu');    
@@ -526,6 +526,7 @@ function renderjeonmang2(data) {
     var chartData = {};
     var chartTitle = {};
     var year = null;
+    var parentTitle = '';
     
     for (var i = 0; i < data['maemae'].length; i++) {
         if (i == 0) continue;
@@ -534,6 +535,13 @@ function renderjeonmang2(data) {
         if (i == 1) {            
             for (var j = 1; j < data['maemae'][i].length; j++) {                                    
                 if (data['maemae'][i][j]) {                                        
+                    // 부모 붙이기
+                    if (data['maemae'][i][j] != '대구' && (data['maemae'][i][j].slice(-1) == '구' || data['maemae'][i][j].slice(-1) == '군')) {
+                        data['maemae'][i][j] = parentTitle + data['maemae'][i][j];
+                    } else {
+                        parentTitle = data['maemae'][i][j];
+                    }
+
                     // 오래 걸려서 특정 지역만 보기
                     if (region && data['maemae'][i][j].indexOf(region) == -1) continue;
                     

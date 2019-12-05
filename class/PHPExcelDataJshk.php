@@ -642,7 +642,7 @@ return array(
         '무' => array(2, 'g', true, '국산'),
         '계란' => array(1, '개', true, '국산'),
         '파' => array(2, 'g', true, '국산'),
-        '마늘' => array(2, 'g', true, '중국'),
+        '마늘' => array(2, 'g', true, '국산'),
         '들기름' => array(2, 'g', true, '국산'),
         '국간장' => array(2, 'g', true, '국산'),
         '멸치액젓' => array(2, 'g', true, '국산'),        

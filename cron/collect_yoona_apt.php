@@ -10,9 +10,17 @@ try {
 
     $_SERVER['DOCUMENT_ROOT'] = dirname(dirname(__FILE__));    
     
-    // 지역코드 5자리 (시군구), 인구수 차트로 확인 가능    
+    // 지역코드 5자리 (시군구), 인구수 차트로 확인 가능        
+    // $lawdCd = '30200';
+    // $sigoongoo = '대전광역시 유성구';
+    // $lawdCd = '30170';
+    // $sigoongoo = '대전광역시 서구';
     // $lawdCd = '31200';
-    // $sigoongoo = '울산광역시 북구';
+    // $sigoongoo = '울산광역시 북구';        
+    // $lawdCd = '31110';
+    // $sigoongoo = '울산광역시 중구';            
+    // $lawdCd = '31140';    
+    // $sigoongoo = '울산광역시 남구';
     $lawdCd = '44133';
     $sigoongoo = '천안시 서북구';
     // $lawdCd = '41273';
