@@ -34,8 +34,8 @@ $queryParams['category'] = $exceptCategoryAll;
 /**
  * 제외키워드 제외
  */
-$queryWheres[] = "ignored != :ignored";
-$queryParams['ignored'] = 1;
+// $queryWheres[] = "ignored != :ignored";
+// $queryParams['ignored'] = 1;
 
 /**
  * 경쟁률 2 이하
