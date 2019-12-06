@@ -914,6 +914,7 @@ class PHPExcelDownload {
             '수량' => '수량',
             '상품명' => '상품명',    
             '옵션정보' => '옵션정보',
+            '수취인명' => '수취인명',
         );        
 
         $filterMerged = $filter;
@@ -1033,11 +1034,13 @@ class PHPExcelDownload {
         $receipeTotal = array();
         $source = array();
         $sourceTotal = array();
+        $customers = array();       
 
         /**
          * 정성한끼 재료        
          */
         $jshkData = include 'PHPExcelDataJshk.php';         
+        $jshkDataCustomer = include 'PHPExcelDataJshkCustomer.php';         
         
         // 테스트 출력
         // foreach ($jshkData as $cookName => $ingredients) {
@@ -1066,6 +1069,7 @@ class PHPExcelDownload {
 
         $optionIndex = array_search('옵션정보', array_keys($filterMerged));
         $amountIndex = array_search('수량', array_keys($filterMerged));               
+        $customerIndex = array_search('수취인명', array_keys($filterMerged));               
 
         foreach ($body as $items) {
             if (empty($items)) continue;   
@@ -1073,6 +1077,16 @@ class PHPExcelDownload {
 
             $cookName = $this->getShortOptionJshk($items[$optionIndex]);                                  
             $amount = $items[$amountIndex];
+            $customer = $items[$customerIndex];
+
+            // 고객주의점
+            if (empty($customers[$customer])) {
+                $customers[$customer] = array('cook' => array());                
+                
+                if (!empty($jshkDataCustomer[$customer])) {
+                    $customers[$customer]['caution'] = $jshkDataCustomer[$customer];
+                }                                
+            }
             
             foreach ($jshkData as $cookNamePart => $ingredients) {
                 // strpos는 위험..
@@ -1080,11 +1094,16 @@ class PHPExcelDownload {
                 if ($cookName == $cookNamePart) {
                     // 레시피 작성                    
                     if (empty($receipe[$cookName])) {
-                        $receipe[$cookName] = array();
+                        $receipe[$cookName] = array();                        
                         $receipeTotal[$cookName] = 0;
                     }
 
+                    if (empty($customers[$customer]['cook'][$cookName])) {
+                        $customers[$customer]['cook'][$cookName] = 0;
+                    }
+
                     $receipeTotal[$cookName] += $amount;
+                    $customers[$customer]['cook'][$cookName] += $amount;                    
 
                     foreach ($ingredients as $ingredientName => $ingredientData) {
                         if (substr($ingredientName, 0, 1) == '_') continue;                                                
@@ -1175,7 +1194,7 @@ class PHPExcelDownload {
         
         $data = array();        
         $receipeMerge = $sourceMerge = array();
-        $receipeRow = $sourceRow = 0;
+        $receipeRow = $sourceRow = $customerRow = 0;
         $data[] = array('재료표', '', '', '');
 
         foreach ($basket as $ingredientName => $ingredientData) {
@@ -1252,6 +1271,26 @@ class PHPExcelDownload {
                 $receipeRow++;
             }
         }
+        
+        // 고객
+        $data[] = array('', '', '', '');
+        $data[] = array('고객별 주문', '', '', '');
+
+        foreach ($customers as $customerName => $customerData) {                        
+            $order = array();
+            
+            foreach ($customerData['cook'] as $cookName => $amount) {   
+                $order[] = $cookName.$amount;                                
+            }         
+
+            if (!empty($customerData['caution'])) {                 
+                $customerName .= ' (※'.implode(', ', $customerData['caution']).')';
+            }
+
+            $data[] = array($customerName);
+            $data[] = array(implode(', ', $order));
+            $customerRow = $customerRow + 2;            
+        }
 
         // 소스 없앰
         // $data[] = array('', '', '', '');
@@ -1273,16 +1312,21 @@ class PHPExcelDownload {
         $indexStartReceipe = $indexEndBasket + 2;
         $indexStartReceipeMerge = $indexStartReceipe + 1;
         $indexEndReceipe = $indexStartReceipe + $receipeRow;        
+
+        $indexStartCustomer = $indexEndReceipe + 2;
+        $indexStartCustomerMerge = $indexStartCustomer + 1;
+        $indexEndCustomer = $indexStartCustomer + $customerRow;        
         
         // 소스 없앰
         // $indexStartSource = $indexEndReceipe + 2;
         // $indexStartSourceMerge = $indexStartSource + 1;
-        // $indexEndSource = $indexStartSource + $sourceRow;        
+        // $indexEndSource = $indexStartSource + $sourceRow;                
 
         $indexLast = sizeOf($data);
 
-        // echo '<pre>';                        
+        // echo '<pre>';                                
         // print_r($data);
+        // print_r($customers);        
         // print_r($basket);   
         // print_r($basketTotal);           
         // print_r($receipe);        
@@ -1314,8 +1358,8 @@ class PHPExcelDownload {
         $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartReceipe}:{$lastChar}{$indexStartReceipe}")->getFont()->setBold(true);
         $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartReceipe}:{$lastChar}{$indexStartReceipe}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        // $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexStartSource}")->getFont()->setBold(true);
-        // $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexStartSource}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartCustomer}:{$lastChar}{$indexStartCustomer}")->getFont()->setBold(true);
+        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartCustomer}:{$lastChar}{$indexStartCustomer}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
         // 계량 정렬
         $excel->setActiveSheetIndex(0)->getStyle("D1:D{$indexEndReceipe}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);        
@@ -1346,6 +1390,18 @@ class PHPExcelDownload {
         ));
 
         // 셀 구분선
+        $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartCustomer}:{$lastChar}{$indexEndCustomer}")->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THICK
+                )
+            )
+        ));
+
+        // 셀 구분선
         // $excel->setActiveSheetIndex(0)->getStyle("A{$indexStartSource}:{$lastChar}{$indexEndSource}")->applyFromArray(array(
         //     'borders' => array(
         //         'allborders' => array(
@@ -1360,11 +1416,22 @@ class PHPExcelDownload {
         // 머지
         $excel->setActiveSheetIndex(0)->mergeCells("A1:{$lastChar}1");        
         $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartReceipe}:{$lastChar}{$indexStartReceipe}");
+        $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartCustomer}:{$lastChar}{$indexStartCustomer}");
         // $excel->setActiveSheetIndex(0)->mergeCells("A{$indexStartSource}:{$lastChar}{$indexStartSource}");
 
         for ($i = 2; $i <= $indexEndBasket; $i++) { 
             $excel->setActiveSheetIndex(0)->mergeCells("B{$i}:C{$i}");
             $excel->setActiveSheetIndex(0)->getStyle("A{$i}:A{$i}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        }  
+
+        $lineCustomer = 0;
+        for ($i = $indexStartCustomer + 1; $i <= $indexEndCustomer; $i++) { 
+            $excel->setActiveSheetIndex(0)->mergeCells("A{$i}:D{$i}");            
+            if ($lineCustomer % 2 == 1) {
+                $excel->getActiveSheet()->getRowDimension($i)->setRowHeight(40);
+                $excel->setActiveSheetIndex(0)->getStyle("A{$i}:A{$i}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+            }
+            $lineCustomer++;
         }  
         
         // 셀 구분선
@@ -1439,6 +1506,9 @@ class PHPExcelDownload {
         foreach ($widths as $i => $w) {
             $excel->setActiveSheetIndex(0)->getColumnDimension($this->columnChar($i))->setWidth($w);
         }
+
+        // chr(10) 줄내림 처리                
+        $excel->getActiveSheet()->getStyle("A{$indexStartCustomer}:{$lastChar}{$indexEndCustomer}")->getAlignment()->setWrapText(true);        
 
         // 데이터 적용
         $excel->getActiveSheet()->fromArray($data, NULL, 'A1');
