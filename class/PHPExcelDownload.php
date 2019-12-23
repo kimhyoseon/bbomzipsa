@@ -964,7 +964,7 @@ class PHPExcelDownload {
         $setMenuMerge = array();
 
         foreach ($body as $key => $items) {            
-            $setMenus = $this->getDailySetMenu($items, $filterMerged);            
+            $setMenus = $this->getDailySetMenu($items, $filterMerged);
             
             if ($setMenus !== false) {
                 $setMenuMerge = array_merge($setMenuMerge, $setMenus);
@@ -986,16 +986,21 @@ class PHPExcelDownload {
         $amountIndex = array_search('수량', array_keys($filterMerged));               
         $optionIndex = array_search('옵션정보', array_keys($filterMerged));         
         
-        if (strpos($items[$optionIndex], '매일반찬5종세트') === false) return false;
+        if (strpos($items[$optionIndex], '매일반찬5종세트') === false && strpos($items[$optionIndex], '반찬세트') === false) return false;
 
         $setMenus = array();
 
-        // array('일', '월', '화', '수', '목', '금', '토');
-        if (in_array(date("w"), array(0, 1, 6))) $option = array('간장멸치볶음', '간장새송이버섯볶음', '메추리알조림', '콩나물무침', '계란말이');
-        else if (in_array(date("w"), array(2))) $option = array('매콤건새우볶음', '간장어묵볶음', '땅콩조림', '건파래무침', '계란말이');
-        else if (in_array(date("w"), array(3))) $option = array('간장오징어실채볶음', '매콤어묵볶음', '메추리알조림', '새우젓애호박볶음', '계란말이');        
-        else if (in_array(date("w"), array(4))) $option = array('간장명엽채볶음', '소세지야채볶음', '검은콩조림', '콩나물무침', '계란말이');        
-        else if (in_array(date("w"), array(5))) $option = array('매콤진미채무침', '간장어묵볶음', '간장새송이버섯볶음', '연근조림', '계란말이');        
+        if (strpos($items[$optionIndex], '매일반찬5종세트') !== false) {
+            // array('일', '월', '화', '수', '목', '금', '토');
+            if (in_array(date("w"), array(0, 1, 6))) $option = array('간장멸치볶음', '간장새송이버섯볶음', '메추리알조림', '콩나물무침', '계란말이');
+            else if (in_array(date("w"), array(2))) $option = array('매콤건새우볶음', '간장어묵볶음', '땅콩조림', '건파래무침', '계란말이');
+            else if (in_array(date("w"), array(3))) $option = array('간장오징어실채볶음', '매콤어묵볶음', '메추리알조림', '새우젓애호박볶음', '계란말이');        
+            else if (in_array(date("w"), array(4))) $option = array('간장명엽채볶음', '소세지야채볶음', '검은콩조림', '콩나물무침', '계란말이');        
+            else if (in_array(date("w"), array(5))) $option = array('매콤진미채무침', '간장어묵볶음', '간장새송이버섯볶음', '연근조림', '계란말이'); 
+        } else if (strpos($items[$optionIndex], '베스트반찬세트') !== false) { 
+            $option = array('매콤진미채무침', '계란말이', '매콤어묵볶음', '감자베이컨볶음', '메추리알조림', '더덕무침');
+        }
+               
 
         foreach ($option as $menu) {
             $newItems = $items;
