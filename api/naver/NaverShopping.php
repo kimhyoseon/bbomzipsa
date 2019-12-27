@@ -379,7 +379,7 @@ class NaverShopping
                     $reviews[] = filter_var(trim($nodeReviews[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
                 }
 
-                if (empty($this->data['category'])) {
+                if (empty($this->data['category']) || $this->data['category'] == '9999') {
                     $nodeAd = $xPath->query("descendant::a[@class='ad_stk']", $nodeItem);
                     if ($nodeAd->length > 0) continue;
 
