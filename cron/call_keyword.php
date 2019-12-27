@@ -108,7 +108,7 @@ if (!empty($keywords)) {
             echo $collectResultJSON.PHP_EOL;
         }
 
-        sleep(3);
+        sleep(2);
     }
 }
 
