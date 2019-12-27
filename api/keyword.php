@@ -139,7 +139,7 @@ try {
 } catch (Exception $e) {
     if (DEBUG == true) print_r('exception: '.$e->getCode());
 
-    if (!empty($row) && !empty($row['id']) && $e->getCode() == 204) {
+    if (!empty($row) && !empty($row['id']) && $e->getCode() == 204 && $row['raceIndex'] <= 0) {
         // 수집된 정보 획득
         $result = $oNaverShopping->getData();
         $result['modDate'] = date('Y-m-d H:i:s', strtotime('+1 year'));

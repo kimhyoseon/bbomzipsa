@@ -23,8 +23,12 @@ $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER']
 
 $exceptCategoryAll = $category->getExceptCategories();
 
-$queryWheres[] = "category NOT IN (:category)";
-$queryParams['category'] = $exceptCategoryAll;
+// $queryWheres[] = "category NOT IN (:category)";
+// $queryParams['category'] = $exceptCategoryAll;
+
+// 임시로 9999 카테고리 되살리기
+$queryWheres[] = "category IN (:category)";
+$queryParams['category'] = '9999';
 
 // echo '<pre>';
 // print_r($exceptCategoryAll);
