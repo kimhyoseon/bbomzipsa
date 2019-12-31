@@ -44,8 +44,8 @@ $queryParams['category'] = '9999';
 /**
  * 경쟁률 2 이하
  */
-$queryWheres[] = "raceIndex < :raceIndex";
-$queryParams['raceIndex'] = 2;
+// $queryWheres[] = "raceIndex < :raceIndex";
+// $queryParams['raceIndex'] = 2;
 
 /**
  * 경쟁률 0이 아닌
