@@ -12,13 +12,11 @@ class PHPExcelDownload {
         '요가링' => '요가링',
         '땅콩볼' => '땅콩볼',    
         '롤빗' => '롤빗',
-        '수면안대' => '레드썬 수면안대',
+        '수면안대' => '수면안대',
         '뽀송양말' => '뽀송양말',
         '좌욕기' => '가정용대야',
         '심리스팬티' => '심리스의류',
-        '천연약쑥' => '천연약쑥',
-        'NBR' => 'NBR 요가매트',
-        'TPE' => 'TPE 요가매트',        
+        '천연약쑥' => '천연약쑥',        
         '발가락교정기' => '발가락교정기',
         '아치보호대' => '아치보호대',
         '압박양말' => '압박양말',
@@ -421,6 +419,8 @@ class PHPExcelDownload {
         $filterIndexReverse = array();
         $header = array_values($filter);
         $body = array();        
+        $stock = array();    
+        $sort = array();    
 
         if (empty($sheetData)) {
             echo '엑셀 데이터를 확인할 수 없습니다.';
@@ -450,7 +450,7 @@ class PHPExcelDownload {
                     if (empty($v)) continue;                    
                     if (in_array($k, $filterArray)) {    
                         if ($filterIndexReverse[$k] == '상품명') {                                                        
-                            $v = $this->getShortName($v);
+                            $v = $this->getShortName($v);                                    
                         }
 
                         if ($filterIndexReverse[$k] == '옵션정보') {                                                              
@@ -459,12 +459,12 @@ class PHPExcelDownload {
                                 $row[array_search('상품명', array_keys($filterMerged))] = '['.$row[array_search('상품명', array_keys($filterMerged))].'] '.$_v;   
                             } else {
                                 $_v = $this->getShortOption($v);
-                                $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' ['.$_v.']';   
+                                $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' ['.$_v.']';                                   
                             }                            
                         }
 
                         if ($filterIndexReverse[$k] == '수량') {                                  
-                            if (strpos($row[array_search('상품명', array_keys($filterMerged))], '신선식품') !== false) {
+                            if (strpos($row[array_search('상품명', array_keys($filterMerged))], '신선식품') !== false) {                                  
                                 if ($v > 1) {
                                     $_v = $v.'*';
                                 } else {
@@ -473,13 +473,20 @@ class PHPExcelDownload {
 
                                 $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].''.$_v;
                             } else {
+                                // 신선식품이 아니라면 재고관리를 위한 배열 생성
+                                if (empty($stock[$row[array_search('상품명', array_keys($filterMerged))]])) {
+                                    $stock[$row[array_search('상품명', array_keys($filterMerged))]] = $v;
+                                } else {
+                                    $stock[$row[array_search('상품명', array_keys($filterMerged))]] += $v;
+                                }
+
                                 if ($v > 1) {
                                     $_v = '*'.$v.'개';
                                 } else {
                                     $_v = $v.'개';
                                 }
 
-                                $row[array_search('상품명', array_keys($filterMerged))] = $_v.' '.$row[array_search('상품명', array_keys($filterMerged))];
+                                $row[array_search('상품명', array_keys($filterMerged))] = $_v.' '.$row[array_search('상품명', array_keys($filterMerged))];                                
                             }
                             
                             // 택배박스는 무조건 1개로..
@@ -488,7 +495,7 @@ class PHPExcelDownload {
 
                         $row[array_search($filterIndexReverse[$k], array_keys($filterMerged))] = $v;
                     }
-                }                
+                } 
                 
                 // 2건 이상 주문자인 경우 처리
                 $isOverwrite = false;
@@ -499,7 +506,8 @@ class PHPExcelDownload {
                         $index2 = array_search('배송지', array_keys($filterMerged));
                         $index3 = array_search('상품명', array_keys($filterMerged));                        
                         $index4 = array_search('수량', array_keys($filterMerged));
-
+                        
+                        // 수취인명과 배송지가 같다면
                         if ($row[$index1] == $v[$index1] && $row[$index2] == $v[$index2]) {
                             $isOverwrite = true;           
                             
@@ -515,7 +523,7 @@ class PHPExcelDownload {
 
                 if (!$isOverwrite) {
                     $body[] = $row;
-                }
+                }    
             }
         }   
 
@@ -523,13 +531,46 @@ class PHPExcelDownload {
             echo '내역이 존재하지 않습니다.';
             return false;
         }
+
+        // 합쳐지지 않은 배송건이 있는지 확인
+        $deleveryCheck = @json_decode(file_get_contents('./data/delevery_check.json'), true);
+
+        // 기존 내역이 없거나 과거인 경우 새로 만듬
+        if (empty($deleveryCheck) || $deleveryCheck['date'] != date('Ymd')) {
+            $deleveryCheck = array('date' => date('Ymd'));
+        }
+
+        $checkIndexes = array(array_search('배송지', array_keys($filterMerged)), array_search('수취인연락처1', array_keys($filterMerged)));
+
+        foreach ($body as $key => $value) {
+            // 중복된 내용이 존재한다면 경고
+            foreach ($checkIndexes as $index) {
+                if (!empty($value[$index])) {
+                    if (!empty($deleveryCheck[$value[$index]])) {
+                        exit("[{$value[$index]}] 내용으로 중복된 내용이 존재합니다. 확인해주세요.");
+                    } else {
+                        $deleveryCheck[$value[$index]] = 1;
+                    }
+                }
+            }            
+        }
+
+        $fp = fopen('./data/delevery_check.json', 'w');
+        fwrite($fp, json_encode($deleveryCheck));
+        fclose($fp);
+
+        // echo '<pre>';
+        // print_r($deleveryCheck);        
+        // print_r($body);        
+        // echo '</pre>';
+        // exit();
         
         $bodyOptimized = array();  
-        
-        // DB
-        $accountDb = parse_ini_file("./config/db.ini");
-        require_once dirname(__FILE__).'/../class/pdo.php';
-        $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+        // 쿠힛 재고 업데이트 (2020.01.07)
+        if (!empty($stock)) {
+            $this->setStockUpdate($stock);
+        }
 
         // filter 값만 다시 담기
         foreach ($body as $key => $value) {
@@ -582,7 +623,7 @@ class PHPExcelDownload {
         if (empty($bodyOptimized)) {
             echo '내역이 존재하지 않습니다.';
             return false;
-        }   
+        }           
         
         foreach ($bodyOptimized as $key => $value) {
             $prevIndex = array_search('_운임타입', array_keys($filter));
@@ -598,12 +639,13 @@ class PHPExcelDownload {
 
             $payIndex = array_search('_지불조건', array_keys($filter));
             $bodyOptimized[$key][$payIndex] = '1';
+            $title = explode(' ', $value[$nameIndex]);
+            unset($title[0]);
+            $sort[] = implode($title);
         }
-        
-        // echo '<pre>';        
-        // print_r($bodyOptimized);
-        // echo '</pre>';
-        // exit();
+
+        // 상품명으로 정렬
+        array_multisort($sort, SORT_ASC, $bodyOptimized);
         
         $data = $bodyOptimized;
         $cntRow = sizeof($bodyOptimized);                
@@ -996,11 +1038,11 @@ class PHPExcelDownload {
 
         if (strpos($items[$optionIndex], '매일반찬5종세트') !== false) {
             // array('일', '월', '화', '수', '목', '금', '토');
-            if (in_array(date("w"), array(0, 1, 6))) $option = array('간장멸치볶음', '간장새송이버섯볶음', '메추리알조림', '콩나물무침', '계란말이');
-            else if (in_array(date("w"), array(2))) $option = array('매콤건새우볶음', '간장어묵볶음', '땅콩조림', '건파래무침', '계란말이');
-            else if (in_array(date("w"), array(3))) $option = array('간장오징어실채볶음', '매콤어묵볶음', '메추리알조림', '새우젓애호박볶음', '계란말이');        
-            else if (in_array(date("w"), array(4))) $option = array('간장명엽채볶음', '소세지야채볶음', '검은콩조림', '콩나물무침', '계란말이');        
-            else if (in_array(date("w"), array(5))) $option = array('매콤진미채무침', '간장어묵볶음', '간장새송이버섯볶음', '연근조림', '계란말이'); 
+            if (in_array(date("w"), array(0, 1, 6))) $option = array('매콤진미채무침', '계란말이', '매콤어묵볶음', '감자베이컨볶음', '메추리알조림');
+            else if (in_array(date("w"), array(2))) $option = array('간장멸치견과류볶음', '건파래무침', '두부매콤조림', '연근조림', '간장미역줄기볶음');
+            else if (in_array(date("w"), array(3))) $option = array('매콤어묵볶음', '계란말이', '메추리알조림', '매콤건새우볶음', '소세지야채볶음');        
+            else if (in_array(date("w"), array(4))) $option = array('간장미역줄기볶음', '콩나물무침', '깻잎무침', '새우젓애호박볶음', '아삭이된장무침');        
+            else if (in_array(date("w"), array(5))) $option = array('계란말이', '매콤멸치볶음', '두부조림', '검은콩조림', '간장가지볶음'); 
         } else if (strpos($items[$optionIndex], '반찬세트') !== false) { 
             if (strpos($items[$optionIndex], '베스트반찬세트') !== false) {
                 if (strpos($items[$optionIndex], '2인세트') !== false) $option = array('매콤진미채무침', '계란말이', '매콤어묵볶음', '감자베이컨볶음', '메추리알조림', '더덕무침');
@@ -1807,5 +1849,250 @@ class PHPExcelDownload {
         // exit;
 
         return $inputDirect;
+    }
+
+    // 재고관리
+    public function setStockUpdate($stock) {
+        // DB
+        $accountDb = parse_ini_file("./config/db.ini");
+        require_once dirname(__FILE__).'/../class/pdo.php';
+        $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+        $newStock1 = $newStock2 = array();
+
+        // 상품명 정리
+        foreach ($stock as $key => $amount) {
+            $items = explode(' ', $key, 2);
+            $title = '';
+            $opt = '';
+            
+            $title = $items[0];
+
+            // 박스 계산
+            if (in_array($title, array('가정용대야')) == true) {
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '박스(C-197)', $amount);                
+            } else if (in_array($title, array('샴푸브러쉬', '요가링', '땅콩볼', '롤빗', '머리끈세트', '아이스롤러', '천연약쑥')) == true) {
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '박스(C-31)', $amount);
+            } else if (strpos($key, '다용도') !== false) {
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '박스(C-31)', $amount);
+            }
+
+            // 더스트백 계산
+            if (in_array($title, array('가정용대야')) == true) {
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '더스트백(530)', $amount);
+            } else if (in_array($title, array('요가링')) == true) {
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '더스트백(320)', $amount);
+            } else if (in_array($title, array('마사지롤러', '리프팅밴드', '땅콩볼', '발케어세트', '발목보호대')) == true) {
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '더스트백(250)', $amount);
+            } else if (in_array($title, array('수면안대', '발가락교정기', '아치보호대', '귀지압패치', '타투스티커')) == true) {
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '더스트백(150)', $amount);
+            } else if (in_array($title, array('천연약쑥')) == true) {                
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '더스트백(150)', ($amount * 2));
+            } else if (in_array($title, array('바른자세밴드')) == true) {                
+                if (strpos($key, 'L') !== false) {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '더스트백(250)', $amount);
+                } else {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '더스트백(150)', $amount);
+                }                
+            } 
+
+            if (!empty($items[1])) {
+                $opt = substr($items[1], 1, -1);
+                $title = $title.'__'.$opt;
+            }
+
+            $newStock1[$title] = $amount;
+        }
+        
+        // 특이한 옵션 처리
+        foreach ($newStock1 as $title => $amount) {
+            if (strpos($title, '마사지롤러') !== false) {
+                if (strpos($title, '미니+다용도 롤러세트') !== false) {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '마사지롤러__미니롤러(얼굴전용)', $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '마사지롤러__다용도롤러', $amount);
+                } else {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
+                }
+            // -- A타입 3켤레 (어두운회색), ABC타입 골고루 3켤레
+            } else if (strpos($title, '요가양말') !== false) {                
+                if (strpos($title, '골고루') !== false) {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '요가양말__A타입(검정)', $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '요가양말__B타입(검정)', $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '요가양말__C타입(검정)', $amount);                    
+                } else {
+                    // 켤레 제거 및 수량 변경
+                    $title = explode(' ', $title);
+                    unset($title[1]);
+                    $title = implode('', $title);
+                    $amount *= 3;
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
+                }                
+            } else if (strpos($title, '뽀송양말') !== false) {                
+                // 혼합 3켤레
+                if (strpos($title, '혼합') !== false) {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '뽀송양말__검정', $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '뽀송양말__회색', $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '뽀송양말__흰색', $amount);                    
+                } else {
+                    // 켤레 제거 및 수량 변경
+                    $title = explode(' ', $title);
+                    unset($title[1]);
+                    $title = implode('', $title);
+                    $amount *= 3;
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
+                } 
+            } else if (strpos($title, '수면안대') !== false) {                  
+                // 수면안대__검정 2개
+                if (strpos($title, '개') !== false) {
+                    $title = explode(' ', $title);
+                    unset($title[1]);
+                    $title = implode('', $title);
+                    $amount *= 2;                    
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);                        
+                // 수면안대__검정 + 회색
+                } else if (strpos($title, '+') !== false) {
+                    $opt = explode('__', $title);                    
+                    $opt = explode(' + ', $opt[1]);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '수면안대__'.$opt[0], $amount);                        
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '수면안대__'.$opt[1], $amount);                        
+                } else {                    
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
+                } 
+            } else if (strpos($title, '가정용대야') !== false) {                
+                // 가정용대야__벚꽃색 + 실리콘마개
+                if (strpos($title, '벚꽃색 + 실리콘마개') !== false) {                    
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '가정용대야__벚꽃색', $amount);                        
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '가정용대야__실리콘마개', $amount);                                        
+                } else {                    
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
+                }
+            } else if (strpos($title, '심리스의류') !== false) {                
+                // 심리스의류__XL(95)/골고루 4개, XL(95)/스킨 4개
+                if (strpos($title, '골고루') !== false) {                    
+                    $opt = explode('__', $title);                    
+                    $opt = explode('/', $opt[1]);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '심리스의류__'.$opt[0].'/검정', $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '심리스의류__'.$opt[0].'/흰색', $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '심리스의류__'.$opt[0].'/밀크티', $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '심리스의류__'.$opt[0].'/스킨', $amount);
+                // 심리스의류__XL(95)/스킨 4개
+                } else {                    
+                    $title = explode(' ', $title);
+                    unset($title[1]);
+                    $title = implode('', $title);
+                    $amount *= 4;
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
+                } 
+            } else if (strpos($title, '천연약쑥') !== false) {                
+                // 천연약쑥__20개입 (1박스), 10개입, 5개입
+                $title = explode('__', $title);                
+                $title = $title[0];
+                $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);                        
+            } else if (strpos($title, '발가락교정기') !== false) {                
+                // 발가락교정기__스트레칭 + 발가락링 세트
+                if (strpos($title, '스트레칭 + 발가락링 세트') !== false) {                    
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '발가락교정기__스트레칭 교정기', $amount);                        
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '발가락교정기__발가락링 교정기', $amount);                                        
+                } else {                    
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
+                }
+            } else if (strpos($title, '무릎보호대') !== false) {                
+                // 무릎보호대__M 2개(양무릎세트할인)
+                if (strpos($title, '세트할인') !== false) {                                        
+                    $title = explode(' ', $title);
+                    $title = $title[0];
+                    $amount *= 2;
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);                    
+                } else {                    
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
+                }
+            } else if (strpos($title, '발목보호대') !== false) {                
+                // 발목보호대__S(양발세트할인)
+                if (strpos($title, '세트할인') !== false) {                                                                     
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, str_replace('양발세트할인', '좌', $title), $amount);                    
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, str_replace('양발세트할인', '우', $title), $amount);                    
+                } else {                    
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
+                }
+            } else if (strpos($title, '귀지압패치') !== false) {                
+                $newStock2 = $this->setStockUpdateAdd($newStock2, $title, ($amount * 2));    
+            // 나머지
+            } else {
+                $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);
+            }       
+        }
+
+        $today = date('Ymd');
+
+        $db->beginTransaction();
+        
+        try {
+            foreach ($newStock2 as $title => $amount) {
+                // DB 찾기
+                $titles = explode('__', $title);     
+
+                if (!empty($titles[1])) {
+                    $row = $db->row("SELECT * FROM smartstore_stock WHERE title=? AND opt=?", array($titles[0], $titles[1]));
+                } else {
+                    $row = $db->row("SELECT * FROM smartstore_stock WHERE title=?", array($titles[0]));
+                }
+                
+                // 재고정보가 없는 것은 오류 종료
+                if (empty($row)) {                    
+                    throw new Exception('['.$title.'] 상품의 재고 정보를 찾을 수 없습니다.');                    
+                }            
+
+                // 오늘자 주문갯수 등록
+                $rowOrder = $db->row("SELECT * FROM smartstore_order WHERE id=? and date=?", array($row['id'], $today));
+
+                if (!empty($rowOrder)) {
+                    $minusAmount = $rowOrder['sale_cnt'] + $amount;
+                    $result = $db->query("UPDATE smartstore_order SET sale_cnt=? WHERE id=? and date=?", array($minusAmount, $row['id'], $today));        
+                } else {
+                    $result = $db->query("INSERT INTO smartstore_order (sale_cnt, id, date) VALUES(?, ?, ?)", array($amount, $row['id'], $today));                                       
+                }
+
+                if ($result != true) {
+                    throw new Exception('['.$title.'] 상품의 일별 주문정보 업데이트에 실패했습니다.');                    
+                }
+
+                // 재고 차감
+                $minusAmount = $row['amount'] - $amount;
+                $result = $db->query("UPDATE smartstore_stock SET amount=? WHERE id=?", array($minusAmount, $row['id']));        
+
+                if ($result != true) {
+                    throw new Exception('['.$title.'] 상품의 재고정보 업데이트에 실패했습니다.');                                        
+                }
+
+                // echo '<pre>';
+                // print_r($row);                    
+                // echo '</pre>';
+            }
+
+            $db->commit();
+            if (!empty($db)) $db->CloseConnection();     
+        } catch(Exception $e) {           
+            $db->rollBack();
+            if (!empty($db)) $db->CloseConnection();     
+            exit($e->getMessage());     
+        }
+
+        // echo '<pre>';
+        // print_r($newStock1);                
+        // echo '</pre>';        
+
+        // echo '<pre>';
+        // print_r($newStock2);                    
+        // echo '</pre>';                
+    }
+
+    public function setStockUpdateAdd($array, $title, $amount) {
+        if (!empty($array[$title])) {            
+            $array[$title] += $amount;
+        } else {
+            $array[$title] = $amount;
+        }
+
+        return $array;
     }
 }

@@ -61,7 +61,7 @@ body {
 var menu = null;
 var chartType = 'LineChart';
 var chartDetail = {};
-var region = '김포';
+var region = '군포';
 
 function clickMenu(e) {    
     menu = $(e.currentTarget).data('menu');    
