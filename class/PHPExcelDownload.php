@@ -560,8 +560,8 @@ class PHPExcelDownload {
         fclose($fp);
 
         // echo '<pre>';
-        // print_r($deleveryCheck);        
-        // print_r($body);        
+        // print_r($stock);        
+        // print_r($body);                
         // echo '</pre>';
         // exit();
         
@@ -569,6 +569,7 @@ class PHPExcelDownload {
 
         // 쿠힛 재고 업데이트 (2020.01.07)
         if (!empty($stock)) {
+            $stock['안내장'] = sizeof($body);
             $this->setStockUpdate($stock);
         }
 
@@ -1896,6 +1897,13 @@ class PHPExcelDownload {
                 }                
             } 
 
+            // 태그 계산            
+            if (in_array($title, array('리프팅밴드', '샴푸브러쉬', '롤빗', '바른자세밴드', '땅콩볼', '귀지압패치', '아치보호대', '발케어세트', '발목보호대', '타투스티커')) == true) {
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '태그(120)', $amount);
+            } else if (in_array($title, array('요가링', '압박양말')) == true) {
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '태그(170)', $amount);
+            } 
+
             if (!empty($items[1])) {
                 $opt = substr($items[1], 1, -1);
                 $title = $title.'__'.$opt;
@@ -1926,7 +1934,9 @@ class PHPExcelDownload {
                     $title = implode('', $title);
                     $amount *= 3;
                     $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
-                }                
+                }        
+                
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '태그(120)', ($amount * 3));
             } else if (strpos($title, '뽀송양말') !== false) {                
                 // 혼합 3켤레
                 if (strpos($title, '혼합') !== false) {
@@ -1941,6 +1951,8 @@ class PHPExcelDownload {
                     $amount *= 3;
                     $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
                 } 
+
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '태그(120)', ($amount * 3));
             } else if (strpos($title, '수면안대') !== false) {                  
                 // 수면안대__검정 2개
                 if (strpos($title, '개') !== false) {
@@ -1948,13 +1960,15 @@ class PHPExcelDownload {
                     unset($title[1]);
                     $title = implode('', $title);
                     $amount *= 2;                    
-                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);                        
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);   
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '태그(120)', ($amount * 2));                     
                 // 수면안대__검정 + 회색
                 } else if (strpos($title, '+') !== false) {
                     $opt = explode('__', $title);                    
                     $opt = explode(' + ', $opt[1]);
                     $newStock2 = $this->setStockUpdateAdd($newStock2, '수면안대__'.$opt[0], $amount);                        
-                    $newStock2 = $this->setStockUpdateAdd($newStock2, '수면안대__'.$opt[1], $amount);                        
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '수면안대__'.$opt[1], $amount);                  
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '태그(120)', ($amount * 2));
                 } else {                    
                     $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
                 } 
@@ -1993,8 +2007,10 @@ class PHPExcelDownload {
                 if (strpos($title, '스트레칭 + 발가락링 세트') !== false) {                    
                     $newStock2 = $this->setStockUpdateAdd($newStock2, '발가락교정기__스트레칭 교정기', $amount);                        
                     $newStock2 = $this->setStockUpdateAdd($newStock2, '발가락교정기__발가락링 교정기', $amount);                                        
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '태그(120)', ($amount * 2));
                 } else {                    
                     $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '태그(120)', $amount);
                 }
             } else if (strpos($title, '무릎보호대') !== false) {                
                 // 무릎보호대__M 2개(양무릎세트할인)
@@ -2084,6 +2100,8 @@ class PHPExcelDownload {
         // echo '<pre>';
         // print_r($newStock2);                    
         // echo '</pre>';                
+        
+        // exit();
     }
 
     public function setStockUpdateAdd($array, $title, $amount) {

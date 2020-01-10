@@ -177,13 +177,15 @@ INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '발목보호대', 'XL(좌)', 100, 15);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '발목보호대', 'XL(우)', 100, 15);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '발케어세트', '', 100, 15);
-
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '박스(C-197)', '', 100, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '박스(C-31)', '', 100, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '더스트백(530)', '', 100, 30);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '더스트백(320)', '', 100, 30);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '더스트백(250)', '', 100, 30);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '더스트백(150)', '', 100, 30);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '태그(120)', '', 1000, 7);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '태그(170)', '', 1000, 7);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '안내장', '', 1000, 7);
 
 
 -- 상품별 판매수
