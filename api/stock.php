@@ -22,7 +22,7 @@ try {
     $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
     
     if (MENU == 'list') {
-        $result = $db->query("SELECT smartstore_stock.*, smartstore_order.sale_cnt, ROUND((smartstore_stock.amount / smartstore_order.sale_cnt) - smartstore_stock.period) AS remain FROM smartstore_stock LEFT JOIN (SELECT id, ROUND(SUM(sale_cnt) / 7, 1) AS sale_cnt FROM smartstore_order WHERE date >=? GROUP BY smartstore_order.id) AS smartstore_order ON smartstore_order.id = smartstore_stock.id ORDER BY title DESC", array($aWeekAgo));
+        $result = $db->query("SELECT smartstore_stock.*, smartstore_order.sale_cnt, ROUND((smartstore_stock.amount / smartstore_order.sale_cnt) - smartstore_stock.period) AS remain FROM smartstore_stock LEFT JOIN (SELECT id, ROUND(SUM(sale_cnt) / 7, 1) AS sale_cnt FROM smartstore_order WHERE date >=? GROUP BY smartstore_order.id) AS smartstore_order ON smartstore_order.id = smartstore_stock.id ORDER BY title ASC", array($aWeekAgo));
     } else if (MENU == 'edit') {        
         $data = $_POST['data'];
         unset($data['id']);
