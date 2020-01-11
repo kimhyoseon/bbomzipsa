@@ -2031,7 +2031,8 @@ class PHPExcelDownload {
                     $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);    
                 }
             } else if (strpos($title, '귀지압패치') !== false) {                
-                $newStock2 = $this->setStockUpdateAdd($newStock2, $title, ($amount * 2));    
+                $newStock2 = $this->setStockUpdateAdd($newStock2, $title, ($amount * 2));   
+                $newStock2 = $this->setStockUpdateAdd($newStock2, '귀혈자리지도', $amount); 
             // 나머지
             } else {
                 $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);
