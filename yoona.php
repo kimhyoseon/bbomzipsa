@@ -61,7 +61,7 @@ body {
 var menu = null;
 var chartType = 'LineChart';
 var chartDetail = {};
-var region = '군포';
+var region = '안양';
 
 function clickMenu(e) {    
     menu = $(e.currentTarget).data('menu');    
@@ -73,7 +73,7 @@ function clickMenu(e) {
         url: '../api/yoona.php',
         dataType : 'json',
         cache: false,
-        timeout: 60000,
+        timeout: 100000,
         data: {
             menu: menu
         },
@@ -105,7 +105,7 @@ function clickSigoongoo(e) {
         url: '../api/yoona.php',
         dataType : 'json',
         cache: false,
-        timeout: 60000,
+        timeout: 100000,
         data: {
             menu: menu + '_detail',
             extra: extra 
@@ -135,7 +135,7 @@ function callApi(data, callback) {
         url: '../api/yoona.php',
         dataType : 'json',
         cache: false,
-        timeout: 60000,
+        timeout: 100000,
         data: data,
         success: function (result, textStatus) {
             console.log(result);
@@ -1417,7 +1417,7 @@ function drawChart(data, options) {
                     url: '../api/yoona.php',
                     dataType : 'json',
                     cache: false,
-                    timeout: 60000,
+                    timeout: 100000,
                     data: {
                         menu: menu + '_detail',
                         extra: extra 
