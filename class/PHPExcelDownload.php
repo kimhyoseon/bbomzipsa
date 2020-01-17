@@ -505,7 +505,7 @@ class PHPExcelDownload {
                     foreach ($body as $k => $v) {                        
                         $index1 = array_search('수취인명', array_keys($filterMerged));                        
                         $index2 = array_search('배송지', array_keys($filterMerged));
-                        $index3 = array_search('상품명', array_keys($filterMerged));                        
+                        $index3 = array_search('상품명', array_keys($filterMerged));
                         $index4 = array_search('수량', array_keys($filterMerged));
                         
                         // 수취인명과 배송지가 같다면
@@ -559,18 +559,25 @@ class PHPExcelDownload {
         $fp = fopen('./data/delevery_check.json', 'w');
         fwrite($fp, json_encode($deleveryCheck));
         fclose($fp);
-
-        // echo '<pre>';
-        // print_r($stock);        
-        // print_r($body);                
-        // echo '</pre>';
-        // exit();
         
         $bodyOptimized = array();  
 
         // 쿠힛 재고 업데이트 (2020.01.07)
-        if (!empty($stock)) {
-            $stock['안내장'] = sizeof($body);
+        if (!empty($stock)) {            
+            $indexTitle = array_search('상품명', array_keys($filterMerged));
+            $countMemo = $countMemoBand = 0;
+            
+            foreach ($body as $value) {
+                if (strpos($value[$indexTitle], '리프팅밴드') !== false) {
+                    $countMemoBand++;
+                } else {
+                    $countMemo++;
+                }
+            }
+
+            if ($countMemoBand > 0) $stock['안내장밴드'] = $countMemoBand;
+            if ($countMemo > 0) $stock['안내장'] = $countMemo;            
+            
             $this->setStockUpdate($stock);
         }
 
@@ -1899,7 +1906,7 @@ class PHPExcelDownload {
             } 
 
             // 태그 계산            
-            if (in_array($title, array('리프팅밴드', '샴푸브러쉬', '롤빗', '바른자세밴드', '땅콩볼', '귀지압패치', '아치보호대', '발케어세트', '발목보호대', '타투스티커')) == true) {
+            if (in_array($title, array('리프팅밴드', '롤빗', '바른자세밴드', '땅콩볼', '귀지압패치', '아치보호대', '발케어세트', '발목보호대', '타투스티커')) == true) {
                 $newStock2 = $this->setStockUpdateAdd($newStock2, '태그(120)', $amount);
             } else if (in_array($title, array('요가링', '압박양말')) == true) {
                 $newStock2 = $this->setStockUpdateAdd($newStock2, '태그(170)', $amount);

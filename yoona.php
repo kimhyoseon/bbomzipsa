@@ -61,7 +61,7 @@ body {
 var menu = null;
 var chartType = 'LineChart';
 var chartDetail = {};
-var region = '안양';
+var region = '';
 
 function clickMenu(e) {    
     menu = $(e.currentTarget).data('menu');    
@@ -1504,6 +1504,7 @@ function getEnergy(year, price) {
     else if (year == '2017') energy = price / 60031080;
     else if (year == '2018') energy = price / 61531857;
     else if (year == '2019') energy = price / 63070153;    
+    else if (year == '2020') energy = price / 64646907;    
     
     return (energy * 10000).toFixed(1)
 }

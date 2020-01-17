@@ -21,16 +21,16 @@ try {
     // $sigoongoo = '울산광역시 중구';            
     // $lawdCd = '31140';    
     // $sigoongoo = '울산광역시 남구';
-    $lawdCd = '44133';
-    $sigoongoo = '천안시 서북구';
+    // $lawdCd = '44133';
+    // $sigoongoo = '천안시 서북구';
     // $lawdCd = '41273';
     // $sigoongoo = '안산시 단원구';
     // $lawdCd = '41430';
     // $sigoongoo = '의왕시';    
     // $lawdCd = '41465';
     // $sigoongoo = '용인시 수지구';
-    // $lawdCd = '41410';
-    // $sigoongoo = '군포시';
+    $lawdCd = '41410';
+    $sigoongoo = '군포시';
     // $lawdCd = '41190';
     // $sigoongoo = '부천시';
 

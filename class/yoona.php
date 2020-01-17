@@ -337,6 +337,7 @@ class Yoona {
         else if ($year == '2017') $energy = $price / 60031080;
         else if ($year == '2018') $energy = $price / 61531857;
         else if ($year == '2019') $energy = $price / 63070153;    
+        else if ($year == '2020') $energy = $price / 64646907;    
         
         return round($energy * 10000, 1);
     }
