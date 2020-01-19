@@ -2,6 +2,7 @@
 include_once('./class/PHPExcel.php');
 
 class PHPExcelDownload {
+    CONST TEST = false;    
     CONST SHORTNAME = array(
         '두피마사지기' => '샴푸브러쉬',
         '페이스롤러' => '마사지롤러',
@@ -486,8 +487,9 @@ class PHPExcelDownload {
                                 } else {
                                     $_v = $v.'개';
                                 }
-
-                                $row[array_search('상품명', array_keys($filterMerged))] = $_v.' '.$row[array_search('상품명', array_keys($filterMerged))];                                
+                                
+                                // 수량 뒤로 변경
+                                $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' '.$_v;  
                             }
                             
                             // 택배박스는 무조건 1개로..
@@ -516,7 +518,7 @@ class PHPExcelDownload {
                                 $row[$index3] = str_replace('[신선식품] ', '', $row[$index3]);
                             }
                             
-                            $body[$k][$index3] = $body[$k][$index3].' / '.$row[$index3];
+                            $body[$k][$index3] = $body[$k][$index3].'__'.$row[$index3];
                             $body[$k][$index4] = 1;
                         }
                     }
@@ -533,52 +535,61 @@ class PHPExcelDownload {
             return false;
         }
 
+        // echo '<pre>';
+        // print_r($body);        
+        // echo '</pre>';
+        // exit();
+
         // 합쳐지지 않은 배송건이 있는지 확인
-        $deleveryCheck = @json_decode(file_get_contents('./data/delevery_check.json'), true);
+        if (!self::TEST) {
+            $deleveryCheck = @json_decode(file_get_contents('./data/delevery_check.json'), true);
 
-        // 기존 내역이 없거나 과거인 경우 새로 만듬
-        if (empty($deleveryCheck) || $deleveryCheck['date'] != date('Ymd')) {
-            $deleveryCheck = array('date' => date('Ymd'));
-        }
+            // 기존 내역이 없거나 과거인 경우 새로 만듬
+            if (empty($deleveryCheck) || $deleveryCheck['date'] != date('Ymd')) {
+                $deleveryCheck = array('date' => date('Ymd'));
+            }
 
-        $checkIndexes = array(array_search('배송지', array_keys($filterMerged)), array_search('수취인연락처1', array_keys($filterMerged)));
+            $checkIndexes = array(array_search('배송지', array_keys($filterMerged)), array_search('수취인연락처1', array_keys($filterMerged)));
 
-        foreach ($body as $key => $value) {
-            // 중복된 내용이 존재한다면 경고
-            foreach ($checkIndexes as $index) {
-                if (!empty($value[$index])) {
-                    if (!empty($deleveryCheck[$value[$index]])) {
-                        exit("[{$value[$index]}] 내용으로 중복된 내용이 존재합니다. 확인해주세요.");
-                    } else {
-                        $deleveryCheck[$value[$index]] = 1;
+            foreach ($body as $key => $value) {
+                // 중복된 내용이 존재한다면 경고
+                foreach ($checkIndexes as $index) {
+                    if (!empty($value[$index])) {
+                        if (!empty($deleveryCheck[$value[$index]])) {
+                            exit("[{$value[$index]}] 내용으로 중복된 내용이 존재합니다. 확인해주세요.");
+                        } else {
+                            $deleveryCheck[$value[$index]] = 1;
+                        }
                     }
-                }
-            }            
-        }
+                }            
+            }
 
-        $fp = fopen('./data/delevery_check.json', 'w');
-        fwrite($fp, json_encode($deleveryCheck));
-        fclose($fp);
+            $fp = fopen('./data/delevery_check.json', 'w');
+            fwrite($fp, json_encode($deleveryCheck));
+            fclose($fp);
+        }
         
         $bodyOptimized = array();  
 
         // 쿠힛 재고 업데이트 (2020.01.07)
-        if (!empty($stock)) {            
-            $indexTitle = array_search('상품명', array_keys($filterMerged));
-            $countMemo = $countMemoBand = 0;
-            
-            foreach ($body as $value) {
-                if (strpos($value[$indexTitle], '리프팅밴드') !== false) {
-                    $countMemoBand++;
-                } else {
-                    $countMemo++;
+        if (!self::TEST) {
+            if (!empty($stock)) {            
+                $indexTitle = array_search('상품명', array_keys($filterMerged));
+                $countMemo = $countMemoBand = 0;
+                
+                foreach ($body as $value) {
+                    if (strpos($value[$indexTitle], '리프팅밴드') !== false) {
+                        $countMemoBand++;
+                    } else {
+                        $countMemo++;
+                    }
                 }
-            }
 
-            if ($countMemoBand > 0) $stock['안내장밴드'] = $countMemoBand;
-            if ($countMemo > 0) $stock['안내장'] = $countMemo;            
-            
-            $this->setStockUpdate($stock);
+                if ($countMemoBand > 0) $stock['안내장밴드'] = $countMemoBand;
+                if ($countMemo > 0) $stock['안내장'] = $countMemo;            
+                
+                $this->setStockUpdate($stock);
+            }
         }
 
         // filter 값만 다시 담기
@@ -649,9 +660,13 @@ class PHPExcelDownload {
             $payIndex = array_search('_지불조건', array_keys($filter));
             $bodyOptimized[$key][$payIndex] = '1';
             $title = explode(' ', $value[$nameIndex]);
-            unset($title[0]);
+
+            // 상품명 줄내림 처리 (2020.01.19)
+            $titleLine = explode('__', $value[$nameIndex]);
+            $bodyOptimized[$key][$nameIndex] = implode(chr(10), $titleLine);
+            
             $sort[] = implode($title);
-        }
+        }  
 
         // 상품명으로 정렬
         array_multisort($sort, SORT_ASC, $bodyOptimized);
@@ -676,6 +691,9 @@ class PHPExcelDownload {
         foreach ($widths as $i => $w) {
             $excel->setActiveSheetIndex(0)->getColumnDimension($this->columnChar($i))->setWidth($w);
         }
+
+        // 상품명 줄내림
+        $excel->getActiveSheet()->getStyle("H1:H{$cntRow}")->getAlignment()->setWrapText(true);  
         
         // 시트명 변경
         $excel->setActiveSheetIndex(0)->setTitle('폼');
