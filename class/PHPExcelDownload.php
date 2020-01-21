@@ -421,8 +421,10 @@ class PHPExcelDownload {
         $filterIndexReverse = array();
         $header = array_values($filter);
         $body = array();        
+        $bodyOver = array();
         $stock = array();    
         $sort = array();    
+        $addrMerge = array();
 
         if (empty($sheetData)) {
             echo '엑셀 데이터를 확인할 수 없습니다.';
@@ -465,36 +467,36 @@ class PHPExcelDownload {
                             }                            
                         }
 
-                        if ($filterIndexReverse[$k] == '수량') {                                  
-                            if (strpos($row[array_search('상품명', array_keys($filterMerged))], '신선식품') !== false) {                                  
-                                if ($v > 1) {
-                                    $_v = $v.'*';
-                                } else {
-                                    $_v = $v;
-                                }
+                        // if ($filterIndexReverse[$k] == '수량') {                                  
+                        //     if (strpos($row[array_search('상품명', array_keys($filterMerged))], '신선식품') !== false) {                                  
+                        //         if ($v > 1) {
+                        //             $_v = $v.'*';
+                        //         } else {
+                        //             $_v = $v;
+                        //         }
 
-                                $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].''.$_v;
-                            } else {
-                                // 신선식품이 아니라면 재고관리를 위한 배열 생성
-                                if (empty($stock[$row[array_search('상품명', array_keys($filterMerged))]])) {
-                                    $stock[$row[array_search('상품명', array_keys($filterMerged))]] = $v;
-                                } else {
-                                    $stock[$row[array_search('상품명', array_keys($filterMerged))]] += $v;
-                                }
+                        //         $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].''.$_v;
+                        //     } else {
+                        //         // 신선식품이 아니라면 재고관리를 위한 배열 생성
+                        //         if (empty($stock[$row[array_search('상품명', array_keys($filterMerged))]])) {
+                        //             $stock[$row[array_search('상품명', array_keys($filterMerged))]] = $v;
+                        //         } else {
+                        //             $stock[$row[array_search('상품명', array_keys($filterMerged))]] += $v;
+                        //         }
 
-                                if ($v > 1) {
-                                    $_v = '*'.$v.'개';
-                                } else {
-                                    $_v = $v.'개';
-                                }
+                        //         if ($v > 1) {
+                        //             $_v = '*'.$v.'개';
+                        //         } else {
+                        //             $_v = $v.'개';
+                        //         }
                                 
-                                // 수량 뒤로 변경
-                                $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' '.$_v;  
-                            }
+                        //         // 수량 뒤로 변경
+                        //         $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' '.$_v;  
+                        //     }
                             
-                            // 택배박스는 무조건 1개로..
-                            $v = 1;
-                        }
+                        //     // 택배박스는 무조건 1개로..
+                        //     $v = 1;
+                        // }
 
                         $row[array_search($filterIndexReverse[$k], array_keys($filterMerged))] = $v;
                     }
@@ -503,8 +505,8 @@ class PHPExcelDownload {
                 // 2건 이상 주문자인 경우 처리
                 $isOverwrite = false;
 
-                if ($body) {
-                    foreach ($body as $k => $v) {                        
+                if ($bodyOver) {
+                    foreach ($bodyOver as $k => $v) {                        
                         $index1 = array_search('수취인명', array_keys($filterMerged));                        
                         $index2 = array_search('배송지', array_keys($filterMerged));
                         $index3 = array_search('상품명', array_keys($filterMerged));
@@ -518,56 +520,77 @@ class PHPExcelDownload {
                                 $row[$index3] = str_replace('[신선식품] ', '', $row[$index3]);
                             }
                             
-                            $body[$k][$index3] = $body[$k][$index3].'__'.$row[$index3];
-                            $body[$k][$index4] = 1;
+                            $bodyOver[$k][$index3] = $bodyOver[$k][$index3].'__'.$row[$index3];
+                            $bodyOver[$k][$index4] = 1;
                         }
                     }
                 }
 
-                if (!$isOverwrite) {
-                    $body[] = $row;
+                if (!$isOverwrite) {                    
+                    $bodyOver[] = $row;
                 }    
+
+                // 주소를 기준으로 이름과 전화번호 정보 통일
+                $indexName = array_search('수취인명', array_keys($filterMerged));                        
+                $indexPhone1 = array_search('수취인연락처1', array_keys($filterMerged));                        
+                $indexPhone2 = array_search('수취인연락처2', array_keys($filterMerged));                        
+                $indexAddr = array_search('배송지', array_keys($filterMerged));                
+                
+                // 저장된 주소정보가 없다면 넣어 줌
+                if (empty($addrMerge[$row[$indexAddr]])) {
+                    if (empty($row[$indexPhone2])) $row[$indexPhone2] = '';
+                    $addrMerge[$row[$indexAddr]] = array($row[$indexName], $row[$indexPhone1], $row[$indexPhone2]);
+                // 중복되는 주소가 존재하는 경우 이전 정보로 덮어쓰기
+                } else {
+                    $row[$indexName] = $addrMerge[$row[$indexAddr]][0];
+                    $row[$indexPhone1] = $addrMerge[$row[$indexAddr]][1];
+                    $row[$indexPhone2] = $addrMerge[$row[$indexAddr]][2];
+                }
+
+                $body[] = $row;
             }
         }   
 
         if (empty($body)) {
             echo '내역이 존재하지 않습니다.';
             return false;
-        }
+        }        
 
         // echo '<pre>';
+        // print_r($addrMerge);        
+        // print_r($bodyOver);        
         // print_r($body);        
         // echo '</pre>';
         // exit();
 
         // 합쳐지지 않은 배송건이 있는지 확인
-        if (!self::TEST) {
-            $deleveryCheck = @json_decode(file_get_contents('./data/delevery_check.json'), true);
+        // if (!self::TEST) {
+        //     $deleveryCheck = @json_decode(file_get_contents('./data/delevery_check.json'), true);
 
-            // 기존 내역이 없거나 과거인 경우 새로 만듬
-            if (empty($deleveryCheck) || $deleveryCheck['date'] != date('Ymd')) {
-                $deleveryCheck = array('date' => date('Ymd'));
-            }
+        //     // 기존 내역이 없거나 과거인 경우 새로 만듬
+        //     if (empty($deleveryCheck) || $deleveryCheck['date'] != date('Ymd')) {
+        //         $deleveryCheck = array('date' => date('Ymd'));
+        //     }
 
-            $checkIndexes = array(array_search('배송지', array_keys($filterMerged)), array_search('수취인연락처1', array_keys($filterMerged)));
+        //     $checkIndexes = array(array_search('배송지', array_keys($filterMerged)), array_search('수취인연락처1', array_keys($filterMerged)));
 
-            foreach ($body as $key => $value) {
-                // 중복된 내용이 존재한다면 경고
-                foreach ($checkIndexes as $index) {
-                    if (!empty($value[$index])) {
-                        if (!empty($deleveryCheck[$value[$index]])) {
-                            exit("[{$value[$index]}] 내용으로 중복된 내용이 존재합니다. 확인해주세요.");
-                        } else {
-                            $deleveryCheck[$value[$index]] = 1;
-                        }
-                    }
-                }            
-            }
+        //     foreach ($bodyOver as $key => $value) {
+        //         // 중복된 내용이 존재한다면 경고
+        //         foreach ($checkIndexes as $index) {
+        //             if (!empty($value[$index])) {
+        //                 if (!empty($deleveryCheck[$value[$index]])) {
+        //                     exit("[{$value[$index]}] 내용으로 중복된 내용이 존재합니다. 확인해주세요.");
+        //                 } else {
+        //                     $deleveryCheck[$value[$index]] = 1;
+        //                 }
+        //             }
+        //         }            
+        //     }
 
-            $fp = fopen('./data/delevery_check.json', 'w');
-            fwrite($fp, json_encode($deleveryCheck));
-            fclose($fp);
-        }
+        //     $fp = fopen('./data/delevery_check.json', 'w');
+        //     fwrite($fp, json_encode($deleveryCheck));
+        //     fclose($fp);
+        // }
         
         $bodyOptimized = array();  
 
@@ -577,7 +600,7 @@ class PHPExcelDownload {
                 $indexTitle = array_search('상품명', array_keys($filterMerged));
                 $countMemo = $countMemoBand = 0;
                 
-                foreach ($body as $value) {
+                foreach ($bodyOver as $value) {
                     if (strpos($value[$indexTitle], '리프팅밴드') !== false) {
                         $countMemoBand++;
                     } else {
@@ -662,11 +685,16 @@ class PHPExcelDownload {
             $title = explode(' ', $value[$nameIndex]);
 
             // 상품명 줄내림 처리 (2020.01.19)
-            $titleLine = explode('__', $value[$nameIndex]);
-            $bodyOptimized[$key][$nameIndex] = implode(chr(10), $titleLine);
+            // $titleLine = explode('__', $value[$nameIndex]);
+            // $bodyOptimized[$key][$nameIndex] = implode(chr(10), $titleLine);
             
             $sort[] = implode($title);
-        }  
+        }
+        
+        // echo '<pre>';
+        // print_r($bodyOptimized);                
+        // echo '</pre>';
+        // exit();
 
         // 상품명으로 정렬
         array_multisort($sort, SORT_ASC, $bodyOptimized);
@@ -693,7 +721,7 @@ class PHPExcelDownload {
         }
 
         // 상품명 줄내림
-        $excel->getActiveSheet()->getStyle("H1:H{$cntRow}")->getAlignment()->setWrapText(true);  
+        // $excel->getActiveSheet()->getStyle("H1:H{$cntRow}")->getAlignment()->setWrapText(true);  
         
         // 시트명 변경
         $excel->setActiveSheetIndex(0)->setTitle('폼');
