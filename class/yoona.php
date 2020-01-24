@@ -341,6 +341,17 @@ class Yoona {
         
         return round($energy * 10000, 1);
     }
+
+    /**
+     * 아찌 
+     */
+    public function getAzzi() {                
+        $azziFileJson = $_SERVER['DOCUMENT_ROOT'].'/../crawler/log/yoonaazzi_data.json';        
+
+        if (file_exists($azziFileJson)) {            
+            return file_get_contents($azziFileJson);
+        }                
+    }
     
     
     

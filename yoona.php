@@ -48,6 +48,7 @@ body {
                 <a href="#" class="list-menu" data-menu="ingooidong"><li class="list-group-item">7. 인구이동차트</li></a>
                 <a href="#" class="list-menu" data-menu="age"><li class="list-group-item">8. 평균연령차트</li></a>
                 <a href="#" class="list-menu" data-menu="apt"><li class="list-group-item">9. 아파트</li></a>
+                <a href="#" class="list-menu" data-menu="azzi"><li class="list-group-item">10. 아찌</li></a>
             </ul>
         </div>
 
@@ -1367,6 +1368,141 @@ function renderaptDetail(data) {
             }
 
             index++;
+        }
+    }
+}
+
+// 10. 아찌
+function renderazzi(data) {          
+    if (!data) return false;       
+
+    var chartData = {};    
+    var year = null;
+    var beforePrice = {};
+    
+    for (apt in data) {
+        // 초기화
+        chartData[apt] = {};
+        chartData[apt][apt + ' 거래량'] = []                
+        beforePrice[apt] = {};
+        
+        for (date in data[apt]) {     
+            // 거래량 데이터
+            chartData[apt][apt + ' 거래량'].push([date, parseFloat(data[apt][date]['total_prices']), parseFloat(data[apt][date]['total_jeonses']), parseFloat(data[apt][date]['total_prices_complete']), parseFloat(data[apt][date]['total_jeonses_complete'])]);            
+            
+            var sizeAll1 = Object.keys(data[apt][date]['prices']);
+            var sizeAll2 = Object.keys(data[apt][date]['jeonses']);                        
+            var sizeAll = sizeAll1.concat(sizeAll2.filter((item) => sizeAll1.indexOf(item) < 0));
+            
+            for (var i = 0; i < sizeAll.length; i++) {
+                // 초기화
+                var title1 = apt + ' 매매 ' + sizeAll[i] + '㎡';
+                var title2 = apt + ' 전세 ' + sizeAll[i] + '㎡';
+                
+                if (!chartData[apt][title1]) {
+                    chartData[apt][title1] = [];                    
+                }                
+                if (!chartData[apt][title2]) {
+                    chartData[apt][title2] = [];                    
+                }       
+
+                var zeroData1 = [0, 0, 0, 0];
+                var zeroData2 = [0, 0, 0, 0];
+
+                if (data[apt][date]['prices'][sizeAll[i]]) {
+                    if (!beforePrice[apt][title1]) {
+                        beforePrice[apt][title1] = parseFloat(data[apt][date]['prices'][sizeAll[i]][1]);
+                    }
+
+                    zeroData1[0] = parseFloat(data[apt][date]['prices'][sizeAll[i]][0]);
+                    zeroData1[1] = beforePrice[apt][title1];                    
+                    zeroData1[2] = parseFloat(data[apt][date]['prices'][sizeAll[i]][1]);
+                    zeroData1[3] = parseFloat(data[apt][date]['prices'][sizeAll[i]][2]);
+
+                    beforePrice[apt][title1] = zeroData1[2];
+                }
+
+                if (data[apt][date]['jeonses'][sizeAll[i]]) {
+                    if (!beforePrice[apt][title2]) {
+                        beforePrice[apt][title2] = parseFloat(data[apt][date]['jeonses'][sizeAll[i]][1]);
+                    }
+
+                    zeroData2[0] = parseFloat(data[apt][date]['jeonses'][sizeAll[i]][0]);
+                    zeroData2[1] = beforePrice[apt][title2];                    
+                    zeroData2[2] = parseFloat(data[apt][date]['jeonses'][sizeAll[i]][1]);
+                    zeroData2[3] = parseFloat(data[apt][date]['jeonses'][sizeAll[i]][2]);
+                    
+                    beforePrice[apt][title2] = zeroData2[2];
+                }
+
+                chartData[apt][title1].push([
+                    date,
+                    zeroData1[0],
+                    zeroData1[1],
+                    zeroData1[2],
+                    zeroData1[3],                                        
+                ]);
+
+                chartData[apt][title2].push([
+                    date,
+                    zeroData2[0],
+                    zeroData2[1],
+                    zeroData2[2],
+                    zeroData2[3],                                        
+                ]);
+            }            
+        }
+
+        // break;
+    }
+
+    console.log(chartData);    
+    
+    for (apt in chartData) {
+        for (title in chartData[apt]) {
+            if (title.indexOf('거래량') != -1) {
+                chartType = 'LineChart';
+                        
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Date');                
+                data.addColumn('number', '매물(매매)');                
+                data.addColumn('number', '매물(전세)');                
+                data.addColumn('number', '거래완료(매매)');                
+                data.addColumn('number', '거래완료(전세)');                
+                data.addRows(chartData[apt][title]);
+
+                var options = {
+                    'title': title,                                     
+                    'width': getRowWidth(), 
+                    'height': 300,                 
+                };
+
+                drawChart(data, options);  
+            // 매매/전세
+            } else if (title.indexOf('매매') != -1 || title.indexOf('전세') != -1) {
+                chartType = 'CandlestickChart';
+                        
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Date');                
+                data.addColumn('number', '최저가');                
+                data.addColumn('number', '시작가');
+                data.addColumn('number', '종료가');                                                
+                data.addColumn('number', '최고가');                
+                data.addRows(chartData[apt][title]);
+
+                var options = {                    
+                    'title': title,                                     
+                    'width': getRowWidth(), 
+                    'height': 300, 
+                    'legend': 'none',
+                    'candlestick': {
+                        'fallingColor': { strokeWidth: 0, fill: '#a52714' }, // red
+                        'risingColor': { strokeWidth: 0, fill: '#0000FF' }   // green
+                    }                    
+                };
+
+                drawChart(data, options);                                    
+            }
         }
     }
 }

@@ -13,7 +13,7 @@ try {
     // echo '<pre>';
     // print_r($data);
     // echo '</pre>';
-    // exit();
+    // exit();    
     
     define('MENU', (filter_input(INPUT_POST, 'menu', FILTER_SANITIZE_STRING)));
     define('EXTRA', (filter_input(INPUT_POST, 'extra', FILTER_SANITIZE_STRING)));
@@ -75,6 +75,8 @@ try {
         $data = json_encode($yoona->getAptRank(EXTRA));
     } else if (MENU == 'apt_detail') {
         $data = json_encode($yoona->getAptDetail(EXTRA));
+    } else if (MENU == 'azzi') {
+        $data = $yoona->getAzzi();
     }
 
     if (empty($data)) {
