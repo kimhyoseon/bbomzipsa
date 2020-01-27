@@ -1385,12 +1385,17 @@ function renderazzi(data) {
         chartData[apt] = {};
         chartData[apt][apt + ' 거래량'] = []                
         beforePrice[apt] = {};
-        
-        for (date in data[apt]) {     
-            var dateType = new Date(date);
 
+        // 날짜별로 정렬
+        var dataSort = {};
+        
+        Object.keys(data[apt]).sort().forEach(function(key) {
+            dataSort[key] = data[apt][key];
+        });
+        
+        for (date in dataSort) {                 
             // 거래량 데이터
-            chartData[apt][apt + ' 거래량'].push([dateType, parseFloat(data[apt][date]['total_prices']), parseFloat(data[apt][date]['total_jeonses']), parseFloat(data[apt][date]['total_prices_complete']), parseFloat(data[apt][date]['total_jeonses_complete'])]);            
+            chartData[apt][apt + ' 거래량'].push([date, parseFloat(data[apt][date]['total_prices']), parseFloat(data[apt][date]['total_jeonses']), parseFloat(data[apt][date]['total_prices_complete']), parseFloat(data[apt][date]['total_jeonses_complete'])]);            
             
             var sizeAll1 = Object.keys(data[apt][date]['prices']);
             var sizeAll2 = Object.keys(data[apt][date]['jeonses']);                        
@@ -1438,7 +1443,7 @@ function renderazzi(data) {
                 }
 
                 chartData[apt][title1].push([
-                    dateType,
+                    date,
                     zeroData1[0],
                     zeroData1[1],
                     zeroData1[2],
@@ -1446,7 +1451,7 @@ function renderazzi(data) {
                 ]);
 
                 chartData[apt][title2].push([
-                    dateType,
+                    date,
                     zeroData2[0],
                     zeroData2[1],
                     zeroData2[2],
@@ -1466,7 +1471,7 @@ function renderazzi(data) {
                 chartType = 'LineChart';
                         
                 var data = new google.visualization.DataTable();
-                data.addColumn('date', 'Date');                
+                data.addColumn('string', 'Date');                
                 data.addColumn('number', '매물(매매)');                
                 data.addColumn('number', '매물(전세)');                
                 data.addColumn('number', '거래완료(매매)');                
@@ -1476,10 +1481,7 @@ function renderazzi(data) {
                 var options = {
                     'title': title,                                     
                     'width': getRowWidth(), 
-                    'height': 300,   
-                    'hAxis': {
-                        'format': 'yyyy-MM-dd'
-                    }              
+                    'height': 300,                 
                 };
 
                 drawChart(data, options);  
@@ -1488,7 +1490,7 @@ function renderazzi(data) {
                 chartType = 'CandlestickChart';
                         
                 var data = new google.visualization.DataTable();
-                data.addColumn('date', 'Date');                
+                data.addColumn('string', 'Date');                
                 data.addColumn('number', '최저가');                
                 data.addColumn('number', '시작가');
                 data.addColumn('number', '종료가');                                                
@@ -1503,17 +1505,14 @@ function renderazzi(data) {
                     'candlestick': {
                         'fallingColor': { strokeWidth: 0, fill: '#a52714' }, // red
                         'risingColor': { strokeWidth: 0, fill: '#0000FF' }   // green
-                    },
-                    'hAxis': {
-                        'format': 'yyyy-MM-dd'
-                    }                         
+                    }                    
                 };
 
                 drawChart(data, options);                                    
             }
         }
 
-        return false;
+        // return false;
     }
 }
 
