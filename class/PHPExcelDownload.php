@@ -467,36 +467,18 @@ class PHPExcelDownload {
                             }                            
                         }
 
-                        // if ($filterIndexReverse[$k] == '수량') {                                  
-                        //     if (strpos($row[array_search('상품명', array_keys($filterMerged))], '신선식품') !== false) {                                  
-                        //         if ($v > 1) {
-                        //             $_v = $v.'*';
-                        //         } else {
-                        //             $_v = $v;
-                        //         }
-
-                        //         $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].''.$_v;
-                        //     } else {
-                        //         // 신선식품이 아니라면 재고관리를 위한 배열 생성
-                        //         if (empty($stock[$row[array_search('상품명', array_keys($filterMerged))]])) {
-                        //             $stock[$row[array_search('상품명', array_keys($filterMerged))]] = $v;
-                        //         } else {
-                        //             $stock[$row[array_search('상품명', array_keys($filterMerged))]] += $v;
-                        //         }
-
-                        //         if ($v > 1) {
-                        //             $_v = '*'.$v.'개';
-                        //         } else {
-                        //             $_v = $v.'개';
-                        //         }
+                        if ($filterIndexReverse[$k] == '수량') {                                  
+                            if (strpos($row[array_search('상품명', array_keys($filterMerged))], '신선식품') !== false) {                                  
                                 
-                        //         // 수량 뒤로 변경
-                        //         $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' '.$_v;  
-                        //     }
-                            
-                        //     // 택배박스는 무조건 1개로..
-                        //     $v = 1;
-                        // }
+                            } else {
+                                // 신선식품이 아니라면 재고관리를 위한 배열 생성
+                                if (empty($stock[$row[array_search('상품명', array_keys($filterMerged))]])) {
+                                    $stock[$row[array_search('상품명', array_keys($filterMerged))]] = $v;
+                                } else {
+                                    $stock[$row[array_search('상품명', array_keys($filterMerged))]] += $v;
+                                }
+                            }
+                        }
 
                         $row[array_search($filterIndexReverse[$k], array_keys($filterMerged))] = $v;
                     }
