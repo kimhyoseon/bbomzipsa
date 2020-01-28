@@ -468,7 +468,7 @@ class PHPExcelDownload {
                         }
 
                         if ($filterIndexReverse[$k] == '수량') {                                  
-                            if (strpos($row[array_search('상품명', array_keys($filterMerged))], '신선식품') !== false) {                                  
+                            if (strpos($row[array_search('상품명', array_keys($filterMerged))], '신선식품') !== false) {
                                 
                             } else {
                                 // 신선식품이 아니라면 재고관리를 위한 배열 생성
@@ -498,9 +498,9 @@ class PHPExcelDownload {
                         if ($row[$index1] == $v[$index1] && $row[$index2] == $v[$index2]) {
                             $isOverwrite = true;           
                             
-                            if (strpos($row[$index3], '신선식품') !== false) {
-                                $row[$index3] = str_replace('[신선식품] ', '', $row[$index3]);
-                            }
+                            // if (strpos($row[$index3], '신선식품') !== false) {
+                            //     $row[$index3] = str_replace('[신선식품] ', '', $row[$index3]);
+                            // }
                             
                             $bodyOver[$k][$index3] = $bodyOver[$k][$index3].'__'.$row[$index3];
                             $bodyOver[$k][$index4] = 1;
