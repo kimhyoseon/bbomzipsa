@@ -429,10 +429,10 @@ class PHPExcelDownload {
         if (empty($sheetData)) {
             echo '엑셀 데이터를 확인할 수 없습니다.';
             return false;
-        }
+        }        
         
         foreach ($sheetData as $key => $value) {
-            if (empty($value[1])) continue;
+            if (empty($value[1]) && empty($value[9])) continue;
 
             if ($key == 1) {
                 foreach ($value as $k => $v) {
@@ -446,7 +446,9 @@ class PHPExcelDownload {
                 }
             } else {
                 // 짐볼, 폼롤러 제외
-                if (in_array($value[$filterIndex['상품번호']], array('4324723046', '4529428871', '4530770714', '4318623001'))) continue;
+                if (!empty($value[$filterIndex['상품번호']])) {
+                    if (in_array($value[$filterIndex['상품번호']], array('4324723046', '4529428871', '4530770714', '4318623001'))) continue;
+                }                
 
                 $row = array();                
 
