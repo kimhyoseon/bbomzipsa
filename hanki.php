@@ -3,11 +3,12 @@ ini_set("memory_limit" , -1);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$jshkData = include './class/PHPExcelDataJshk.php';         
-echo '<pre>';                            
-print_r($jshkData);                    
-echo '</pre>';   
-exit();
+if ($_GET && $_GET['excel'] == 1) {
+  include_once($_SERVER['DOCUMENT_ROOT'].'/class/hanki.php');
+  $hanki = new Hanki(); 
+  $hanki->excelOption();
+  exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +30,7 @@ body {
 }
 
 body {    
-  background-color: #f5f5f5;
+  background-color: #fff;
 }
 
 .chart {
@@ -38,15 +39,229 @@ body {
 .chart > div {
     display: inline-block;
 }
+
+.wrap-chart,
+.table {
+  width: 100%;
+}
+
+.table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-style: hidden;
+  border-top: 1px solid #dee2e6;
+  background-color: #fff;
+}
+
+.table th {
+  text-align: center;
+  font-size:2.5rem;
+}
+
+.table td {
+  border: 1px solid #dee2e6;
+}
+
+.table td p {
+  margin-bottom: 0.1rem;
+  text-align: center;
+  font-size:2.2rem;
+}
+
+.table td .h6 {
+  display: block;
+  margin-bottom: 0.5rem;  
+  font-size:2.2rem;
+}
+
 </style>
 
 <body>  
-    <div class="container-fluid">        
+    <div class="container-fluid">     
+      <div class="container-fluid">
+          <div class="row m-0 mt-2 mb-2">
+              <ul class="list-group list-group-horizontal">
+                  <a href="#" class="list-menu" data-menu="new"><li class="list-group-item">메뉴생성</li></a>
+                  <a href="#" class="option-excel"><li class="list-group-item">옵션다운로드</li></a>
+              </ul>
+          </div>
+
+          <div class="row m-0 mt-2 mb-2">
+              <div class="wrap-chart"></div>
+          </div>
+      </div>    
     </div>    
 </body>
 
 <script>
+  var dataNew = null;
 
+  function clickMenu(e) {    
+    menu = $(e.currentTarget).data('menu');    
+    
+    if (!menu) return false;
+
+    $.ajax({
+        type: "POST",
+        url: '../api/hanki.php',
+        dataType : 'json',
+        cache: false,
+        timeout: 10000,
+        data: {
+            menu: menu
+        },
+        success: function (result, textStatus) {
+            console.log(result);
+            console.log(textStatus);    
+            window['render' + menu](result);
+            dataNew = result;
+        },
+        error: function(result, textStatus, jqXHR) {
+            console.log(result);
+            console.log(textStatus);
+            console.log(jqXHR);
+        },
+        complete: function() {
+        } 
+    });
+
+    return false;  
+  }
+
+  function rendernew(data) {
+    if (!data) return false;
+
+    var html = '';
+    html += '<table class="table">';
+    html += '<thead><tr><th scope="col">화</th><th scope="col">수</th><th scope="col">목</th><th scope="col">금</th><th scope="col"><span class="text-primary">토</span></th></tr></thead>';
+    html += '<tbody>';        
+
+    var keys = Object.keys(data);
+    
+    while (keys.length > 0) {      
+      html += '<tr>';        
+
+      for (var i = 0; i < 7; i++) {        
+        var date = keys[0];
+        
+        if (!date) {
+          keys.shift();
+          continue;
+        }
+        var dash = date.replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3');        
+        var dayOfWeek = new Date(dash).getDay();  
+
+        if (dayOfWeek != i) {  
+          if (i == 0 || i == 1) {          
+            continue;
+          }        
+
+          html += '<td></td>';
+        } else {  
+          // 일, 월 제외
+          if (i == 0 || i == 1) {
+            keys.shift();
+            continue;
+          }        
+
+          // 메뉴
+          var menuHtml = '';
+          var secCount = data[date].length - 4;          
+
+          if (data[date]) {
+            for (var j = 0; j < data[date].length; j++) {    
+              var txt = data[date][j];
+              
+              if (i == 4 && j < 2) {
+                txt = '<b>' + txt + '</b>';
+              }
+
+              if (j > secCount) {
+                txt = '<span class="text-secondary">' + txt + '</span>'; 
+              }
+              
+              menuHtml += '<p>' + txt + '</p>'; 
+            }
+          }
+
+          var month = date.substr(4, 2).replace(/^0+/, '');          
+          var day = date.substr(6, 2).replace(/^0+/, '');          
+
+          day = month + '/' + day;
+
+          if (i == 0) {
+            day = '<span class="text-danger h6">' + day + '</span>';
+          } else if (i == 6) {
+            day = '<span class="text-primary h6">' + day + '</span>';
+          } else {
+            day = '<span class="h6">' + day + '</span>';
+          }
+
+          html += '<td>';          
+          html += day;
+          html += '<div>';
+          html += menuHtml;
+          html += '<div>';
+          html += '</td>';
+          keys.shift();
+        }
+      }
+
+      html += '</tr>';    
+    }
+    
+    html += '</tbody>';
+    html += '</table>';    
+
+    html += '<div class="mt-5">';    
+    html += '<button type="button" class="save-new btn btn-primary btn-lg btn-block">저장</button>';    
+    html += '</div>';    
+
+    $('.wrap-chart').html(html);    
+  }
+
+  function saveNew() {
+    if (!dataNew) return false;
+
+    $.ajax({
+        type: "POST",
+        url: '../api/hanki.php',
+        dataType : 'json',
+        cache: false,
+        timeout: 10000,
+        data: {
+            menu: 'saveNew',
+            data: dataNew
+        },
+        success: function (result, textStatus) {
+            console.log(result);
+            console.log(textStatus);                
+
+            if (result['result'] == true) {
+              alert('저장했습니다.');
+            } else {
+              alert('저장에 실패했습니다.');
+            }
+        },
+        error: function(result, textStatus, jqXHR) {
+            console.log(result);
+            console.log(textStatus);
+            console.log(jqXHR);
+        },
+        complete: function() {
+        } 
+    });
+  }
+
+  function optionExcel() {
+    window.open('hanki.php?excel=1', '_blank');
+  }
+
+  $(document).ready(function() {
+    $(document).on('click', '.list-menu', clickMenu);
+    $(document).on('click', '.save-new', saveNew);
+    $(document).on('click', '.option-excel', optionExcel);    
+  });
 </script>
 
 </html>
