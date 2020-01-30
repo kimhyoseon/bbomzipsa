@@ -1196,8 +1196,13 @@ class PHPExcelDownload {
                     $customers[$customer]['caution'] = $jshkDataCustomer[$customer];
                 }                                
             }
+
+            // 레시피에 없다면 오류!
+            if (empty($jshkData[$cookName])) {
+                exit('레시피에 해당 반찬이 등록되어 있지 않습니다.('.$cookName.')');
+            }
             
-            foreach ($jshkData as $cookNamePart => $ingredients) {
+            foreach ($jshkData as $cookNamePart => $ingredients) {                
                 // strpos는 위험..
                 // if (strpos($cookName, $cookNamePart) !== false) {
                 if ($cookName == $cookNamePart) {
@@ -1663,9 +1668,14 @@ class PHPExcelDownload {
 
             $cookName = $this->getShortOptionJshk($items[$optionIndex]);
             $amount = $items[$amountIndex];
+
+            // 레시피에 없다면 오류!
+            if (empty($jshkData[$cookName])) {
+                exit('레시피에 해당 반찬이 등록되어 있지 않습니다.('.$cookName.')');
+            }
             
             foreach ($jshkData as $cookNamePart => $ingredients) {                
-                if (strpos($cookName, $cookNamePart) !== false) {                    
+                if ($cookName == $cookNamePart) {                
                     $row = array();                    
                     $ingredientsSum = array();
                     $contents = array();
