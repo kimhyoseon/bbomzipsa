@@ -81,6 +81,7 @@ body {
       <div class="container-fluid">
           <div class="row m-0 mt-2 mb-2">
               <ul class="list-group list-group-horizontal">
+                  <a href="#" class="list-menu" data-menu="view"><li class="list-group-item">메뉴보기</li></a>
                   <a href="#" class="list-menu" data-menu="new"><li class="list-group-item">메뉴생성</li></a>
                   <a href="#" class="option-excel"><li class="list-group-item">옵션다운로드</li></a>
               </ul>
@@ -128,7 +129,21 @@ body {
     return false;  
   }
 
+  function renderview(data) {
+    renderCalendar(data);
+  }
+
   function rendernew(data) {
+    renderCalendar(data);
+    var html = '';
+    html += '<div class="mt-5">';    
+    html += '<button type="button" class="save-new btn btn-primary btn-lg btn-block">저장</button>';    
+    html += '</div>';    
+
+    $('.wrap-chart').append(html); 
+  }
+
+  function renderCalendar(data) {
     if (!data) return false;
 
     var html = '';
@@ -141,13 +156,15 @@ body {
     while (keys.length > 0) {      
       html += '<tr>';        
 
-      for (var i = 0; i < 7; i++) {        
+      for (var i = 0; i < 7; i++) {            
         var date = keys[0];
         
         if (!date) {
           keys.shift();
+          html += '<td></td>';
           continue;
-        }
+        }        
+
         var dash = date.replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3');        
         var dayOfWeek = new Date(dash).getDay();  
 
@@ -165,22 +182,27 @@ body {
           }        
 
           // 메뉴
-          var menuHtml = '';
-          var secCount = data[date].length - 4;          
+          var menuHtml = '';          
 
-          if (data[date]) {
+          if (data[date] && data[date] != 0) {
             for (var j = 0; j < data[date].length; j++) {    
               var txt = data[date][j];
               
-              if (i == 4 && j < 2) {
+              if (i == 4 && j > 5) {
                 txt = '<b>' + txt + '</b>';
               }
 
-              if (j > secCount) {
+              if (j < 3) {
                 txt = '<span class="text-secondary">' + txt + '</span>'; 
-              }
+              }               
               
               menuHtml += '<p>' + txt + '</p>'; 
+
+              // if (j == 2) {
+              //   menuHtml += '<div style="border-top:3px dashed #4F9EC4"></div>'; 
+              // } else if (i == 4 && j == 5) {
+              //   menuHtml += '<div style="border-top:3px dashed #FF756D"></div>'; 
+              // } 
             }
           }
 
@@ -212,11 +234,7 @@ body {
     
     html += '</tbody>';
     html += '</table>';    
-
-    html += '<div class="mt-5">';    
-    html += '<button type="button" class="save-new btn btn-primary btn-lg btn-block">저장</button>';    
-    html += '</div>';    
-
+   
     $('.wrap-chart').html(html);    
   }
 

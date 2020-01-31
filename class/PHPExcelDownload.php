@@ -718,7 +718,7 @@ class PHPExcelDownload {
         $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');        
 
         header('Content-type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment; filename="CJ대한통운_운송장출력폼_'.date('YmdH').'.xlsx"');
+        header('Content-Disposition: attachment; filename="CJ대한통운_운송장출력폼_'.date('Ymd').'.xlsx"');
         header('Cache-Control: max-age=0');
         
         // 다운로드
@@ -966,7 +966,7 @@ class PHPExcelDownload {
         $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');        
 
         header('Content-type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment; filename="엑셀일괄발송_'.date('YmdH').'.xlsx"');
+        header('Content-Disposition: attachment; filename="엑셀일괄발송_'.date('Ymd').'.xlsx"');
         header('Cache-Control: max-age=0');
         
         // 다운로드

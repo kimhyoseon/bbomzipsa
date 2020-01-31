@@ -11,8 +11,14 @@ try {
 
     // print_r($data = json_encode($hanki->getMenu()));
     // exit();
+
+    if (empty($_POST)) {
+        throw new Exception(null, 400);
+    }        
     
-    if ($_POST['menu'] == 'new') {
+    if ($_POST['menu'] == 'view') {
+        $data = $hanki->getMenuExist();
+    } else if ($_POST['menu'] == 'new') {
         $data = json_encode($hanki->getMenu());
     } else if ($_POST['menu'] == 'saveNew') {
         if (empty($_POST['data'])) {

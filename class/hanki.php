@@ -21,81 +21,94 @@ class Hanki {
     public function __destruct() {
     }       
 
-/**
- * 식단 생성
- */
-function getMenu() {    
-    $this->year = date('Y', strtotime('+1 months'));
-    $this->month = date('m', strtotime('+1 months')); // 계산할 월    
-    $this->jshkData = include $_SERVER['DOCUMENT_ROOT'].'/class/PHPExcelDataJshk.php';     
-
-    // 공휴일 가져오기
-    // $this->getHoliday();
-
-    // 유효 배송일 계산
-    $this->getValidDay();
-
-    // 정기배송용 반찬 분류
-    $this->filterChan();
-
-    // 날짜에 맞게 반찬세트 생성
-    foreach ($this->validDay as $value) {
-        $dayOfWeek = date('w', strtotime($value));
-
-        $chans = $this->getBanchanSet($dayOfWeek);
-
-        $sort = array();
-
-        foreach ($chans as $v) {
-            $sort[] = $this->jshkDataSort[$v];
-        }  
-        
-        array_multisort($sort, SORT_DESC, $chans);
-        
-        // 목요일은 특별식
-        if ($dayOfWeek == 4) {
-            array_unshift($chans, $this->jshkDataSoup[0]);
-            array_unshift($chans, $this->jshkDataSpecial[0]);    
-
-            $c = array_shift($this->jshkDataSpecial);
-            $this->jshkDataSpecial[] = $c;
-            $c = array_shift($this->jshkDataSoup);
-            $this->jshkDataSoup[] = $c;
+    /**
+     * 식단 보기
+     */
+    function getMenuExist() {    
+        // 기존 정보 가져오기
+        if (file_exists($this->dailyFile)) {            
+            return file_get_contents($this->dailyFile);
         }
-        
-        $this->allDay[$value] = $chans;
-    }   
-
-    return $this->allDay;
-}
-
-/**
- * 한달간 유효일 가져오기
- */
-function getValidDay() {   
-    $lastDay = date("t", strtotime($this->year.$this->month.'01'));
-    
-    for ($i=1; $i <= $lastDay; $i++) { 
-      $d = sprintf("%02d", $i);
-      $ymd = $this->year.$this->month.$d;
-
-      $this->allDay[$ymd] = false;
-  
-      // 공휴일 체크
-      if (in_array($ymd, $this->holiday)) {          
-          continue;
-      }
-  
-      // 주말체크
-      $weekDay = date('w', strtotime($ymd));
-      
-      if ($weekDay == 0 || $weekDay == 1) {          
-          continue;
-      }
-  
-      $this->validDay[] = $ymd;
     }
-  }
+
+    /**
+     * 식단 생성
+     */
+    function getMenu() {    
+        $this->year = date('Y', strtotime('+1 months'));
+        $this->month = date('m', strtotime('+1 months')); // 계산할 월    
+        // $this->month = '04';
+        $this->jshkData = include $_SERVER['DOCUMENT_ROOT'].'/class/PHPExcelDataJshk.php';     
+
+        // 공휴일 가져오기
+        $this->getHoliday();
+
+        // 유효 배송일 계산
+        $this->getValidDay();
+
+        // 정기배송용 반찬 분류
+        $this->filterChan();
+
+        // 날짜에 맞게 반찬세트 생성
+        foreach ($this->validDay as $value) {
+            $dayOfWeek = date('w', strtotime($value));
+
+            $chans = $this->getBanchanSet($dayOfWeek);
+
+            $sort = array();
+
+            foreach ($chans as $v) {
+                $sort[] = $this->jshkDataSort[$v];
+            }  
+            
+            array_multisort($sort, SORT_DESC, $chans);
+            
+            // 목요일은 특별식
+            if ($dayOfWeek == 4) {
+                // array_unshift($chans, $this->jshkDataSoup[0]);
+                // array_unshift($chans, $this->jshkDataSpecial[0]);    
+                $chans[] = $this->jshkDataSpecial[0];
+                $chans[] = $this->jshkDataSoup[0];
+
+                $c = array_shift($this->jshkDataSpecial);
+                $this->jshkDataSpecial[] = $c;
+                $c = array_shift($this->jshkDataSoup);
+                $this->jshkDataSoup[] = $c;
+            }
+            
+            $this->allDay[$value] = $chans;
+        }   
+
+        return $this->allDay;
+    }
+
+    /**
+     * 한달간 유효일 가져오기
+     */
+    function getValidDay() {   
+        $lastDay = date("t", strtotime($this->year.$this->month.'01'));
+        
+        for ($i=1; $i <= $lastDay; $i++) { 
+            $d = sprintf("%02d", $i);
+            $ymd = $this->year.$this->month.$d;
+
+            $this->allDay[$ymd] = 0;
+        
+            // 공휴일 체크
+            if (in_array($ymd, $this->holiday)) {          
+                continue;
+            }
+        
+            // 주말체크
+            $weekDay = date('w', strtotime($ymd));
+            
+            if ($weekDay == 0 || $weekDay == 1) {          
+                continue;
+            }
+        
+            $this->validDay[] = $ymd;
+        }
+    }
   
   /**
    * 공휴일 가져오기
@@ -125,6 +138,10 @@ function getValidDay() {
     $newArr = json_decode($con, true); 
   
     if ($newArr['body']['totalCount'] == 0) return $this->holiday;
+
+    if (empty($newArr['body']['items']['item'][0])) {
+        $newArr['body']['items']['item'] = array($newArr['body']['items']['item']);
+    }    
   
     foreach ($newArr['body']['items']['item'] as $value) {
       if ($value['isHoliday'] != 'Y') continue;
