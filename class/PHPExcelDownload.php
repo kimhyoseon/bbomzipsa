@@ -1057,9 +1057,15 @@ class PHPExcelDownload {
             }
         }
 
+        // echo '<pre>';                            
+        // print_r($setMenuMerge);                
+        // echo '</pre>'; 
+
         if (!empty($body)) {
             $body = array_merge($setMenuMerge, $body);
-        }        
+        } else {
+            $body = $setMenuMerge;
+        }
 
         return array($filterMerged, $body);
     }
