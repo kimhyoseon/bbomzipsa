@@ -548,33 +548,33 @@ class PHPExcelDownload {
         // exit();
 
         // 합쳐지지 않은 배송건이 있는지 확인
-        // if (!self::TEST) {
-        //     $deleveryCheck = @json_decode(file_get_contents('./data/delevery_check.json'), true);
+        if (!self::TEST) {
+            $deleveryCheck = @json_decode(file_get_contents('./data/delevery_check.json'), true);
 
-        //     // 기존 내역이 없거나 과거인 경우 새로 만듬
-        //     if (empty($deleveryCheck) || $deleveryCheck['date'] != date('Ymd')) {
-        //         $deleveryCheck = array('date' => date('Ymd'));
-        //     }
+            // 기존 내역이 없거나 과거인 경우 새로 만듬
+            if (empty($deleveryCheck) || $deleveryCheck['date'] != date('Ymd')) {
+                $deleveryCheck = array('date' => date('Ymd'));
+            }
 
-        //     $checkIndexes = array(array_search('배송지', array_keys($filterMerged)), array_search('수취인연락처1', array_keys($filterMerged)));
+            $checkIndexes = array(array_search('배송지', array_keys($filterMerged)), array_search('수취인연락처1', array_keys($filterMerged)));
 
-        //     foreach ($bodyOver as $key => $value) {
-        //         // 중복된 내용이 존재한다면 경고
-        //         foreach ($checkIndexes as $index) {
-        //             if (!empty($value[$index])) {
-        //                 if (!empty($deleveryCheck[$value[$index]])) {
-        //                     exit("[{$value[$index]}] 내용으로 중복된 내용이 존재합니다. 확인해주세요.");
-        //                 } else {
-        //                     $deleveryCheck[$value[$index]] = 1;
-        //                 }
-        //             }
-        //         }            
-        //     }
+            foreach ($bodyOver as $key => $value) {
+                // 중복된 내용이 존재한다면 경고
+                foreach ($checkIndexes as $index) {
+                    if (!empty($value[$index])) {
+                        if (!empty($deleveryCheck[$value[$index]])) {
+                            exit("[{$value[$index]}] 내용으로 중복된 내용이 존재합니다. 확인해주세요.");
+                        } else {
+                            $deleveryCheck[$value[$index]] = 1;
+                        }
+                    }
+                }            
+            }
 
-        //     $fp = fopen('./data/delevery_check.json', 'w');
-        //     fwrite($fp, json_encode($deleveryCheck));
-        //     fclose($fp);
-        // }
+            $fp = fopen('./data/delevery_check.json', 'w');
+            fwrite($fp, json_encode($deleveryCheck));
+            fclose($fp);
+        }
         
         $bodyOptimized = array();  
 
