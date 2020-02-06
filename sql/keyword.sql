@@ -70,7 +70,7 @@ create table smartstore_stock (
     title varchar(100) NOT NULL comment '상품명',
     opt varchar(100) NOT NULL default '' comment '옵션',
     amount int(11) default 0 comment '재고',
-    period smallint NOT NULL default 0 comment '입고기간(일)',    
+    period smallint NOT NULL default 0 comment '입고기간(일)',
     PRIMARY KEY (id),
     INDEX title (title)
 );
@@ -193,13 +193,24 @@ drop table smartstore_order;
 create table smartstore_order (
     id int(11) NOT NULL comment '상품ID',
     date char(8) NOT NULL comment '년월일',
-    sale_cnt int(11) unsigned default 0 comment '일평균판매수',    
+    sale_cnt int(11) unsigned default 0 comment '일평균판매수',
     INDEX date (id, date)
 );
 
 INSERT INTO smartstore_order (id, date, sale_cnt) VALUES (1, '20200104', 30);
 INSERT INTO smartstore_order (id, date, sale_cnt) VALUES (1, '20200105', 40);
 INSERT INTO smartstore_order (id, date, sale_cnt) VALUES (1, '20200106', 50);
+
+-- 정성한끼 정기주문
+drop table smartstore_order_hanki;
+create table smartstore_order_hanki (
+    id BIGINT unsigned NOT NULL comment '상품주문번호',
+    date char(8) NOT NULL comment '년월일',
+    contents TEXT NOT NULL comment '주문데이터(serialize)',
+    PRIMARY KEY (id),
+    INDEX date (date)
+);
+delete from smartstore_order_hanki;
 
 
 drop table yoona_apt;
@@ -211,7 +222,7 @@ create table yoona_apt (
     upmyeondong varchar(20) NOT NULL default '' comment '읍면동',
     code_beopjeongdong char(10) NOT NULL default '' comment '법정동코드(10자리)',
     code_sigoongoo char(5) NOT NULL default '' comment '시군구코드',
-    code_eupmyeondong char(5) NOT NULL default '' comment '읍면동코드',    
+    code_eupmyeondong char(5) NOT NULL default '' comment '읍면동코드',
     number_apt varchar(20) NOT NULL default '' comment '아파트번호',
     road varchar(20) NOT NULL default '' comment '도로명',
     code_road varchar(10) NOT NULL default '' comment '도로명코드',
@@ -233,11 +244,11 @@ create table yoona_apt_deal (
     sale_count smallint NOT NULL default 0 comment '매매거래횟수',
     sale_price decimal(10) NOT NULL default 0 comment '평균매매가',
     sale_price_max decimal(10) NOT NULL default 0 comment '상위매매가',
-    sale_price_min decimal(10) NOT NULL default 0 comment '하위매매가',    
+    sale_price_min decimal(10) NOT NULL default 0 comment '하위매매가',
     jeonse_count smallint NOT NULL default 0 comment '전세거래횟수',
     jeonse_price decimal(10) NOT NULL default 0 comment '평균전세가',
     jeonse_price_max decimal(10) NOT NULL default 0 comment '상위전세가',
-    jeonse_price_min decimal(10) NOT NULL default 0 comment '하위전세가',    
+    jeonse_price_min decimal(10) NOT NULL default 0 comment '하위전세가',
     INDEX yoona_apt_id (yoona_apt_id),
     INDEX yoona_apt_date (yoona_apt_id, date, size)
 );
@@ -246,7 +257,7 @@ ALTER TABLE yoona_apt_deal MODIFY jeonse_count smallint;
 ALTER TABLE yoona_apt_deal MODIFY sale_count smallint;
 
 -- 지역 아파트 특정 기간 내 투자수익률순
-SELECT ya.id, ya.name_apt, yad.size, ya.year_build, ya.upmyeondong, ROUND(((bf.beforesale * ya.rank_index) - bf.beforesale) / (bf.beforesale - bf.beforejeonse) * 100) AS calc_sooicper, ROUND((af.aftersale - bf.beforesale) / (bf.beforesale - bf.beforejeonse) * 100) AS sooicper, ROUND((ya.rank_index - 1) * 100) AS calc_incper, ROUND((af.aftersale - bf.beforesale) / bf.beforesale * 100) AS incper, ROUND(af.aftersale - bf.beforesale) AS sooic, ROUND(bf.beforesale / yad.size * 3.3) AS priceper, ROUND(bf.beforesale - bf.beforejeonse) AS gap, ROUND(bf.salecount + bf.jeonsecount) AS countsum, ROUND(bf.beforesale) AS beforesale, ROUND(bf.beforejeonse) AS beforejeonse, ROUND(af.aftersale) AS aftersale, ROUND(af.afterjeonse) AS afterjeonse FROM yoona_apt_deal AS yad 
+SELECT ya.id, ya.name_apt, yad.size, ya.year_build, ya.upmyeondong, ROUND(((bf.beforesale * ya.rank_index) - bf.beforesale) / (bf.beforesale - bf.beforejeonse) * 100) AS calc_sooicper, ROUND((af.aftersale - bf.beforesale) / (bf.beforesale - bf.beforejeonse) * 100) AS sooicper, ROUND((ya.rank_index - 1) * 100) AS calc_incper, ROUND((af.aftersale - bf.beforesale) / bf.beforesale * 100) AS incper, ROUND(af.aftersale - bf.beforesale) AS sooic, ROUND(bf.beforesale / yad.size * 3.3) AS priceper, ROUND(bf.beforesale - bf.beforejeonse) AS gap, ROUND(bf.salecount + bf.jeonsecount) AS countsum, ROUND(bf.beforesale) AS beforesale, ROUND(bf.beforejeonse) AS beforejeonse, ROUND(af.aftersale) AS aftersale, ROUND(af.afterjeonse) AS afterjeonse FROM yoona_apt_deal AS yad
 LEFT JOIN (SELECT yoona_apt_id, size, AVG(sale_price) AS beforesale, AVG(jeonse_price) AS beforejeonse, AVG(sale_count) AS salecount, AVG(jeonse_count) AS jeonsecount FROM yoona_apt_deal WHERE date >= '201606' AND date <= '201612' AND sale_count > 0 AND jeonse_count > 0 GROUP BY yoona_apt_id, size) AS bf on bf.yoona_apt_id = yad.yoona_apt_id AND bf.size = yad.size
 LEFT JOIN (SELECT yoona_apt_id, size, MAX(sale_price) AS aftersale, MAX(jeonse_price) AS afterjeonse FROM yoona_apt_deal WHERE date >= '201909' AND date <= '201912' GROUP BY yoona_apt_id, size) AS af on af.yoona_apt_id = yad.yoona_apt_id AND af.size = yad.size
 LEFT JOIN yoona_apt AS ya on ya.id = yad.yoona_apt_id
@@ -258,7 +269,7 @@ LIMIT 100;
 
 
 -- 투자 유망한 아파트 포인트 순 정렬
-SELECT ya.id, ya.name_apt, yad.size, ya.year_build, ya.upmyeondong, ROUND(((bf.beforesale * ya.rank_index) - bf.beforesale) / (bf.beforesale - bf.beforejeonse) * 100) AS calc_sooicper, ROUND((ya.rank_index - 1) * 100) AS calc_incper, ROUND(bf.beforesale / yad.size * 3.3) AS priceper, ROUND(bf.beforesale - bf.beforejeonse) AS gap, ROUND(bf.salecount + bf.jeonsecount) AS countsum, ROUND(bf.beforesale) AS beforesale, ROUND(bf.beforejeonse) AS beforejeonse FROM yoona_apt_deal AS yad 
+SELECT ya.id, ya.name_apt, yad.size, ya.year_build, ya.upmyeondong, ROUND(((bf.beforesale * ya.rank_index) - bf.beforesale) / (bf.beforesale - bf.beforejeonse) * 100) AS calc_sooicper, ROUND((ya.rank_index - 1) * 100) AS calc_incper, ROUND(bf.beforesale / yad.size * 3.3) AS priceper, ROUND(bf.beforesale - bf.beforejeonse) AS gap, ROUND(bf.salecount + bf.jeonsecount) AS countsum, ROUND(bf.beforesale) AS beforesale, ROUND(bf.beforejeonse) AS beforejeonse FROM yoona_apt_deal AS yad
 LEFT JOIN (SELECT yoona_apt_id, size, MAX(sale_price) AS beforesale, MAX(jeonse_price) AS beforejeonse, AVG(sale_count) AS salecount, AVG(jeonse_count) AS jeonsecount FROM yoona_apt_deal WHERE date >= '201905' AND date <= '201911' AND sale_count > 0 AND jeonse_count > 0 GROUP BY yoona_apt_id, size) AS bf on bf.yoona_apt_id = yad.yoona_apt_id AND bf.size = yad.size
 LEFT JOIN yoona_apt AS ya on ya.id = yad.yoona_apt_id
 WHERE yad.yoona_apt_id IN (SELECT id FROM yoona_apt WHERE code_sigoongoo = '31140') AND bf.beforesale > 0 AND bf.beforejeonse > 0 AND yad.size > 50 AND yad.size < 100
@@ -270,7 +281,7 @@ LIMIT 100;
 
 
 -- 수지
-SELECT ya.id, ya.name_apt, yad.size, ya.year_build, ya.upmyeondong, ROUND(((bf.beforesale * ya.rank_index) - bf.beforesale) / (bf.beforesale - bf.beforejeonse) * 100) AS calc_sooicper, ROUND((af.aftersale - bf.beforesale) / (bf.beforesale - bf.beforejeonse) * 100) AS sooicper, ROUND((ya.rank_index - 1) * 100) AS calc_incper, ROUND((af.aftersale - bf.beforesale) / bf.beforesale * 100) AS incper, ROUND(af.aftersale - bf.beforesale) AS sooic, ROUND(bf.beforesale / yad.size * 3.3) AS priceper, ROUND(bf.beforesale - bf.beforejeonse) AS gap, ROUND(bf.salecount + bf.jeonsecount) AS countsum, ROUND(bf.beforesale) AS beforesale, ROUND(bf.beforejeonse) AS beforejeonse, ROUND(af.aftersale) AS aftersale, ROUND(af.afterjeonse) AS afterjeonse FROM yoona_apt_deal AS yad 
+SELECT ya.id, ya.name_apt, yad.size, ya.year_build, ya.upmyeondong, ROUND(((bf.beforesale * ya.rank_index) - bf.beforesale) / (bf.beforesale - bf.beforejeonse) * 100) AS calc_sooicper, ROUND((af.aftersale - bf.beforesale) / (bf.beforesale - bf.beforejeonse) * 100) AS sooicper, ROUND((ya.rank_index - 1) * 100) AS calc_incper, ROUND((af.aftersale - bf.beforesale) / bf.beforesale * 100) AS incper, ROUND(af.aftersale - bf.beforesale) AS sooic, ROUND(bf.beforesale / yad.size * 3.3) AS priceper, ROUND(bf.beforesale - bf.beforejeonse) AS gap, ROUND(bf.salecount + bf.jeonsecount) AS countsum, ROUND(bf.beforesale) AS beforesale, ROUND(bf.beforejeonse) AS beforejeonse, ROUND(af.aftersale) AS aftersale, ROUND(af.afterjeonse) AS afterjeonse FROM yoona_apt_deal AS yad
 LEFT JOIN (SELECT yoona_apt_id, size, AVG(sale_price) AS beforesale, AVG(jeonse_price) AS beforejeonse, AVG(sale_count) AS salecount, AVG(jeonse_count) AS jeonsecount FROM yoona_apt_deal WHERE date >= '201307' AND date <= '201312' AND sale_count > 0 AND jeonse_count > 0 GROUP BY yoona_apt_id, size) AS bf on bf.yoona_apt_id = yad.yoona_apt_id AND bf.size = yad.size
 LEFT JOIN (SELECT yoona_apt_id, size, MAX(sale_price) AS aftersale, MAX(jeonse_price) AS afterjeonse FROM yoona_apt_deal WHERE date >= '201906' AND date <= '201912' GROUP BY yoona_apt_id, size) AS af on af.yoona_apt_id = yad.yoona_apt_id AND af.size = yad.size
 LEFT JOIN yoona_apt AS ya on ya.id = yad.yoona_apt_id

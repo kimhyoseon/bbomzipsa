@@ -5,7 +5,7 @@ ini_set('display_errors', 1);
 
 if ($_GET && $_GET['excel'] == 1) {
   include_once($_SERVER['DOCUMENT_ROOT'].'/class/hanki.php');
-  $hanki = new Hanki(); 
+  $hanki = new Hanki();
   $hanki->excelOption();
   exit();
 }
@@ -29,7 +29,7 @@ body {
   height: 100%;
 }
 
-body {    
+body {
   background-color: #fff;
 }
 
@@ -45,7 +45,7 @@ body {
   width: 100%;
 }
 
-.table {
+.table.print {
   table-layout: fixed;
   border-collapse: collapse;
   border-style: hidden;
@@ -53,53 +53,75 @@ body {
   background-color: #fff;
 }
 
-.table th {
+.table.print th {
   text-align: center;
   font-size:2.5rem;
 }
 
-.table td {
+.table.print td {
   border: 1px solid #dee2e6;
 }
 
-.table td p {
+.table.print td p {
   margin-bottom: 0.1rem;
   text-align: center;
   font-size:2.2rem;
 }
 
-.table td .h6 {
+.table.print td .h6 {
   display: block;
-  margin-bottom: 0.5rem;  
+  margin-bottom: 0.5rem;
   font-size:2.2rem;
 }
 
 </style>
 
-<body>  
-    <div class="container-fluid">     
+<body>
+    <div class="container-fluid">
       <div class="container-fluid">
           <div class="row m-0 mt-2 mb-2">
               <ul class="list-group list-group-horizontal">
+                  <a href="#" class="list-menu" data-menu="order"><li class="list-group-item">주문보기</li></a>
                   <a href="#" class="list-menu" data-menu="view"><li class="list-group-item">메뉴보기</li></a>
                   <a href="#" class="list-menu" data-menu="new"><li class="list-group-item">메뉴생성</li></a>
                   <a href="#" class="option-excel"><li class="list-group-item">옵션다운로드</li></a>
               </ul>
           </div>
+          <div class="form-row">
+            <div class="col">
+              <select name="year" class="form-control form-control-lg">
+                <option value="2020">2020</option>
+              </select>
+            </div>
+            <div class="col">
+            <select name="month" class="form-control form-control-lg">
+              <?php
+              for ($i = 1; $i < 13; $i++) {
+                if ($i == date('n')) echo '<option selected="selected" value="'.$i.'">'.$i.'</option>';
+                else echo '<option value="'.$i.'">'.$i.'</option>';
+              }
+              ?>
+              </select>
+            </div>
+            <div class="col-10">
+            </div>
+          </div>
 
-          <div class="row m-0 mt-2 mb-2">
+          <div class="row m-0 mt-3 mb-2">
               <div class="wrap-chart"></div>
           </div>
-      </div>    
-    </div>    
+      </div>
+    </div>
 </body>
 
 <script>
   var dataNew = null;
 
-  function clickMenu(e) {    
-    menu = $(e.currentTarget).data('menu');    
-    
+  function clickMenu(e) {
+    var menu = $(e.currentTarget).data('menu');
+    var year = $('select[name=year]').val();
+    var month = $('select[name=month]').val();
+
     if (!menu) return false;
 
     $.ajax({
@@ -109,11 +131,13 @@ body {
         cache: false,
         timeout: 10000,
         data: {
-            menu: menu
+            menu: menu,
+            year: year,
+            month: month
         },
         success: function (result, textStatus) {
             console.log(result);
-            console.log(textStatus);    
+            console.log(textStatus);
             window['render' + menu](result);
             dataNew = result;
         },
@@ -123,10 +147,37 @@ body {
             console.log(jqXHR);
         },
         complete: function() {
-        } 
+        }
     });
 
-    return false;  
+    return false;
+  }
+
+  function renderorder(data) {
+    if (!data) return false;
+
+    var html = '';
+    html += '<table class="table">';
+    html += '<thead><tr><th scope="col">조리일</th><th scope="col">주문내역</th><th scope="col"></th></tr></thead>';
+    html += '<tbody>';
+
+    for (var i = 0; i < data.length; i++) {
+      var contents = [];
+      contents.push(data[i]['contents'][0]);
+      contents.push(data[i]['contents'][3]);
+      contents.push(data[i]['contents'][13]);
+
+      html += '<tr data-id="' + data[i]['id'] + '">';
+      html += '<td><input type="text" value="' + data[i]['date'] + '" class="form-control-sm form-control inp-date"/></td>';
+      html += '<td>' + contents.join(' / ') + '</td>';
+      html += '<td><button class="btn btn-secondary btn-sm mr-1 btn-edit-order">수정</button></td>';
+      html += '</tr>';
+    }
+
+    html += '</tbody>';
+    html += '</table>';
+
+    $('.wrap-chart').html(html);
   }
 
   function renderview(data) {
@@ -136,78 +187,78 @@ body {
   function rendernew(data) {
     renderCalendar(data);
     var html = '';
-    html += '<div class="mt-5">';    
-    html += '<button type="button" class="save-new btn btn-primary btn-lg btn-block">저장</button>';    
-    html += '</div>';    
+    html += '<div class="mt-5">';
+    html += '<button type="button" class="save-new btn btn-primary btn-lg btn-block">저장</button>';
+    html += '</div>';
 
-    $('.wrap-chart').append(html); 
+    $('.wrap-chart').append(html);
   }
 
   function renderCalendar(data) {
     if (!data) return false;
 
     var html = '';
-    html += '<table class="table">';
+    html += '<table class="table print">';
     html += '<thead><tr><th scope="col">화</th><th scope="col">수</th><th scope="col">목</th><th scope="col">금</th><th scope="col"><span class="text-primary">토</span></th></tr></thead>';
-    html += '<tbody>';        
+    html += '<tbody>';
 
     var keys = Object.keys(data);
-    
-    while (keys.length > 0) {      
-      html += '<tr>';        
 
-      for (var i = 0; i < 7; i++) {            
-        var date = keys[0];
-        
+    while (keys.length > 0) {
+      html += '<tr>';
+
+      for (var i = 0; i < 7; i++) {
+        var date = keys[0 ];
+
         if (!date) {
           keys.shift();
           html += '<td></td>';
           continue;
-        }        
+        }
 
-        var dash = date.replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3');        
-        var dayOfWeek = new Date(dash).getDay();  
+        var dash = date.replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3');
+        var dayOfWeek = new Date(dash).getDay();
 
-        if (dayOfWeek != i) {  
-          if (i == 0 || i == 1) {          
+        if (dayOfWeek != i) {
+          if (i == 0 || i == 1) {
             continue;
-          }        
+          }
 
           html += '<td></td>';
-        } else {  
+        } else {
           // 일, 월 제외
           if (i == 0 || i == 1) {
             keys.shift();
             continue;
-          }        
+          }
 
           // 메뉴
-          var menuHtml = '';          
+          var menuHtml = '';
 
           if (data[date] && data[date] != 0) {
-            for (var j = 0; j < data[date].length; j++) {    
+            for (var j = 0; j < data[date].length; j++) {
               var txt = data[date][j];
-              
+
               if (i == 4 && j > 5) {
                 txt = '<b>' + txt + '</b>';
               }
 
               if (j < 3) {
-                txt = '<span class="text-secondary">' + txt + '</span>'; 
-              }               
-              
-              menuHtml += '<p>' + txt + '</p>'; 
+                txt = '<span class="text-secondary">' + txt + '</span>';
+              }
+
+              menuHtml += '<p>' + txt + '</p>';
 
               // if (j == 2) {
-              //   menuHtml += '<div style="border-top:3px dashed #4F9EC4"></div>'; 
+              //   menuHtml += '<div style="border-top:3px dashed #4F9EC4"></div>';
               // } else if (i == 4 && j == 5) {
-              //   menuHtml += '<div style="border-top:3px dashed #FF756D"></div>'; 
-              // } 
+              //   menuHtml += '<div style="border-top:3px dashed #FF756D"></div>';
+              // }
             }
           }
 
-          var month = date.substr(4, 2).replace(/^0+/, '');          
-          var day = date.substr(6, 2).replace(/^0+/, '');          
+          var month = date.substr(4, 2).replace(/^0+/, '');
+          var day = date.substr(6, 2).replace(/^0+/, '');
 
           day = month + '/' + day;
 
@@ -219,7 +270,7 @@ body {
             day = '<span class="h6">' + day + '</span>';
           }
 
-          html += '<td>';          
+          html += '<td>';
           html += day;
           html += '<div>';
           html += menuHtml;
@@ -229,13 +280,13 @@ body {
         }
       }
 
-      html += '</tr>';    
+      html += '</tr>';
     }
-    
+
     html += '</tbody>';
-    html += '</table>';    
-   
-    $('.wrap-chart').html(html);    
+    html += '</table>';
+
+    $('.wrap-chart').html(html);
   }
 
   function saveNew() {
@@ -253,7 +304,7 @@ body {
         },
         success: function (result, textStatus) {
             console.log(result);
-            console.log(textStatus);                
+            console.log(textStatus);
 
             if (result['result'] == true) {
               alert('저장했습니다.');
@@ -267,7 +318,7 @@ body {
             console.log(jqXHR);
         },
         complete: function() {
-        } 
+        }
     });
   }
 
@@ -275,10 +326,50 @@ body {
     window.open('hanki.php?excel=1', '_blank');
   }
 
+  function editOrder(e) {
+    if (confirm("수정하시겠습니까?")) {
+        var row = $(e.currentTarget).closest('tr').eq(0);
+
+        var data = {
+            id: $(row).data('id'),
+            date: $(row).find('.inp-date').val(),
+        };
+
+        // console.log(data);
+
+        $.ajax({
+            type: 'POST',
+            url: '../api/hanki.php',
+            dataType : 'json',
+            timeout: 5000,
+            data: {
+                menu: 'editorder',
+                data: data
+            },
+            success: function (result, textStatus) {
+                console.log(result);
+                console.log(textStatus);
+
+                if (result['result'] == true) {
+                    location.reload();
+                }
+            },
+            error: function(result, textStatus, jqXHR) {
+                console.log(result);
+                console.log(textStatus);
+                console.log(jqXHR);
+            },
+            complete: function() {
+            }
+        });
+    }
+}
+
   $(document).ready(function() {
     $(document).on('click', '.list-menu', clickMenu);
     $(document).on('click', '.save-new', saveNew);
-    $(document).on('click', '.option-excel', optionExcel);    
+    $(document).on('click', '.option-excel', optionExcel);
+    $(document).on('click', '.btn-edit-order', editOrder);
   });
 </script>
 
