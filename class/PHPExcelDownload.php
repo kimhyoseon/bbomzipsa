@@ -2,7 +2,7 @@
 include_once('./class/PHPExcel.php');
 
 class PHPExcelDownload {
-    CONST TEST = false;
+    CONST TEST = true;
     CONST SHORTNAME = array(
         '두피마사지기' => '샴푸브러쉬',
         '페이스롤러' => '마사지롤러',
@@ -655,6 +655,7 @@ class PHPExcelDownload {
         foreach ($bodyOptimized as $key => $value) {
             $prevIndex = array_search('_운임타입', array_keys($filter));
             $nameIndex = array_search('상품명', array_keys($filter));
+            $amountIndex = array_search('수량', array_keys($filter));
 
             if (strpos($value[$nameIndex], '가정용대야') !== false) {                            ;
                 $bodyOptimized[$key][$prevIndex] = '2';
@@ -673,15 +674,20 @@ class PHPExcelDownload {
             // $bodyOptimized[$key][$nameIndex] = implode(chr(10), $titleLine);
 
             $sort[] = implode($title);
+
+            // 수량 2개인 경우 * 표시
+            if ($value[$amountIndex] > 1) {
+                $bodyOptimized[$key][$nameIndex] = '*'.$value[$nameIndex];
+            }
         }
+
+        // 상품명으로 정렬
+        array_multisort($sort, SORT_ASC, $bodyOptimized);
 
         // echo '<pre>';
         // print_r($bodyOptimized);
         // echo '</pre>';
         // exit();
-
-        // 상품명으로 정렬
-        array_multisort($sort, SORT_ASC, $bodyOptimized);
 
         $data = $bodyOptimized;
         $cntRow = sizeof($bodyOptimized);

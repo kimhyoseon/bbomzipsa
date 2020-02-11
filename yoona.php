@@ -22,7 +22,7 @@ body {
   height: 100%;
 }
 
-body {    
+body {
   background-color: #f5f5f5;
 }
 
@@ -34,14 +34,14 @@ body {
 }
 </style>
 
-<body>  
+<body>
     <div class="container-fluid">
         <div class="row m-0 mt-2 mb-2">
             <ul class="list-group list-group-horizontal">
                 <a href="#" class="list-menu" data-menu="simri"><li class="list-group-item" title="매주 금요일 업데이트(KB주간)">1. 심리차트(광역시,도)</li></a>
                 <a href="#" class="list-menu" data-menu="m1m2"><li class="list-group-item">2. M1/M2차트</li></a>
                 <a href="#" class="list-menu" data-menu="jeonmang"><li class="list-group-item" title="매달 말일 업데이트(KB월간)">3. 전망차트(광역시,도)</li></a>
-                <a href="#" class="list-menu" data-menu="jeonmang2"><li class="list-group-item" title="매주 금요일 업데이트(KB주간)">3-1. 전망차트(시군구)</li></a>                
+                <a href="#" class="list-menu" data-menu="jeonmang2"><li class="list-group-item" title="매주 금요일 업데이트(KB주간)">3-1. 전망차트(시군구)</li></a>
                 <a href="#" class="list-menu" data-menu="choongjeon"><li class="list-group-item" title="매주 금요일 업데이트(KB주간)">4. 충전차트(시군구)</li></a>
                 <a href="#" class="list-menu" data-menu="miboonyang"><li class="list-group-item">5. 미분양차트</li></a>
                 <a href="#" class="list-menu" data-menu="ingoo"><li class="list-group-item">6. 인구수차트</li></a>
@@ -55,7 +55,7 @@ body {
         <div class="row m-0 mt-2 mb-2">
             <div class="wrap-chart"></div>
         </div>
-    </div>    
+    </div>
 </body>
 
 <script>
@@ -64,9 +64,9 @@ var chartType = 'LineChart';
 var chartDetail = {};
 var region = '';
 
-function clickMenu(e) {    
-    menu = $(e.currentTarget).data('menu');    
-    
+function clickMenu(e) {
+    menu = $(e.currentTarget).data('menu');
+
     if (!menu) return false;
 
     $.ajax({
@@ -90,15 +90,15 @@ function clickMenu(e) {
             console.log(jqXHR);
         },
         complete: function() {
-        } 
+        }
     });
 
-    return false;  
+    return false;
 }
 
-function clickSigoongoo(e) {    
-    extra = $(e.currentTarget).data('code');    
-    
+function clickSigoongoo(e) {
+    extra = $(e.currentTarget).data('code');
+
     if (!extra) return false;
 
     $.ajax({
@@ -109,11 +109,11 @@ function clickSigoongoo(e) {
         timeout: 100000,
         data: {
             menu: menu + '_detail',
-            extra: extra 
+            extra: extra
         },
         success: function (result, textStatus) {
             console.log(result);
-            console.log(textStatus);                        
+            console.log(textStatus);
             window['render' + menu + 'Detail'](result);
         },
         error: function(result, textStatus, jqXHR) {
@@ -122,14 +122,14 @@ function clickSigoongoo(e) {
             console.log(jqXHR);
         },
         complete: function() {
-        } 
+        }
     });
 
-    return false;  
+    return false;
 }
 
 function callApi(data, callback) {
-    if (!data) return false;    
+    if (!data) return false;
 
     $.ajax({
         type: "POST",
@@ -140,10 +140,10 @@ function callApi(data, callback) {
         data: data,
         success: function (result, textStatus) {
             console.log(result);
-            console.log(textStatus); 
+            console.log(textStatus);
             if (callback && typeof callback == 'function') {
                 callback(result);
-            }                                   
+            }
         },
         error: function(result, textStatus, jqXHR) {
             console.log(result);
@@ -151,14 +151,14 @@ function callApi(data, callback) {
             console.log(jqXHR);
         },
         complete: function() {
-        } 
+        }
     });
 
-    return false;  
+    return false;
 }
 
 // 1. 심리차트 + 전세수급
-function rendersimri(data) {    
+function rendersimri(data) {
     // 데이터 준비
     if (data) {
         var chartData = {};
@@ -166,39 +166,39 @@ function rendersimri(data) {
         var chartDataMaeJeon = {};
         var chartTitle = {};
         var chartTitleJeonse = {};
-        var chartTitleMaeJeon = {};        
+        var chartTitleMaeJeon = {};
         var year = null;
         var lastDate = null;
-        
+
         // 심리차트
         for (var i = 0; i < data['simri'].length; i++) {
             if (i == 0) continue;
             if (i == 2) continue;
             if (i == 3) continue;
-            
+
             if (i == 1) {
-                for (var j = 0; j < data['simri'][i].length; j++) {                                    
+                for (var j = 0; j < data['simri'][i].length; j++) {
                     if (data['simri'][i][j]) {
                         // 오래 걸려서 특정 지역만 보기
                         if (region && data['simri'][i][j].indexOf(region) == -1) continue;
-                        
-                        chartTitle[j] = data['simri'][i][j];                        
+
+                        chartTitle[j] = data['simri'][i][j];
                     }
                 }
 
                 continue;
             }
-            
+
             if (!data['simri'][i][0]) continue;
-            
+
             // 연도 생성
-            var date = data['simri'][i][0].split('/');            
-            
+            var date = data['simri'][i][0].split('/');
+
             if (date.length == 3) {
                 year = date[0];
             } else {
                 data['simri'][i][0] = year + '/' + data['simri'][i][0];
-            }            
+            }
 
             if (year < 8) continue;
             else if (year == 8 && date[0] < 4) continue;
@@ -207,7 +207,7 @@ function rendersimri(data) {
                 if (!chartData[key]) {
                     chartData[key] = [];
                 }
-                
+
                 chartData[key].push([data['simri'][i][0], parseFloat(data['simri'][i][key]), parseFloat(data['simri'][i][(parseInt(key) + 1)])]);
             }
 
@@ -219,9 +219,9 @@ function rendersimri(data) {
             if (i == 0) continue;
             if (i == 2) continue;
             if (i == 3) continue;
-            
+
             if (i == 1) {
-                for (var j = 0; j < data['jeonse'][i].length; j++) {                                    
+                for (var j = 0; j < data['jeonse'][i].length; j++) {
                     if (data['jeonse'][i][j]) {
                         // 오래 걸려서 특정 지역만 보기
                         if (region && data['jeonse'][i][j].indexOf(region) == -1) continue;
@@ -232,12 +232,12 @@ function rendersimri(data) {
 
                 continue;
             }
-            
+
             if (!data['jeonse'][i][0]) continue;
-            
+
             // 연도 생성
             var date = data['jeonse'][i][0].split('/');
-            
+
             if (date.length == 3) {
                 year = date[0];
             } else {
@@ -251,89 +251,89 @@ function rendersimri(data) {
                 if (!chartDataJeonse[key]) {
                     chartDataJeonse[key] = [];
                 }
-                
+
                 chartDataJeonse[key].push([data['jeonse'][i][0], parseFloat(data['jeonse'][i][key]), parseFloat(data['jeonse'][i][(parseInt(key) + 1)]), parseFloat(data['jeonse'][i][(parseInt(key) + 2)])]);
-            }            
+            }
         }
-        
+
         // 매매, 전세 증감
         // for (var i = 0; i < data['maemae1'].length; i++) {
         //     if (i == 0) continue;
-        //     if (i == 2) continue;                
+        //     if (i == 2) continue;
 
-        //     if (i == 1) {            
-        //         for (var j = 1; j < data['maemae1'][i].length; j++) {                                    
-        //             if (data['maemae1'][i][j]) {                                        
+        //     if (i == 1) {
+        //         for (var j = 1; j < data['maemae1'][i].length; j++) {
+        //             if (data['maemae1'][i][j]) {
         //                 // 오래 걸려서 특정 지역만 보기
         //                 if (region && data['maemae1'][i][j].indexOf(region) == -1) continue;
-                        
-        //                 chartTitleMaeJeon[j] = data['maemae1'][i][j];                        
+
+        //                 chartTitleMaeJeon[j] = data['maemae1'][i][j];
         //             }
         //         }
 
         //         continue;
         //     }
-            
+
         //     if (!data['maemae1'][i][0]) continue;
 
         //     // 연도 생성
         //     var date = data['maemae1'][i][0].split('/');
-            
+
         //     if (date.length == 3) {
         //         year = date[0];
         //     } else {
         //         data['maemae1'][i][0] = year + '/' + data['maemae1'][i][0];
-        //     }        
+        //     }
 
         //     for (key in chartTitleMaeJeon) {
         //         if (!chartDataMaeJeon[key]) {
         //             chartDataMaeJeon[key] = [];
         //         }
-                
+
         //         var jeonse = parseFloat(data['jeonse1'][i][key]);
-        //         var maemae = parseFloat(data['maemae1'][i][key]);           
-                
+        //         var maemae = parseFloat(data['maemae1'][i][key]);
+
         //         chartDataMaeJeon[key].push([data['maemae1'][i][0], maemae, jeonse]);
         //     }
         // }
     }
-        
+
     // console.log(chartTitleJeonse);
     // console.log(chartDataJeonse);
     // console.log(chartTitleMaeJeon);
     // console.log(chartDataMaeJeon);
-    // return false;     
-    
+    // return false;
+
     // for (key in chartTitleMaeJeon) {
     //     console.log('?');
     //     chartType = 'ColumnChart';
-    
+
     //     var data = new google.visualization.DataTable();
     //     data.addColumn('string', 'Date');
     //     data.addColumn('number', '매매');
     //     data.addColumn('number', '전세');
-    //     data.addRows(chartDataMaeJeon[key]);        
+    //     data.addRows(chartDataMaeJeon[key]);
 
     //     var options = {
-    //         'title': chartTitleMaeJeon[key],                 
-    //         'legend': 'none', 
-    //         'width': getRowWidth(), 
-    //         'height': 300, 
-    //         vAxis: {                
+    //         'title': chartTitleMaeJeon[key],
+    //         'legend': 'none',
+    //         'width': getRowWidth(),
+    //         'height': 300,
+    //         vAxis: {
     //             viewWindow: {
     //                 max: 0.5,
     //                 min: -0.5
     //             }
-    //         }           
-    //     };        
+    //         }
+    //     };
 
-    //     drawChart(data, options);       
+    //     drawChart(data, options);
     // }
-    
+
     for (key in chartTitle) {
         chartType = 'LineChart';
 
-        // 심리차트 그리기        
+        // 심리차트 그리기
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Date');
         data.addColumn('number', '매도');
@@ -341,15 +341,15 @@ function rendersimri(data) {
         data.addRows(chartData[key]);
 
         var options = {
-            'title': chartTitle[key] + ' (' + lastDate + ')',                 
-            'legend': 'none', 
-            'width': getRowWidth(), 
+            'title': chartTitle[key] + ' (' + lastDate + ')',
+            'legend': 'none',
+            'width': getRowWidth(),
             'height': 300,
         };
 
         drawChart(data, options);
 
-        // 전세수급차트 그리기        
+        // 전세수급차트 그리기
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Date');
         data.addColumn('number', '수요');
@@ -358,28 +358,28 @@ function rendersimri(data) {
         data.addRows(chartDataJeonse[key]);
 
         var options = {
-            'title': chartTitleJeonse[key] + ' (' + lastDate + ')',                 
-            'legend': 'none', 
-            'width': getRowWidth(), 
+            'title': chartTitleJeonse[key] + ' (' + lastDate + ')',
+            'legend': 'none',
+            'width': getRowWidth(),
             'height': 300,
-            'series': {                
-                2: { 
-                    'targetAxisIndex': 1                    
-                }                
-            }, 
+            'series': {
+                2: {
+                    'targetAxisIndex': 1
+                }
+            },
             // 오른쪽 축만 별도로 옵션
-            'vAxes': { 
-                1: {               
+            'vAxes': {
+                1: {
                     viewWindow: {
                         max: 200,
                         min: 0
                     }
                 }
-            }    
+            }
         };
 
-        drawChart(data, options);        
-    }        
+        drawChart(data, options);
+    }
 }
 
 // 2. m1m2 차트
@@ -390,45 +390,45 @@ function renderm1m2(data) {
         var m1m2Sum = 0;
         var m1m2Average = 0;
         chartData['m1'] = [];
-        chartData['m1m2'] = [];        
-        
+        chartData['m1m2'] = [];
+
         for (var i = 0; i < data['m1'].length; i++) {
             var m1m2Ratio = parseFloat((data['m1'][i].DT/data['m2'][i].DT).toFixed(2));
             m1m2Sum += m1m2Ratio;
-            chartData['m1'].push([data['m1'][i].PRD_DE, parseFloat(data['m1'][i].DT)]);            
+            chartData['m1'].push([data['m1'][i].PRD_DE, parseFloat(data['m1'][i].DT)]);
             chartData['m1m2'].push([data['m1'][i].PRD_DE, m1m2Ratio]);
         }
 
         m1m2Average = parseFloat((m1m2Sum / data['m1'].length).toFixed(2));
 
-        for (var i = 0; i < data['m1'].length; i++) {            
+        for (var i = 0; i < data['m1'].length; i++) {
             chartData['m1m2'][i].push(m1m2Average);
         }
 
-        console.log(chartData);        
-        
+        console.log(chartData);
+
         chartType = 'ComboChart';
 
-        for (key in chartData) {        
+        for (key in chartData) {
             var data = new google.visualization.DataTable();
             data.addColumn('string', 'Date');
             data.addColumn('number', key);
-            
+
             if (key == 'm1m2') {
-                data.addColumn('number', key);            
+                data.addColumn('number', key);
             }
 
             data.addRows(chartData[key]);
 
             var options = {
-                'title': key,                 
-                'legend': 'none', 
+                'title': key,
+                'legend': 'none',
                 'seriesType': 'bars',
-                'width': getRowWidth(), 
-                'height': 300,              
+                'width': getRowWidth(),
+                'height': 300,
             };
 
-            if (key == 'm1m2') {                
+            if (key == 'm1m2') {
                 options.series = {1: {type: 'line'}};
             }
 
@@ -440,21 +440,21 @@ function renderm1m2(data) {
 // 3. 부동산전망 차트
 function renderjeonmang(data) {
     if (!data) return false;
-    
+
     var chartData = {};
     var chartTitle = {};
     var year = null;
-   
+
     // 날짜 맞춤
-    data['maemae'].splice(4, 33);    
-    
+    data['maemae'].splice(4, 33);
+
     for (var i = 0; i < data['maemae'].length; i++) {
         if (i == 0) continue;
         if (i == 2) continue;
         if (i == 3) continue;
-        
+
         if (i == 1) {
-            for (var j = 0; j < data['maemae'][i].length; j++) {                                    
+            for (var j = 0; j < data['maemae'][i].length; j++) {
                 if (data['maemae'][i][j]) {
                     chartTitle[j] = data['maemae'][i][j];
                 }
@@ -462,14 +462,14 @@ function renderjeonmang(data) {
 
             continue;
         }
-        
+
         if (!data['maemae'][i][0]) continue;
-        
-        // 연도 생성        
-        
+
+        // 연도 생성
+
         if (typeof data['maemae'][i][0] == 'string' && data['maemae'][i][0].indexOf('.') !== -1) {
-            year = data['maemae'][i][0].split('.')[0]                        
-            year = year.substring(1);         
+            year = data['maemae'][i][0].split('.')[0]
+            year = year.substring(1);
             data['maemae'][i][0] = data['maemae'][i][0].substring(1);
         } else {
             data['maemae'][i][0] = year + '.' + data['maemae'][i][0];
@@ -479,36 +479,36 @@ function renderjeonmang(data) {
             if (!chartData[key]) {
                 chartData[key] = [];
             }
-            
+
             var maemae = parseFloat(data['maemae'][i][(parseInt(key) + 1)]) - parseFloat(data['maemae'][i][(parseInt(key) + 3)]);
             var jeonse = parseFloat(data['jeonse'][i][(parseInt(key) + 1)]) - parseFloat(data['jeonse'][i][(parseInt(key) + 3)]);
 
             maemae = parseFloat(maemae.toFixed(2));
             jeonse = parseFloat(jeonse.toFixed(2));
-            
+
             chartData[key].push([data['maemae'][i][0], maemae, jeonse]);
         }
     }
-    
+
     // console.log(chartTitle);
     // console.log(chartData);
-    // return false;  
+    // return false;
 
     chartType = 'ColumnChart';
 
-    for (key in chartTitle) {        
+    for (key in chartTitle) {
         var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Date');        
+        data.addColumn('string', 'Date');
         data.addColumn('number', '매매');
-        data.addColumn('number', '전세');        
+        data.addColumn('number', '전세');
         data.addRows(chartData[key]);
 
         var options = {
-            'title': chartTitle[key],                 
-            'legend': 'none', 
-            'width': getRowWidth(), 
+            'title': chartTitle[key],
+            'legend': 'none',
+            'width': getRowWidth(),
             'height': 300,
-            vAxis: {                
+            vAxis: {
                 viewWindow: {
                     max: 100,
                     min: -100
@@ -516,26 +516,26 @@ function renderjeonmang(data) {
             }
         };
 
-        drawChart(data, options);   
-    } 
+        drawChart(data, options);
+    }
 }
 
 // 3. 부동산전망 차트2
 function renderjeonmang2(data) {
     if (!data) return false;
-    
+
     var chartData = {};
     var chartTitle = {};
     var year = null;
     var parentTitle = '';
-    
+
     for (var i = 0; i < data['maemae'].length; i++) {
         if (i == 0) continue;
-        if (i == 2) continue;                
+        if (i == 2) continue;
 
-        if (i == 1) {            
-            for (var j = 1; j < data['maemae'][i].length; j++) {                                    
-                if (data['maemae'][i][j]) {                                        
+        if (i == 1) {
+            for (var j = 1; j < data['maemae'][i].length; j++) {
+                if (data['maemae'][i][j]) {
                     // 부모 붙이기
                     if (data['maemae'][i][j] != '대구' && (data['maemae'][i][j].slice(-1) == '구' || data['maemae'][i][j].slice(-1) == '군')) {
                         data['maemae'][i][j] = parentTitle + data['maemae'][i][j];
@@ -545,19 +545,19 @@ function renderjeonmang2(data) {
 
                     // 오래 걸려서 특정 지역만 보기
                     if (region && data['maemae'][i][j].indexOf(region) == -1) continue;
-                    
+
                     chartTitle[j] = data['maemae'][i][j];
                 }
             }
 
             continue;
         }
-        
+
         if (!data['maemae'][i][0]) continue;
 
         // 연도 생성
         var date = data['maemae'][i][0].split('/');
-        
+
         if (date.length == 3) {
             year = date[0];
         } else {
@@ -566,11 +566,11 @@ function renderjeonmang2(data) {
 
         // 데이터가 많아서 올해 데이터만
         // if (year < 19) continue;
-        
+
         // // 연도 생성
         // if (typeof data['maemae'][i][0] == 'string' && data['maemae'][i][0].indexOf('.') !== -1) {
-        //     year = data['maemae'][i][0].split('.')[0]                        
-        //     year = year.substring(1);         
+        //     year = data['maemae'][i][0].split('.')[0]
+        //     year = year.substring(1);
         //     data['maemae'][i][0] = data['maemae'][i][0].substring(1);
         // } else {
         //     data['maemae'][i][0] = year + '.' + data['maemae'][i][0];
@@ -580,24 +580,24 @@ function renderjeonmang2(data) {
             if (!chartData[key]) {
                 chartData[key] = [];
             }
-            
+
             var jeonse = parseFloat(data['jeonse'][i][key]);
             var maemae = parseFloat(data['maemae'][i][key]);
 
             // maemae = parseFloat(maemae.toFixed(2));
             // jeonse = parseFloat(jeonse.toFixed(2));
-            
+
             chartData[key].push([data['maemae'][i][0], maemae, jeonse]);
         }
     }
-    
+
     // console.log(chartTitle);
     // console.log(chartData);
-    // return false;  
+    // return false;
 
     chartType = 'ColumnChart';
 
-    for (key in chartTitle) {        
+    for (key in chartTitle) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Date');
         data.addColumn('number', '매매');
@@ -605,53 +605,53 @@ function renderjeonmang2(data) {
         data.addRows(chartData[key]);
 
         var options = {
-            'title': chartTitle[key],                 
-            'legend': 'none', 
-            'width': getRowWidth(), 
-            'height': 300, 
-            vAxis: {                
+            'title': chartTitle[key],
+            'legend': 'none',
+            'width': getRowWidth(),
+            'height': 300,
+            vAxis: {
                 viewWindow: {
                     max: 0.5,
                     min: -0.5
                 }
-            }           
+            }
         };
 
-        drawChart(data, options);   
-    } 
+        drawChart(data, options);
+    }
 }
 
 // 4. 충전차트
-function renderchoongjeon(data) {       
+function renderchoongjeon(data) {
 
     if (!data) return false;
-    
+
     var chartData = {};
     var chartTitle = {};
     var year = null;
-    
+
     for (var i = 0; i < data['jeonse'].length; i++) {
         if (i == 0) continue;
-        if (i == 2) continue;            
-        
+        if (i == 2) continue;
+
         if (i == 1) {
-            for (var j = 1; j < data['jeonse'][i].length; j++) {                                    
+            for (var j = 1; j < data['jeonse'][i].length; j++) {
                 if (data['jeonse'][i][j]) {
                     // 오래 걸려서 특정 지역만 보기
                     if (region && data['jeonse'][i][j].indexOf(region) == -1) continue;
-                    
+
                     chartTitle[j] = data['jeonse'][i][j];
                 }
             }
 
             continue;
         }
-        
+
         if (!data['jeonse'][i][0]) continue;
-        
+
         // 연도 생성
         var date = data['jeonse'][i][0].split('/');
-        
+
         if (date.length == 3) {
             year = date[0];
         } else {
@@ -668,18 +668,18 @@ function renderchoongjeon(data) {
             var jeonse = parseFloat(jeonse.toFixed(2));
             var maemae = parseFloat(maemae.toFixed(2));
             var choongjeon = parseFloat((jeonse - maemae).toFixed(2));
-            
+
             chartData[key].push([data['jeonse'][i][0], jeonse, maemae, choongjeon]);
         }
-    }    
-        
+    }
+
     // console.log(chartTitle);
     // console.log(chartData);
-    // return false;  
-    
+    // return false;
+
     chartType = 'LineChart';
-    
-    for (key in chartTitle) {        
+
+    for (key in chartTitle) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Date');
         data.addColumn('number', '전세');
@@ -688,41 +688,41 @@ function renderchoongjeon(data) {
         data.addRows(chartData[key]);
 
         var options = {
-            'title': chartTitle[key],                 
-            'legend': 'none', 
-            'width': getRowWidth(), 
+            'title': chartTitle[key],
+            'legend': 'none',
+            'width': getRowWidth(),
             'height': 300,
-            'series': {                
-                2: { 
+            'series': {
+                2: {
                     'targetAxisIndex': 1
                 }
             },
         };
 
-        drawChart(data, options);        
+        drawChart(data, options);
     }
 }
 
 // 5. 미분양차트
-function rendermiboonyang(data) {   
-    if (!data) return false;    
-    
+function rendermiboonyang(data) {
+    if (!data) return false;
+
     var chartData = [];
     var index = 0;
     var min = 0;
     var max = 0;
 
-    for (var i = 0; i < data.length; i++) {    
+    for (var i = 0; i < data.length; i++) {
         if (!chartData[index]) chartData[index] = [];
 
         data[i]['DT'] = parseInt(data[i]['DT']) + 100
         data[i]['C1_NM'] = data[i]['C1_NM'] + ' ' + data[i]['C2_NM'];
-        
+
         // 추가 데이터
         if (!chartDetail[data[i]['C1_NM']]) {
-            chartDetail[data[i]['C1_NM']] = data[i]['C1'] + '||' + data[i]['C2'];            
+            chartDetail[data[i]['C1_NM']] = data[i]['C1'] + '||' + data[i]['C2'];
         }
-        
+
         chartData[index].push([data[i]['C1_NM'], data[i]['DT']]);
 
         if (min > data[i]['DT']) {
@@ -732,26 +732,26 @@ function rendermiboonyang(data) {
         if (max < data[i]['DT']) {
             max = data[i]['DT'];
         }
-        
+
         if (i > 0 && i % 20 == 0) index++;
-    }          
-    
-    // console.log(chartData);        
-    
+    }
+
+    // console.log(chartData);
+
     chartType = 'ColumnChart';
 
     for (var i = 0; i < chartData.length; i++) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', '시군구');
-        data.addColumn('number', '미분양');        
+        data.addColumn('number', '미분양');
         data.addRows(chartData[i]);
 
         var options = {
-            'title': '미분양차트',                 
-            'legend': 'none',             
-            'width': getRowWidth(), 
+            'title': '미분양차트',
+            'legend': 'none',
+            'width': getRowWidth(),
             'height': 300,
-            vAxis: {                
+            vAxis: {
                 viewWindow: {
                     max: max,
                     min: min
@@ -759,12 +759,12 @@ function rendermiboonyang(data) {
             }
         };
 
-        drawChart(data, options);        
-    }   
+        drawChart(data, options);
+    }
     // if (!data) return false;
-    
+
     // var chartData = {};
-    
+
     // for (var i = 0; i < data.length; i++) {
     //     for (var j = 0; j < data[i].length; j++) {
     //         if (!chartData[data[i][j]['C1_NM']]) {
@@ -773,81 +773,81 @@ function rendermiboonyang(data) {
 
     //         chartData[data[i][j]['C1_NM']].push([data[i][j]['PRD_DE'], parseInt(data[i][j]['DT'])]);
     //     }
-    // }           
-    
+    // }
+
     // chartType = 'ColumnChart';
 
-    // for (key in chartData) {        
+    // for (key in chartData) {
     //     var data = new google.visualization.DataTable();
     //     data.addColumn('string', 'Date');
-    //     data.addColumn('number', key);       
+    //     data.addColumn('number', key);
     //     data.addRows(chartData[key]);
 
     //     var options = {
-    //         'title': key,                 
-    //         'legend': 'none',             
-    //         'width': 1000, 
-    //         'height': 300,,                
+    //         'title': key,
+    //         'legend': 'none',
+    //         'width': 1000,
+    //         'height': 300,,
     //     };
 
     //     drawChart(data, options);
-    // }    
+    // }
 }
 
 // 5-1. 미분양 지역상세
-function rendermiboonyangDetail(data) {      
-    if (!data) return false;        
-    
+function rendermiboonyangDetail(data) {
+    if (!data) return false;
+
     var chartData = {};
-    
-    for (var i = 0; i < data.length; i++) {        
+
+    for (var i = 0; i < data.length; i++) {
         data[i]['C1_NM'] = data[i]['C1_NM'] + ' ' + data[i]['C2_NM'];
 
         if (!chartData[data[i]['C1_NM']]) {
             chartData[data[i]['C1_NM']] = [];
         }
 
-        chartData[data[i]['C1_NM']].push([data[i]['PRD_DE'], parseInt(data[i]['DT'])]);        
-    }           
-    
+        chartData[data[i]['C1_NM']].push([data[i]['PRD_DE'], parseInt(data[i]['DT'])]);
+    }
+
     chartType = 'ColumnChart';
 
-    for (key in chartData) {        
+    for (key in chartData) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Date');
-        data.addColumn('number', '미분양');       
+        data.addColumn('number', '미분양');
         data.addRows(chartData[key]);
 
         var options = {
-            'title': key,                 
-            'legend': 'none',             
-            'width': getRowWidth(), 
-            'height': 300,               
+            'title': key,
+            'legend': 'none',
+            'width': getRowWidth(),
+            'height': 300,
         };
 
         drawChart(data, options);
-    }        
+    }
 }
 
 // 6. 인구수 (최근 1개월 내)
-function renderingoo(data) {      
-    if (!data) return false;        
-    
+function renderingoo(data) {
+    if (!data) return false;
+
     var chartData = [];
     var index = 0;
     var min = 0;
     var max = 0;
 
-    for (var i = 1; i < data.length; i++) {    
+    for (var i = 1; i < data.length; i++) {
         if (!chartData[index]) chartData[index] = [];
 
         data[i]['DT'] = parseInt(data[i]['DT'])
-        
+
         // 추가 데이터
         if (!chartDetail[data[i]['C1_NM']]) {
             chartDetail[data[i]['C1_NM']] = data[i]['C1'];
         }
-        
+
         chartData[index].push([data[i]['C1_NM'], data[i]['DT']]);
 
         if (min > data[i]['DT']) {
@@ -857,54 +857,54 @@ function renderingoo(data) {
         if (max < data[i]['DT']) {
             max = data[i]['DT'];
         }
-        
+
         if (i > 0 && i % 20 == 0) index++;
-    }          
-    
-    // console.log(chartData);    
-    
+    }
+
+    // console.log(chartData);
+
     chartType = 'ColumnChart';
 
     for (var i = 0; i < chartData.length; i++) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', '시군구');
-        data.addColumn('number', '인구수');        
+        data.addColumn('number', '인구수');
         data.addRows(chartData[i]);
 
         var options = {
-            'title': '인구수',                 
-            'legend': 'none',             
-            'width': getRowWidth(), 
+            'title': '인구수',
+            'legend': 'none',
+            'width': getRowWidth(),
             'height': 300,
-            vAxis: {                
+            vAxis: {
                 viewWindow: {
                     max: max,
                     min: min
                 }
-            }                                    
+            }
         };
 
-        drawChart(data, options);        
+        drawChart(data, options);
     }
 }
 
 // 6-1. 인구수차트 지역상세
-function renderingooDetail(data) {      
+function renderingooDetail(data) {
     if (!data) return false;
-    
+
     var chartData = {};
-    
+
     for (var i = 0; i < data['ingoo'].length; i++) {
         if (!chartData[data['ingoo'][i]['C1_NM']]) {
             chartData[data['ingoo'][i]['C1_NM']] = [];
         }
 
-        chartData[data['ingoo'][i]['C1_NM']].push([data['ingoo'][i]['PRD_DE'], parseInt(data['ingoo'][i]['DT']), parseInt(data['sedae'][i]['DT'])]);        
-    }           
-    
+        chartData[data['ingoo'][i]['C1_NM']].push([data['ingoo'][i]['PRD_DE'], parseInt(data['ingoo'][i]['DT']), parseInt(data['sedae'][i]['DT'])]);
+    }
+
     chartType = 'LineChart';
 
-    for (key in chartData) {        
+    for (key in chartData) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Date');
         data.addColumn('number', '인구수');
@@ -912,40 +912,40 @@ function renderingooDetail(data) {
         data.addRows(chartData[key]);
 
         var options = {
-            'title': key,                 
-            'legend': 'none',             
-            'width': getRowWidth(), 
-            'height': 300, 
-            'series': {                
-                1: { 
+            'title': key,
+            'legend': 'none',
+            'width': getRowWidth(),
+            'height': 300,
+            'series': {
+                1: {
                     'targetAxisIndex': 1
                 }
-            },               
+            },
         };
 
         drawChart(data, options);
-    }      
+    }
 }
 
 // 7. 인구이동차트(최근3개월)
-function renderingooidong(data) {      
-    if (!data) return false;    
-    
+function renderingooidong(data) {
+    if (!data) return false;
+
     var chartData = [];
     var index = 0;
     var min = 0;
     var max = 0;
 
-    for (var i = 0; i < data.length; i++) {    
+    for (var i = 0; i < data.length; i++) {
         if (!chartData[index]) chartData[index] = [];
 
         data[i]['DT'] = parseInt(data[i]['DT'])
-        
+
         // 추가 데이터
         if (!chartDetail[data[i]['C1_NM']]) {
             chartDetail[data[i]['C1_NM']] = data[i]['C1'];
         }
-        
+
         chartData[index].push([data[i]['C1_NM'], data[i]['DT']]);
 
         if (min > data[i]['DT']) {
@@ -955,95 +955,95 @@ function renderingooidong(data) {
         if (max < data[i]['DT']) {
             max = data[i]['DT'];
         }
-        
+
         if (i > 0 && i % 20 == 0) index++;
-    }          
-    
-    // console.log(chartData);        
-    
+    }
+
+    // console.log(chartData);
+
     chartType = 'ColumnChart';
 
     for (var i = 0; i < chartData.length; i++) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', '시군구');
-        data.addColumn('number', '순이동');        
+        data.addColumn('number', '순이동');
         data.addRows(chartData[i]);
 
         var options = {
-            'title': '인구이동차트(최근3개월)',                 
-            'legend': 'none',             
-            'width': getRowWidth(), 
+            'title': '인구이동차트(최근3개월)',
+            'legend': 'none',
+            'width': getRowWidth(),
             'height': 300,
-            vAxis: {                
+            vAxis: {
                 viewWindow: {
                     max: max,
                     min: min
                 }
-            }                                    
+            }
         };
 
-        drawChart(data, options);        
+        drawChart(data, options);
     }
 }
 
 // 7-1. 인구이동차트 지역상세
-function renderingooidongDetail(data) {      
-    if (!data) return false;      
-    
+function renderingooidongDetail(data) {
+    if (!data) return false;
+
     var chartData = {};
-    
-    for (var i = 0; i < data.length; i++) {        
+
+    for (var i = 0; i < data.length; i++) {
         if (!chartData[data[i]['C1_NM']]) {
             chartData[data[i]['C1_NM']] = [];
         }
 
-        chartData[data[i]['C1_NM']].push([data[i]['PRD_DE'], parseInt(data[i]['DT'])]);        
-    }           
-    
+        chartData[data[i]['C1_NM']].push([data[i]['PRD_DE'], parseInt(data[i]['DT'])]);
+    }
+
     chartType = 'ColumnChart';
 
-    for (key in chartData) {        
+    for (key in chartData) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Date');
-        data.addColumn('number', key);       
+        data.addColumn('number', key);
         data.addRows(chartData[key]);
 
         var options = {
-            'title': key,                 
-            'legend': 'none',             
-            'width': getRowWidth(), 
-            'height': 300,              
+            'title': key,
+            'legend': 'none',
+            'width': getRowWidth(),
+            'height': 300,
         };
 
         drawChart(data, options);
-    }        
+    }
 }
 
 // 8. 평균연령
-function renderage(data) {          
-    if (!data) return false;    
-    
-    var chartData = {};    
+function renderage(data) {
+    if (!data) return false;
+
+    var chartData = {};
     var min = 0;
     var max = 0;
     var date = '';
 
-    for (var i = 0; i < data.length; i++) {    
+    for (var i = 0; i < data.length; i++) {
         if (i == 0) continue;
         if (i == 1) {
             date = data[i][1];
             continue;
         }
         if (i == 2) continue;
-        
+
         var codes = data[i][0].match(/\((.*)\)/);
         var name = '';
         var parent = 0;
-        
-        data[i][0] = data[i][0].substring(0, codes['index']);        
-        data[i][0] = data[i][0].split(' ').map(function(item) {            
+
+        data[i][0] = data[i][0].substring(0, codes['index']);
+        data[i][0] = data[i][0].split(' ').map(function(item) {
             if (item) {
-                // 부모                
+                // 부모
                 // console.log('parent', parent);
                 // console.log('name', name);
                 if (parent == 0) parent = name;
@@ -1052,20 +1052,20 @@ function renderage(data) {
                 name = item.trim();
                 return name;
             }
-        });        
-        
+        });
+
         // console.log(codes[1]);
-        // console.log(name);        
+        // console.log(name);
 
         data[i][3] = parseFloat(data[i][3])
-        
+
         // // 추가 데이터
         // if (!chartDetail[data[i]['C1_NM']]) {
         //     chartDetail[data[i]['C1_NM']] = data[i]['C1'];
         // }
 
         // console.log(parent);
-        // console.log(name);    
+        // console.log(name);
 
         if (!chartData[parent]) chartData[parent] = [];
         chartData[parent].push([name, data[i][3]]);
@@ -1079,14 +1079,14 @@ function renderage(data) {
         }
 
         // if (i > 100) return false;
-    }          
-    
-    // console.log(chartData);  
-    // return false;      
-    
-    chartType = 'ColumnChart';   
+    }
 
-    for (key in chartData) {   
+    // console.log(chartData);
+    // return false;
+
+    chartType = 'ColumnChart';
+
+    for (key in chartData) {
         // 오름차순 정렬
         chartData[key].sort(function (a, b) {
             if (a[1] > b[1]) {
@@ -1095,102 +1095,102 @@ function renderage(data) {
             if (a[1] < b[1]) {
                 return -1;
             }
-            
+
             return 0;
-        });        
+        });
 
         var data = new google.visualization.DataTable();
         data.addColumn('string', '읍면동');
-        data.addColumn('number', '평균연령');        
+        data.addColumn('number', '평균연령');
         data.addRows(chartData[key]);
-        
-        if (key == '0') title = '';        
-        else title = key        
+
+        if (key == '0') title = '';
+        else title = key
 
         var options = {
-            'title': title + ' 평균연령 (' + date + ')',                 
-            'legend': 'none',             
-            'width': getRowWidth(), 
+            'title': title + ' 평균연령 (' + date + ')',
+            'legend': 'none',
+            'width': getRowWidth(),
             'height': 300,
-            vAxis: {                
+            vAxis: {
                 viewWindow: {
                     max: max,
                     min: min
                 }
-            }                                    
+            }
         };
 
-        drawChart(data, options);        
-    } 
+        drawChart(data, options);
+    }
 }
 
 // 9. 아파트
-function renderapt(data) {          
-    if (!data) return false;       
-    
+function renderapt(data) {
+    if (!data) return false;
+
     var html = '<select class="form-control" id="apt-sigoongoo">';
     html    += '<option value="">- 시군구 -</option>';
 
-    for (var i = 0; i < data.length; i++) {   
+    for (var i = 0; i < data.length; i++) {
         html += '<option value="' + data[i]['code_sigoongoo'] + '">' + data[i]['sigoongoo'] + '</option>';
         html += '<li class="breadcrumb-item"><a href="#" class="sigoongoo" data-code="' + data[i]['C1'] + '">' + data[i]['C1_NM'] + '</a></li>';
-    } 
+    }
 
-    html += '</select>';        
+    html += '</select>';
 
-    $('.wrap-chart').html(html);    
+    $('.wrap-chart').html(html);
 }
 
 // 9-1. 아파트 랭킹 렌더링
-function renderaptSiRank(data) {          
-    if (!data) return false;           
-    
+function renderaptSiRank(data) {
+    if (!data) return false;
+
     var chartData = [];
-    
-    for (var i = 0; i < data.length; i++) {                
+
+    for (var i = 0; i < data.length; i++) {
         var aptName = data[i]['name_apt'] + ' (' + data[i]['upmyeondong'] + ', ' + data[i]['pyeong'] + '평)';
-        
+
         // 추가 데이터
         if (!chartDetail[aptName]) {
             chartDetail[aptName] = data[i]['id'];
         }
 
         // 아파트 상세정보
-        var detailText = data[i]['name_apt'] + ' (' + numberWithCommas(data[i]['price']) + ') \n';        
+        var detailText = data[i]['name_apt'] + ' (' + numberWithCommas(data[i]['price']) + ') \n';
         var isValueColor = true;
-        for (var j = 0; j < data[i]['detail'].length; j++) {            
+        for (var j = 0; j < data[i]['detail'].length; j++) {
             detailText += '*' + data[i]['detail'][j]['pyeong'] + '평' + ' (' + data[i]['detail'][j]['date'] + ') ';
-            detailText += numberWithCommas(data[i]['detail'][j]['sale_price']) + '-' + numberWithCommas(data[i]['detail'][j]['jeonse_price']) + '=' + numberWithCommas(parseInt(data[i]['detail'][j]['sale_price']) - parseInt(data[i]['detail'][j]['jeonse_price']));             
-            if (data[i]['detail'][j]['values'] && data[i]['detail'][j]['values'][0] > 0) {                
-                detailText +=  ' 가치 (' + data[i]['detail'][j]['values'][0] + '/' + data[i]['detail'][j]['values'][1] + ')';            
+            detailText += numberWithCommas(data[i]['detail'][j]['sale_price']) + '-' + numberWithCommas(data[i]['detail'][j]['jeonse_price']) + '=' + numberWithCommas(parseInt(data[i]['detail'][j]['sale_price']) - parseInt(data[i]['detail'][j]['jeonse_price']));
+            if (data[i]['detail'][j]['values'] && data[i]['detail'][j]['values'][0] > 0) {
+                detailText +=  ' 가치 (' + data[i]['detail'][j]['values'][0] + '/' + data[i]['detail'][j]['values'][1] + ')';
                 if (data[i]['detail'][j]['values'][0] > data[i]['detail'][j]['values'][1]) {
                     isValueColor = false;
                 }
             }
-            detailText += '\n';                                
+            detailText += '\n';
         }
-        
+
         var valueColor = '';
-        
+
         if (isValueColor == true) valueColor = 'green';
 
-        chartData.push([aptName, parseInt(data[i]['price']), detailText, valueColor]);        
-    }           
-    
+        chartData.push([aptName, parseInt(data[i]['price']), detailText, valueColor]);
+    }
+
     chartType = 'ColumnChart';
-    
+
     var data = new google.visualization.DataTable();
     data.addColumn('string', '아파트');
-    data.addColumn('number', '평당가격');           
+    data.addColumn('number', '평당가격');
     data.addColumn({type: 'string', role: 'tooltip'});
     data.addColumn({type: 'string', role: 'style'});
     data.addRows(chartData);
 
     var options = {
-        'title': '평당가격 순위',                 
-        'legend': 'none',             
-        'width': getRowWidth(), 
-        'height': 300,  
+        'title': '평당가격 순위',
+        'legend': 'none',
+        'width': getRowWidth(),
+        'height': 300,
         // 'focusTarget': 'category'
     };
 
@@ -1198,21 +1198,21 @@ function renderaptSiRank(data) {
 }
 
 // 9-2. 아파트 매매/전세, 가치 렌더링
-function renderaptDetail(data) {          
-    if (!data) return false;  
+function renderaptDetail(data) {
+    if (!data) return false;
 
     var startYm = data.price[0].date;
-    var priceDefault = {};    
-    var priceDates = {};  
+    var priceDefault = {};
+    var priceDates = {};
 
     var now = new Date();
     var month = now.getMonth() + 1;
-    month = (month > 9 ? '' : '0') + month;  
+    month = (month > 9 ? '' : '0') + month;
 
     for (var i = 0; i < data.price.length; i++) {
-        if (!priceDefault[data.price[i]['size']]) priceDefault[data.price[i]['size']] = {'jeonse_price': 0, 'jeonse_price_max': 0, 'jeonse_price_min': 0, 'sale_price': 0, 'sale_price_max': 0, 'sale_price_min': 0};                
-        if (!priceDates[data.price[i]['size']]) priceDates[data.price[i]['size']] = {};                
-        
+        if (!priceDefault[data.price[i]['size']]) priceDefault[data.price[i]['size']] = {'jeonse_price': 0, 'jeonse_price_max': 0, 'jeonse_price_min': 0, 'sale_price': 0, 'sale_price_max': 0, 'sale_price_min': 0};
+        if (!priceDates[data.price[i]['size']]) priceDates[data.price[i]['size']] = {};
+
         if (!priceDefault[data.price[i]['size']]['jeonse_price'] && data.price[i]['jeonse_price'] > 0) priceDefault[data.price[i]['size']]['jeonse_price'] = data.price[i]['jeonse_price'];
         if (!priceDefault[data.price[i]['size']]['jeonse_price_max'] && data.price[i]['jeonse_price_max'] > 0) priceDefault[data.price[i]['size']]['jeonse_price_max'] = data.price[i]['jeonse_price_max'];
         if (!priceDefault[data.price[i]['size']]['jeonse_price_min'] && data.price[i]['jeonse_price_min'] > 0) priceDefault[data.price[i]['size']]['jeonse_price_min'] = data.price[i]['jeonse_price_min'];
@@ -1225,7 +1225,7 @@ function renderaptDetail(data) {
 
     // console.log(priceDefault);
 
-    var yms = getYmArrayAfterYm(startYm);        
+    var yms = getYmArrayAfterYm(startYm);
 
     for (var size in priceDefault) {
         var titlePrice = data.info.name_apt + ' 매매/전세' + '(' + size + ')';
@@ -1237,7 +1237,7 @@ function renderaptDetail(data) {
         priceDefault[size]['chartData'][titleCount] = [];
         priceDefault[size]['chartData'][titleEnergy] = [];
 
-        for (var i = 0; i < yms.length; i++) {             
+        for (var i = 0; i < yms.length; i++) {
             if (priceDates[size][yms[i]]) {
                 if (priceDates[size][yms[i]]['jeonse_price'] > 0) priceDefault[size]['jeonse_price'] = priceDates[size][yms[i]]['jeonse_price'];
                 if (priceDates[size][yms[i]]['jeonse_price_max'] > 0) priceDefault[size]['jeonse_price_max'] = priceDates[size][yms[i]]['jeonse_price_max'];
@@ -1248,37 +1248,37 @@ function renderaptDetail(data) {
             }
 
             priceDefault[size]['chartData'][titlePrice].push([
-                yms[i], 
+                yms[i],
                 parseInt(priceDefault[size]['sale_price']),
                 // parseInt(priceDefault[size]['sale_price_max']),
                 // parseInt(priceDefault[size]['sale_price_min']),
                 parseInt(priceDefault[size]['jeonse_price']),
                 // parseInt(priceDefault[size]['jeonse_price_max']),
-                // parseInt(priceDefault[size]['jeonse_price_min']),                
+                // parseInt(priceDefault[size]['jeonse_price_min']),
                 (parseInt(priceDefault[size]['sale_price']) - parseInt(priceDefault[size]['jeonse_price'])),
             ]);
 
             priceDefault[size]['chartData'][titleCount].push([
-                yms[i], 
+                yms[i],
                 parseInt((priceDates[size][yms[i]] && priceDates[size][yms[i]]['sale_count'] || 0)),
-                parseInt((priceDates[size][yms[i]] && priceDates[size][yms[i]]['jeonse_count'] || 0)), 
+                parseInt((priceDates[size][yms[i]] && priceDates[size][yms[i]]['jeonse_count'] || 0)),
             ]);
-            
-            // 이번 달과 같다면 가격 추출            
+
+            // 이번 달과 같다면 가격 추출
             if (yms[i].substring(4, 6) == month) {
-                var year = yms[i].substring(0, 4);                
+                var year = yms[i].substring(0, 4);
                 var energy = getEnergy(year, priceDefault[size]['sale_price']);
-                
+
                 if (energy) {
                     energy = parseFloat(energy);
 
                     priceDefault[size]['chartData'][titleEnergy].push([
-                        year,                         
+                        year,
                         energy,
                     ]);
 
                     energies.push(energy);
-                }                
+                }
             }
         }
 
@@ -1289,82 +1289,82 @@ function renderaptDetail(data) {
             // console.log(energies);
             // console.log(sumEnergy);
             // console.log(averageEnergy);
-            
-            for (var i = 0; i < priceDefault[size]['chartData'][titleEnergy].length; i++) {  
+
+            for (var i = 0; i < priceDefault[size]['chartData'][titleEnergy].length; i++) {
                 priceDefault[size]['chartData'][titleEnergy][i][2] = parseFloat(averageEnergy);
-            }        
+            }
         }
     }
-    
-    console.log(priceDefault);    
+
+    console.log(priceDefault);
 
     for (var size in priceDefault) {
         var index = 0;
         console.log(priceDefault[size]);
-        for (var title in priceDefault[size]['chartData']) {            
+        for (var title in priceDefault[size]['chartData']) {
             console.log(priceDefault[size]['chartData'][title]);
             // 거래빈도
             if (title.indexOf('거래횟수') != -1) {
                 chartType = 'ColumnChart';
-                       
+
                 var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Date');                
-                data.addColumn('number', '매매거래');                
-                data.addColumn('number', '전세거래');                
+                data.addColumn('string', 'Date');
+                data.addColumn('number', '매매거래');
+                data.addColumn('number', '전세거래');
                 data.addRows(priceDefault[size]['chartData'][title]);
 
                 var options = {
-                    'title': title,                                     
-                    'width': getRowWidth(), 
-                    'height': 300,                 
+                    'title': title,
+                    'width': getRowWidth(),
+                    'height': 300,
                 };
 
-                drawChart(data, options);  
+                drawChart(data, options);
             // 매매/전세
             } else if (title.indexOf('매매/전세') != -1) {
                 chartType = 'LineChart';
-                       
+
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Date');
                 data.addColumn('number', '매매평균');
-                // data.addColumn('number', '매매상위');                
-                // data.addColumn('number', '매매하위');                                
+                // data.addColumn('number', '매매상위');
+                // data.addColumn('number', '매매하위');
                 data.addColumn('number', '전세평균');
                 // data.addColumn('number', '전세상위');
-                // data.addColumn('number', '전세하위');                                                
+                // data.addColumn('number', '전세하위');
                 data.addColumn('number', '갭');
                 data.addRows(priceDefault[size]['chartData'][title]);
 
                 var options = {
-                    'title': title,                                     
-                    'width': getRowWidth(), 
-                    'height': 300, 
-                    'series': {                
-                        2: { 
+                    'title': title,
+                    'width': getRowWidth(),
+                    'height': 300,
+                    'series': {
+                        2: {
                             'targetAxisIndex': 1,
                             'lineDashStyle': [1, 3]
                         }
                     },
                 };
 
-                drawChart(data, options);                        
+                drawChart(data, options);
             // 가치
             } else if (title.indexOf('가치차트') != -1) {
                 chartType = 'LineChart';
-                       
+
                 var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Date');                
+                data.addColumn('string', 'Date');
                 data.addColumn('number', '가치');
-                data.addColumn('number', '평균');                
+                data.addColumn('number', '평균');
                 data.addRows(priceDefault[size]['chartData'][title]);
 
                 var options = {
-                    'title': title,                                     
-                    'width': getRowWidth(), 
-                    'height': 300,                      
+                    'title': title,
+                    'width': getRowWidth(),
+                    'height': 300,
                 };
 
-                drawChart(data, options);  
+                drawChart(data, options);
             }
 
             index++;
@@ -1373,45 +1373,45 @@ function renderaptDetail(data) {
 }
 
 // 10. 아찌
-function renderazzi(data) {          
-    if (!data) return false;        
+function renderazzi(data) {
+    if (!data) return false;
 
-    var chartData = {};    
+    var chartData = {};
     var year = null;
     var beforePrice = {};
-    
+
     for (apt in data) {
         // 초기화
         chartData[apt] = {};
-        chartData[apt][apt + ' 거래량'] = []                
+        chartData[apt][apt + ' 거래량'] = []
         beforePrice[apt] = {};
 
         // 날짜별로 정렬
         var dataSort = {};
-        
+
         Object.keys(data[apt]).sort().forEach(function(key) {
             dataSort[key] = data[apt][key];
         });
-        
-        for (date in dataSort) {                 
+
+        for (date in dataSort) {
             // 거래량 데이터
-            chartData[apt][apt + ' 거래량'].push([date, parseFloat(data[apt][date]['total_prices']), parseFloat(data[apt][date]['total_jeonses']), parseFloat(data[apt][date]['total_prices_complete']), parseFloat(data[apt][date]['total_jeonses_complete'])]);            
-            
+            chartData[apt][apt + ' 거래량'].push([date, parseFloat(data[apt][date]['total_prices']), parseFloat(data[apt][date]['total_jeonses']), parseFloat(data[apt][date]['total_prices_complete']), parseFloat(data[apt][date]['total_jeonses_complete'])]);
+
             var sizeAll1 = Object.keys(data[apt][date]['prices']);
-            var sizeAll2 = Object.keys(data[apt][date]['jeonses']);                        
+            var sizeAll2 = Object.keys(data[apt][date]['jeonses']);
             var sizeAll = sizeAll1.concat(sizeAll2.filter((item) => sizeAll1.indexOf(item) < 0));
-            
+
             for (var i = 0; i < sizeAll.length; i++) {
                 // 초기화
                 var title1 = apt + ' 매매 ' + sizeAll[i] + '㎡';
                 var title2 = apt + ' 전세 ' + sizeAll[i] + '㎡';
-                
+
                 if (!chartData[apt][title1]) {
-                    chartData[apt][title1] = [];                    
-                }                
+                    chartData[apt][title1] = [];
+                }
                 if (!chartData[apt][title2]) {
-                    chartData[apt][title2] = [];                    
-                }       
+                    chartData[apt][title2] = [];
+                }
 
                 var zeroData1 = [0, 0, 0, 0];
                 var zeroData2 = [0, 0, 0, 0];
@@ -1422,7 +1422,7 @@ function renderazzi(data) {
                     }
 
                     zeroData1[0] = parseFloat(data[apt][date]['prices'][sizeAll[i]][0]);
-                    zeroData1[1] = beforePrice[apt][title1];                    
+                    zeroData1[1] = beforePrice[apt][title1];
                     zeroData1[2] = parseFloat(data[apt][date]['prices'][sizeAll[i]][1]);
                     zeroData1[3] = parseFloat(data[apt][date]['prices'][sizeAll[i]][2]);
 
@@ -1435,10 +1435,10 @@ function renderazzi(data) {
                     }
 
                     zeroData2[0] = parseFloat(data[apt][date]['jeonses'][sizeAll[i]][0]);
-                    zeroData2[1] = beforePrice[apt][title2];                    
+                    zeroData2[1] = beforePrice[apt][title2];
                     zeroData2[2] = parseFloat(data[apt][date]['jeonses'][sizeAll[i]][1]);
                     zeroData2[3] = parseFloat(data[apt][date]['jeonses'][sizeAll[i]][2]);
-                    
+
                     beforePrice[apt][title2] = zeroData2[2];
                 }
 
@@ -1447,7 +1447,7 @@ function renderazzi(data) {
                     zeroData1[0],
                     zeroData1[1],
                     zeroData1[2],
-                    zeroData1[3],                                        
+                    zeroData1[3],
                 ]);
 
                 chartData[apt][title2].push([
@@ -1455,60 +1455,60 @@ function renderazzi(data) {
                     zeroData2[0],
                     zeroData2[1],
                     zeroData2[2],
-                    zeroData2[3],                                        
+                    zeroData2[3],
                 ]);
-            }            
+            }
         }
 
         // break;
     }
 
-    console.log(chartData);    
-    
+    console.log(chartData);
+
     for (apt in chartData) {
         for (title in chartData[apt]) {
             if (title.indexOf('거래량') != -1) {
                 chartType = 'LineChart';
-                        
+
                 var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Date');                
-                data.addColumn('number', '매물(매매)');                
-                data.addColumn('number', '매물(전세)');                
-                data.addColumn('number', '거래완료(매매)');                
-                data.addColumn('number', '거래완료(전세)');                
+                data.addColumn('string', 'Date');
+                data.addColumn('number', '매물(매매)');
+                data.addColumn('number', '매물(전세)');
+                data.addColumn('number', '거래완료(매매)');
+                data.addColumn('number', '거래완료(전세)');
                 data.addRows(chartData[apt][title]);
 
                 var options = {
-                    'title': title,                                     
-                    'width': getRowWidth(), 
-                    'height': 300,                 
+                    'title': title,
+                    'width': getRowWidth(),
+                    'height': 300,
                 };
 
-                drawChart(data, options);  
+                drawChart(data, options);
             // 매매/전세
             } else if (title.indexOf('매매') != -1 || title.indexOf('전세') != -1) {
                 chartType = 'CandlestickChart';
-                        
+
                 var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Date');                
-                data.addColumn('number', '최저가');                
+                data.addColumn('string', 'Date');
+                data.addColumn('number', '최저가');
                 data.addColumn('number', '시작가');
-                data.addColumn('number', '종료가');                                                
-                data.addColumn('number', '최고가');                
+                data.addColumn('number', '종료가');
+                data.addColumn('number', '최고가');
                 data.addRows(chartData[apt][title]);
 
-                var options = {                    
-                    'title': title,                                     
-                    'width': getRowWidth(), 
-                    'height': 300, 
+                var options = {
+                    'title': title,
+                    'width': getRowWidth(),
+                    'height': 300,
                     'legend': 'none',
                     'candlestick': {
                         'fallingColor': { strokeWidth: 0, fill: '#a52714' }, // red
                         'risingColor': { strokeWidth: 0, fill: '#0000FF' }   // green
-                    }                    
+                    }
                 };
 
-                drawChart(data, options);                                    
+                drawChart(data, options);
             }
         }
 
@@ -1517,44 +1517,44 @@ function renderazzi(data) {
 }
 
 // breadcrumb sample
-// function renderage(data) {          
-//     if (!data) return false;     
-    
+// function renderage(data) {
+//     if (!data) return false;
+
 //     var html = '<nav aria-label="breadcrumb"><ol class="breadcrumb">';
 
-//     for (var i = 0; i < data.length; i++) {    
-         
+//     for (var i = 0; i < data.length; i++) {
+
 //         html += '<li class="breadcrumb-item"><a href="#" class="sigoongoo" data-code="' + data[i]['C1'] + '">' + data[i]['C1_NM'] + '</a></li>';
-//     } 
+//     }
 
-//     html += '</ol></nav>';        
+//     html += '</ol></nav>';
 
-//     $('.wrap-chart').html(html);    
+//     $('.wrap-chart').html(html);
 // }
-    
+
 function drawChart(data, options) {
     if (!data) return false;
-    if (!options) return false;    
-    
+    if (!options) return false;
+
     insertChart();
 
     var chart = new google.visualization[chartType]($('.chart-empty')[0]);
-    
-    chart.draw(data, options); 
 
-    // 차트 클릭 
+    chart.draw(data, options);
+
+    // 차트 클릭
     google.visualization.events.addListener(chart, 'select', function() {
         var selection = chart.getSelection();
 
         var message = '';
-        
+
         for (var i = 0; i < selection.length; i++) {
-            var item = selection[i]; 
+            var item = selection[i];
             var extra = chartDetail[data.getValue(item.row, 0)];
 
             console.log(data.getValue(item.row, 0))
-            console.log(extra);        
-            
+            console.log(extra);
+
             if (extra && window['render' + menu + 'Detail']) {
 
                 $.ajax({
@@ -1565,11 +1565,11 @@ function drawChart(data, options) {
                     timeout: 100000,
                     data: {
                         menu: menu + '_detail',
-                        extra: extra 
+                        extra: extra
                     },
                     success: function (result, textStatus) {
                         console.log(result);
-                        console.log(textStatus);                        
+                        console.log(textStatus);
                         window['render' + menu + 'Detail'](result);
                     },
                     error: function(result, textStatus, jqXHR) {
@@ -1578,14 +1578,14 @@ function drawChart(data, options) {
                         console.log(jqXHR);
                     },
                     complete: function() {
-                    } 
+                    }
                 });
-            }            
+            }
 
             // console.log(data.getValue(item.row, 0));
             // console.log(data.getValue(0, item.column));
             // console.log(data.getValue(item.row, item.column));
-        }        
+        }
     });
 
     $('.chart-empty').eq(0).removeClass('chart-empty');
@@ -1595,10 +1595,10 @@ function insertChart() {
     if ($('.chart-empty').length > 0) return false;
 
     var html = '';
-    
-    html += '<div class="row">';    
-    html += '<div class="mt-2 mb-2 col-sm"><div class="chart chart-empty"></div></div>';        
-    html += '</div> ';    
+
+    html += '<div class="row">';
+    html += '<div class="mt-2 mb-2 col-sm"><div class="chart chart-empty"></div></div>';
+    html += '</div> ';
 
     $('.wrap-chart').append(html);
 }
@@ -1611,17 +1611,17 @@ function getYmArrayAfterYm(startYm) {
     if (!startYm) return false;
 
     var startYear = parseInt(startYm.substring(0, 4));
-    var startMonth = parseInt(startYm.substring(4, 6)) - 1;               
+    var startMonth = parseInt(startYm.substring(4, 6)) - 1;
 
     var now = new Date();
     var ym = [];
-    
-    for (var d = new Date(startYear, startMonth, 1); d <= now; d.setMonth(d.getMonth() + 1)) {    
+
+    for (var d = new Date(startYear, startMonth, 1); d <= now; d.setMonth(d.getMonth() + 1)) {
         var year = d.getFullYear();
         var month = d.getMonth() + 1;
-        month = (month > 9 ? '' : '0') + month;        
-        ym.push(year + month);        
-    }    
+        month = (month > 9 ? '' : '0') + month;
+        ym.push(year + month);
+    }
 
     return ym;
 }
@@ -1648,9 +1648,9 @@ function getEnergy(year, price) {
     else if (year == '2016') energy = price / 58613376;
     else if (year == '2017') energy = price / 60031080;
     else if (year == '2018') energy = price / 61531857;
-    else if (year == '2019') energy = price / 63070153;    
-    else if (year == '2020') energy = price / 64646907;    
-    
+    else if (year == '2019') energy = price / 63070153;
+    else if (year == '2020') energy = price / 64646907;
+
     return (energy * 10000).toFixed(1)
 }
 
@@ -1666,15 +1666,15 @@ function numberWithCommas(x) {
 // function getYArrayAfterY(startY) {
 //     if (!startY) return false;
 
-//     var startYear = parseInt(startY.substring(0, 4));    
+//     var startYear = parseInt(startY.substring(0, 4));
 
 //     var now = new Date();
 //     var y = [];
-    
-//     for (var d = new Date(startYear, 0, 1); d <= now; d.setYear(d.getYear() + 1)) {    
-//         var year = d.getFullYear();                
-//         y.push(year);        
-//     }    
+
+//     for (var d = new Date(startYear, 0, 1); d <= now; d.setYear(d.getYear() + 1)) {
+//         var year = d.getFullYear();
+//         y.push(year);
+//     }
 
 //     return y;
 // }
@@ -1684,11 +1684,11 @@ $(document).ready(function() {
     $(document).on('click', '.sigoongoo', clickSigoongoo);
     $(document).on('change', '#apt-sigoongoo', function (){
         var code = $(this).val();
-        if (!code) return false;        
+        if (!code) return false;
         callApi({menu: 'apt_rank', extra: code}, renderaptSiRank);
     });
-    // $('.list-menu').on('click', clickMenu);    
-    
+    // $('.list-menu').on('click', clickMenu);
+
 
     // Load the Visualization API and the corechart package.
     google.charts.load('current', {'packages':['corechart']});
