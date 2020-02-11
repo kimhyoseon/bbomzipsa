@@ -2,7 +2,7 @@
 include_once('./class/PHPExcel.php');
 
 class PHPExcelDownload {
-    CONST TEST = true;
+    CONST TEST = false;
     CONST SHORTNAME = array(
         '두피마사지기' => '샴푸브러쉬',
         '페이스롤러' => '마사지롤러',
