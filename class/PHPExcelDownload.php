@@ -1134,7 +1134,7 @@ class PHPExcelDownload {
     public function getRegularMenu($db, $filterMerged) {
         $menus = array();
         $optionIndex = array_search('옵션정보', array_keys($filterMerged));
-        $date = date('Ymd');
+        $date = date('Ymd', strtotime('+1 days'));
         // $date = '20200303'; // 테스트
 
         $list = $db->query("SELECT * FROM smartstore_order_hanki WHERE date=? ", array($date));
