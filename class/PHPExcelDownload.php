@@ -1134,12 +1134,14 @@ class PHPExcelDownload {
     public function getRegularMenu($db, $filterMerged) {
         $menus = array();
         $optionIndex = array_search('옵션정보', array_keys($filterMerged));
-        $date = date('Ymd', strtotime('+1 days'));
+        $date = date('Ymd'); // 오늘자로 조회
         // $date = '20200303'; // 테스트
 
         $list = $db->query("SELECT * FROM smartstore_order_hanki WHERE date=? ", array($date));
 
         if (!empty($list)) {
+            $date = date('Ymd', strtotime('+1 days')); // 메뉴에서는 수령날짜로 조회
+
             if (file_exists($_SERVER['DOCUMENT_ROOT'].'/data/dailychan.json')) {
                 $dailyChan = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/data/dailychan.json'), true);
             }
