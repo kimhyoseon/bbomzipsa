@@ -94,18 +94,18 @@ class SearchForm extends React.Component {
             return false;
           }
 
-          // console.log(result);         
-          
+          // console.log(result);
+
           this.pushItems(result);
           this.state.keywords.push(keyword);
-          if (result.relKeywords) this.state.relkeyword = result.relKeywords.split(',');          
+          if (result.relKeywords) this.state.relkeyword = result.relKeywords.split(',');
 
           // 유사 키워드 모두 가져오기
           this.state.page = 1;
-          this.state.keyword = this.keywordInput.value;          
+          this.state.keyword = this.keywordInput.value;
           this.state.isSearching = false;
           this.setState(this.state);
-          
+
           // $('#btn-search-submit, .btn-search-categoty').removeClass('disabled');
 
           this.search();
@@ -153,15 +153,15 @@ class SearchForm extends React.Component {
         }
 
         this.state.items.push(items);
-        
+
         if (items.ignored != 2) {
-          this.state.itemsIds.push(items.id); 
+          this.state.itemsIds.push(items.id);
         }
       } else {
-        for (let index = 0; index < items.length; index++) {          
+        for (let index = 0; index < items.length; index++) {
           this.pushItems(items[index]);
         }
-      }       
+      }
     }
 
     searchCategory(event) {
@@ -169,11 +169,11 @@ class SearchForm extends React.Component {
 
       this.state.items = [];
       this.state.itemsIds = [];
-      this.state.page = 1;
+      // this.state.page = 1;
       this.state.relkeyword = null;
       this.state.detailId = null;
       this.state.keyword = null;
-      this.state.modeSearch = 'c';      
+      this.state.modeSearch = 'c';
       this.setState(this.state);
 
       this.search();
@@ -213,7 +213,7 @@ class SearchForm extends React.Component {
           if (!result || textStatus != 'success') {
             Layer.toast(textStatus);
             return false;
-          }          
+          }
 
           this.pushItems(result);
 
@@ -271,8 +271,8 @@ class SearchForm extends React.Component {
     btnMore() {
       if (this.state.modeSearch != 'c') return false;
       if (this.state.page < 2) return false;
-      
-      return (        
+
+      return (
         <button onClick={this.requestListMore} className="btn btn-secondary btn-lg btn-block">더보기</button>
       )
     }
@@ -280,6 +280,11 @@ class SearchForm extends React.Component {
     requestListMore() {
       Layer.toast('목록을 가져오는 중입니다. 잠시만 기다려 주세요.');
       this.search();
+    }
+
+    changePage(page) {
+      this.state.page = page.target.value;
+      this.setState(this.state);
     }
 
     render() {
@@ -295,6 +300,9 @@ class SearchForm extends React.Component {
                     <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                     카테고리 검색
                   </button>
+                </div>
+                <div className="col mb-1">
+                  <input type="text" id="page" autoComplete="off" onChange={(input) => this.changePage(input)} value={this.state.page} className="form-control mx-sm-3" />
                 </div>
               </div>
               <div className="form-group row mb-0">
