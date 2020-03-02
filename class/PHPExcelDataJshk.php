@@ -648,6 +648,21 @@ return array(
         '깨' => array(1, 'g', false, '국산'),
         '참기름' => array(2, 'g', false, '국산'),
     ),
+    '매콤닭갈비' => array( // 200g 2020-03-02
+        '_total' => array(200, 'g', false, ''),
+        '_expired' => array(4, 'days', false, ''),
+        '_special' => 1,
+
+        '닭다리살' => array(200, 'g', true, '브라질'),
+        '모듬야채' => array(50, 'g', true, '국산'),
+        '고추장볶음소스' => array(80, 'g', false, ''),
+        '간장볶음소스' => array(10, 'g', false, ''),
+        '깻잎' => array(10, 'g', true, '국산'),
+        '떡' => array(10, 'g', true, '호주'),
+        '고구마' => array(10, 'g', true, '국산'),
+        '깨' => array(1, 'g', false, '국산'),
+        '참기름' => array(2, 'g', false, '국산'),
+    ),
 
 
     // 국
