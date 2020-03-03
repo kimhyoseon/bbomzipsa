@@ -42,6 +42,14 @@ try {
         $data['data'] = $_POST['data'];
         $data['result'] = $hanki->saveJson($data['data']);
         $data = json_encode($data);
+    } else if ($_POST['menu'] == 'saveNewOver') {
+        if (empty($_POST['data'])) {
+            throw new Exception(null, 400);
+        }
+
+        $data['data'] = $_POST['data'];
+        $data['result'] = $hanki->saveJson($data['data'], true);
+        $data = json_encode($data);
     }
 
     if (empty($data)) {

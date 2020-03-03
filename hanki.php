@@ -208,10 +208,15 @@ body {
       html += '<tr>';
 
       for (var i = 0; i < 7; i++) {
-        var date = keys[0 ];
+        var date = keys[0];
 
         if (!date) {
           keys.shift();
+
+          if (i == 0 || i == 1) {
+            continue;
+          }
+
           html += '<td></td>';
           continue;
         }
@@ -239,7 +244,7 @@ body {
             for (var j = 0; j < data[date].length; j++) {
               var txt = data[date][j];
 
-              if (i == 4 && j > 5) {
+              if (j > 5) {
                 txt = '<b>' + txt + '</b>';
               }
 
@@ -309,7 +314,36 @@ body {
             if (result['result'] == true) {
               alert('저장했습니다.');
             } else {
-              alert('저장에 실패했습니다.');
+              if (confirm('이미 생성된 정보가 있습니다.\n다시 생성하시겠습니다? (데이터 삭제주의)')) {
+                $.ajax({
+                  type: "POST",
+                  url: '../api/hanki.php',
+                  dataType : 'json',
+                  cache: false,
+                  timeout: 10000,
+                  data: {
+                      menu: 'saveNewOver',
+                      data: dataNew
+                  },
+                  success: function (result, textStatus) {
+                      console.log(result);
+                      console.log(textStatus);
+
+                      if (result['result'] == true) {
+                        alert('저장했습니다.');
+                      } else {
+                        alert('저장에 실패했습니다.');
+                      }
+                  },
+                  error: function(result, textStatus, jqXHR) {
+                      console.log(result);
+                      console.log(textStatus);
+                      console.log(jqXHR);
+                  },
+                  complete: function() {
+                  }
+                });
+              }
             }
         },
         error: function(result, textStatus, jqXHR) {

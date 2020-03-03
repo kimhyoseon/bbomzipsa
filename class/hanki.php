@@ -128,10 +128,15 @@ class Hanki {
                 $sort[] = $this->jshkDataSort[$v];
             }
 
-            array_multisort($sort, SORT_DESC, $chans);
+            // 금, 토는 1인 메뉴에 나물도 들어갈 수 있도록 반대 sort
+            if ($dayOfWeek != 5 && $dayOfWeek != 6) {
+              array_multisort($sort, SORT_DESC, $chans);
+            } else {
+              array_multisort($sort, SORT_ASC, $chans);
+            }
 
-            // 목요일은 특별식
-            if ($dayOfWeek == 4) {
+            // 수, 금은 특별식
+            if ($dayOfWeek == 3 || $dayOfWeek == 5) {
                 // array_unshift($chans, $this->jshkDataSoup[0]);
                 // array_unshift($chans, $this->jshkDataSpecial[0]);
                 $chans[] = $this->jshkDataSpecial[0];
@@ -343,7 +348,7 @@ class Hanki {
   /**
    * 파일 저장
    */
-  function saveJson($data) {
+  function saveJson($data, $isOverWrite = false) {
       if (empty($data)) return false;
 
       $dailyChan = array();
@@ -355,7 +360,7 @@ class Hanki {
 
       // 기존 정보에 추가
       foreach ($data as $key => $value) {
-          if (!empty($dailyChan[$key])) return false;
+          if ($isOverWrite == false && !empty($dailyChan[$key])) return false;
 
           $dailyChan[$key] = $value;
       }
@@ -392,11 +397,11 @@ class Hanki {
             $ym = $m.'월'.$d.'일'.'('.$dayKor[$dayOfWeek].')';
 
             // $var = ltrim($var, '0');
-            $data[] = array($ym, '1인세트(3개)', 0, 9999, '', 'Y');
-            $data[] = array($ym, '2인세트(6개)', 7000, 9999, '', 'Y');
+            $data[] = array($ym, '1인세트(3개)', 0, 20, '', 'Y');
+            $data[] = array($ym, '2인세트(6개)', 7000, 20, '', 'Y');
 
-            if ($dayOfWeek == 4) {
-                $data[] = array($ym, '패밀리세트(8개)', 14000, 9999, '', 'Y');
+            if (sizeOf($value) > 6) {
+                $data[] = array($ym, '패밀리세트(8개)', 14000, 20, '', 'Y');
             }
         }
 
