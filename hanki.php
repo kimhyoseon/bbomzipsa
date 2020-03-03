@@ -314,35 +314,38 @@ body {
             if (result['result'] == true) {
               alert('저장했습니다.');
             } else {
+              var month = $('select[name=month]').val();
               if (confirm('이미 생성된 정보가 있습니다.\n다시 생성하시겠습니다? (데이터 삭제주의)')) {
-                $.ajax({
-                  type: "POST",
-                  url: '../api/hanki.php',
-                  dataType : 'json',
-                  cache: false,
-                  timeout: 10000,
-                  data: {
-                      menu: 'saveNewOver',
-                      data: dataNew
-                  },
-                  success: function (result, textStatus) {
-                      console.log(result);
-                      console.log(textStatus);
+                if (confirm(month + '월 데이터 리셋이 맞습니까? 다시 한번 확인하세요.')) {
+                  $.ajax({
+                    type: "POST",
+                    url: '../api/hanki.php',
+                    dataType : 'json',
+                    cache: false,
+                    timeout: 10000,
+                    data: {
+                        menu: 'saveNewOver',
+                        data: dataNew
+                    },
+                    success: function (result, textStatus) {
+                        console.log(result);
+                        console.log(textStatus);
 
-                      if (result['result'] == true) {
-                        alert('저장했습니다.');
-                      } else {
-                        alert('저장에 실패했습니다.');
-                      }
-                  },
-                  error: function(result, textStatus, jqXHR) {
-                      console.log(result);
-                      console.log(textStatus);
-                      console.log(jqXHR);
-                  },
-                  complete: function() {
-                  }
-                });
+                        if (result['result'] == true) {
+                          alert('저장했습니다.');
+                        } else {
+                          alert('저장에 실패했습니다.');
+                        }
+                    },
+                    error: function(result, textStatus, jqXHR) {
+                        console.log(result);
+                        console.log(textStatus);
+                        console.log(jqXHR);
+                    },
+                    complete: function() {
+                    }
+                  });
+                }
               }
             }
         },

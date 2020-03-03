@@ -16,6 +16,7 @@ class Hanki {
 
     public function __construct() {
         $this->dailyFile = $_SERVER['DOCUMENT_ROOT'].'/data/dailychan.json';
+        $this->dailyFileBakup = $_SERVER['DOCUMENT_ROOT'].'/data/dailychan.bak.json';
     }
 
     public function __destruct() {
@@ -364,6 +365,9 @@ class Hanki {
 
           $dailyChan[$key] = $value;
       }
+
+      // 기존 파일 백업
+      copy($this->dailyFile, $this->dailyFileBakup);
 
       $fp = fopen($this->dailyFile, 'w');
       fwrite($fp, json_encode($dailyChan));
