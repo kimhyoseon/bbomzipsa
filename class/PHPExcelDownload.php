@@ -380,7 +380,7 @@ class PHPExcelDownload {
     /**
      * cj택배
      */
-    public function cj($files) {
+    public function cj($files, $isOk = false) {
         if (empty($files)) return false;
 
         $inputFile = $files['tmp_name'];
@@ -548,7 +548,7 @@ class PHPExcelDownload {
         // exit();
 
         // 합쳐지지 않은 배송건이 있는지 확인
-        if (!self::TEST) {
+        if (!self::TEST && $isOk == false) {
             $deleveryCheck = @json_decode(file_get_contents('./data/delevery_check.json'), true);
 
             // 기존 내역이 없거나 과거인 경우 새로 만듬
