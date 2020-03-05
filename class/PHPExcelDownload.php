@@ -92,7 +92,7 @@ class PHPExcelDownload {
         $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 
         header('Content-type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment; filename="택배양식(쿠힛)_'.date('Ymd').'.xlsx"');
+        header('Content-Disposition: attachment; filename="코리아스포츠_쿠힛_주문서_'.date('Ymd').'.xlsx"');
         header('Cache-Control: max-age=0');
 
         // 다운로드
@@ -215,7 +215,7 @@ class PHPExcelDownload {
         $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 
         header('Content-type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment; filename="택배양식(쿠힛)_'.date('Ymd').'_계산서.xlsx"');
+        header('Content-Disposition: attachment; filename="코리아스포츠_쿠힛_주문서_'.date('Ymd').'.xlsx"');
         header('Cache-Control: max-age=0');
 
         // 다운로드
@@ -725,7 +725,7 @@ class PHPExcelDownload {
         $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
 
         header('Content-type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment; filename="CJ대한통운_운송장출력폼_'.date('Ymd').'.xlsx"');
+        header('Content-Disposition: attachment; filename="박동훈_쿠힛_주문서_'.date('Ymd').'.xlsx"');
         header('Cache-Control: max-age=0');
 
         // 다운로드
