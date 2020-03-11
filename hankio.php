@@ -166,6 +166,10 @@ for ($i = 0; $i < 14; $i++) {
     array_multisort($sort, SORT_DESC, $orderData2[$todayFull]);
   }
 
+  if (!empty($total[$todayFull]) && $total[$todayFull] == 0) {
+    unset($orderData2[$todayFull]);
+  }
+
   if (sizeOf($orderData2) > 6) break;
 }
 
