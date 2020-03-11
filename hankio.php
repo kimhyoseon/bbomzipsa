@@ -9,9 +9,10 @@ $chanFile = $_SERVER['DOCUMENT_ROOT'].'/data/dailychan.json';
 if (!file_exists($orderFile)) exit('주문정보를 찾을 수 없습니다.');
 if (!file_exists($chanFile)) exit('식단정보를 찾을 수 없습니다.');
 
-
 $dailyChan = json_decode(file_get_contents($chanFile), true);
 $orderData = json_decode(file_get_contents($orderFile), true);
+$modTime = filemtime($orderFile);
+$modTime = date('n월 j일 H시', $modTime);
 
 $week = array('일', '월', '화', '수', '목', '금', '토');
 $setWeek = array('', '베스트반찬세트(월요일조리후발송)', '국민반찬세트(화요일조리후발송)', '아들반찬세트(수요일조리후발송)', '엄마반찬세트(목요일조리후발송)', '아빠반찬세트(금요일조리후발송)', '');
@@ -30,11 +31,6 @@ foreach ($orderData as $option => $amount) {
 
   $orderData1[$date][] = [$set, $amount];
 }
-
-// echo '<pre>';
-// print_r($orderData1);
-// echo '</pre>';
-// exit();
 
 for ($i = 0; $i < 14; $i++) {
   $tomo = $i + 1;
@@ -58,6 +54,35 @@ for ($i = 0; $i < 14; $i++) {
   // print_r($todayWeek);
   // echo '</pre>';
   // exit();
+
+  // 기본찬 0개로 깔기
+  if (!empty($dailyChan[$tomo])) {
+    if (empty($orderData2[$todayFull])) $orderData2[$todayFull] = array();
+
+    // 정기배송
+    foreach ($dailyChan[$tomo] as $value) {
+      if (empty($orderData2[$todayFull][$value])) $orderData2[$todayFull][$value] = 0;
+    }
+
+    // 세트반찬
+    if (strpos($todaySet, '베스트반찬세트') !== false) {
+        $option = array('매콤진미채무침', '계란말이', '매콤어묵볶음', '감자베이컨볶음', '메추리알조림', '더덕무침');
+    } else if (strpos($todaySet, '국민반찬세트') !== false) {
+        $option = array('간장멸치견과류볶음', '건파래무침', '두부매콤조림', '연근조림', '간장미역줄기볶음', '무말랭이무침');
+    } else if (strpos($todaySet, '아들반찬세트') !== false) {
+        $option = array('매콤어묵볶음', '계란말이', '메추리알조림', '매콤건새우볶음', '마파두부', '소세지야채볶음');
+    } else if (strpos($todaySet, '엄마반찬세트') !== false) {
+        $option = array('간장미역줄기볶음', '콩나물무침', '깻잎무침', '새우젓애호박볶음', '아삭이된장무침', '무나물');
+    } else if (strpos($todaySet, '아빠반찬세트') !== false) {
+        $option = array('계란말이', '매콤멸치볶음', '두부조림', '검은콩조림', '간장가지볶음', '무말랭이무침');
+    }
+
+    foreach ($option as $v) {
+      if (empty($orderData2[$todayFull][$v])) $orderData2[$todayFull][$v] = 0;
+    }
+
+    if (empty($total[$todayFull])) $total[$todayFull] = 0;
+  }
 
   // 정기배송
   if (!empty($orderData1[$tomoKor]) && !empty($dailyChan[$tomo])) {
@@ -89,47 +114,56 @@ for ($i = 0; $i < 14; $i++) {
           $total[$todayFull] += $amount;
       }
     }
+  }
 
-    // 세트반찬
-    if (!empty($orderData1[$todaySet])) {
-      if (empty($orderData2[$todayFull])) $orderData2[$todayFull] = array();
+  // 세트반찬
+  if (!empty($orderData1[$todaySet])) {
+    if (empty($orderData2[$todayFull])) $orderData2[$todayFull] = array();
 
-      // 주문서를 돌면서
-      foreach ($orderData1[$tomoKor] as $value) {
-        if (strpos($todaySet, '베스트반찬세트') !== false) {
-            if (strpos($value, '2인세트') !== false) $option = array('매콤진미채무침', '계란말이', '매콤어묵볶음', '감자베이컨볶음', '메추리알조림', '더덕무침');
-            else if (strpos($value, '1인세트A') !== false) $option = array('매콤진미채무침', '계란말이', '매콤어묵볶음');
-            else if (strpos($value, '1인세트B') !== false) $option = array('감자베이컨볶음', '메추리알조림', '더덕무침');
-        } else if (strpos($todaySet, '국민반찬세트') !== false) {
-            if (strpos($value, '2인세트') !== false) $option = array('간장멸치견과류볶음', '건파래무침', '두부매콤조림', '연근조림', '간장미역줄기볶음', '무말랭이무침');
-            else if (strpos($value, '1인세트A') !== false) $option = array('간장멸치견과류볶음', '건파래무침', '두부매콤조림');
-            else if (strpos($value, '1인세트B') !== false) $option = array('연근조림', '간장미역줄기볶음', '무말랭이무침');
-        } else if (strpos($todaySet, '아들반찬세트') !== false) {
-            if (strpos($value, '2인세트') !== false) $option = array('매콤어묵볶음', '계란말이', '메추리알조림', '매콤건새우볶음', '마파두부', '소세지야채볶음');
-            else if (strpos($value, '1인세트A') !== false) $option = array('매콤어묵볶음', '계란말이', '메추리알조림');
-            else if (strpos($value, '1인세트B') !== false) $option = array('매콤건새우볶음', '마파두부', '소세지야채볶음');
-        } else if (strpos($todaySet, '엄마반찬세트') !== false) {
-            if (strpos($value, '2인세트') !== false) $option = array('간장미역줄기볶음', '콩나물무침', '깻잎무침', '새우젓애호박볶음', '아삭이된장무침', '무나물');
-            else if (strpos($value, '1인세트A') !== false) $option = array('간장미역줄기볶음', '콩나물무침', '깻잎무침');
-            else if (strpos($value, '1인세트B') !== false) $option = array('새우젓애호박볶음', '아삭이된장무침', '무나물');
-        } else if (strpos($todaySet, '아빠반찬세트') !== false) {
-            if (strpos($value, '2인세트') !== false) $option = array('계란말이', '매콤멸치볶음', '두부조림', '검은콩조림', '간장가지볶음', '무말랭이무침');
-            else if (strpos($value, '1인세트A') !== false) $option = array('계란말이', '매콤멸치볶음', '두부조림');
-            else if (strpos($value, '1인세트B') !== false) $option = array('검은콩조림', '간장가지볶음', '무말랭이무침');
-        }
+    // 주문서를 돌면서
+    foreach ($orderData1[$todaySet] as $value) {
+      $set = $value[0];
+      $amount = $value[1];
 
-        foreach ($option as $v) {
-          if (empty($orderData2[$todayFull][$v])) $orderData2[$todayFull][$v] = 0;
-
-          $orderData2[$todayFull][$v] += $amount;
-
-          if (empty($total[$todayFull])) $total[$todayFull] = 0;
-          $total[$todayFull] += $amount;
-        }
+      if (strpos($todaySet, '베스트반찬세트') !== false) {
+          if (strpos($set, '2인세트') !== false) $option = array('매콤진미채무침', '계란말이', '매콤어묵볶음', '감자베이컨볶음', '메추리알조림', '더덕무침');
+          else if (strpos($set, '1인세트A') !== false) $option = array('매콤진미채무침', '계란말이', '매콤어묵볶음');
+          else if (strpos($set, '1인세트B') !== false) $option = array('감자베이컨볶음', '메추리알조림', '더덕무침');
+      } else if (strpos($todaySet, '국민반찬세트') !== false) {
+          if (strpos($set, '2인세트') !== false) $option = array('간장멸치견과류볶음', '건파래무침', '두부매콤조림', '연근조림', '간장미역줄기볶음', '무말랭이무침');
+          else if (strpos($set, '1인세트A') !== false) $option = array('간장멸치견과류볶음', '건파래무침', '두부매콤조림');
+          else if (strpos($set, '1인세트B') !== false) $option = array('연근조림', '간장미역줄기볶음', '무말랭이무침');
+      } else if (strpos($todaySet, '아들반찬세트') !== false) {
+          if (strpos($set, '2인세트') !== false) $option = array('매콤어묵볶음', '계란말이', '메추리알조림', '매콤건새우볶음', '마파두부', '소세지야채볶음');
+          else if (strpos($set, '1인세트A') !== false) $option = array('매콤어묵볶음', '계란말이', '메추리알조림');
+          else if (strpos($set, '1인세트B') !== false) $option = array('매콤건새우볶음', '마파두부', '소세지야채볶음');
+      } else if (strpos($todaySet, '엄마반찬세트') !== false) {
+          if (strpos($set, '2인세트') !== false) $option = array('간장미역줄기볶음', '콩나물무침', '깻잎무침', '새우젓애호박볶음', '아삭이된장무침', '무나물');
+          else if (strpos($set, '1인세트A') !== false) $option = array('간장미역줄기볶음', '콩나물무침', '깻잎무침');
+          else if (strpos($set, '1인세트B') !== false) $option = array('새우젓애호박볶음', '아삭이된장무침', '무나물');
+      } else if (strpos($todaySet, '아빠반찬세트') !== false) {
+          if (strpos($set, '2인세트') !== false) $option = array('계란말이', '매콤멸치볶음', '두부조림', '검은콩조림', '간장가지볶음', '무말랭이무침');
+          else if (strpos($set, '1인세트A') !== false) $option = array('계란말이', '매콤멸치볶음', '두부조림');
+          else if (strpos($set, '1인세트B') !== false) $option = array('검은콩조림', '간장가지볶음', '무말랭이무침');
       }
 
-      unset($orderData1[$todaySet]);
+      foreach ($option as $v) {
+        if (empty($orderData2[$todayFull][$v])) $orderData2[$todayFull][$v] = 0;
+
+        $orderData2[$todayFull][$v] += $amount;
+
+        if (empty($total[$todayFull])) $total[$todayFull] = 0;
+        $total[$todayFull] += $amount;
+      }
     }
+
+    unset($orderData1[$todaySet]);
+  }
+
+  // 정렬
+  if (!empty($orderData2[$todayFull])) {
+    $sort = array_values($orderData2[$todayFull]);
+    array_multisort($sort, SORT_DESC, $orderData2[$todayFull]);
   }
 
   if (sizeOf($orderData2) > 6) break;
@@ -180,6 +214,10 @@ h2 {
   text-align: center;
   color: green;
   margin-top: .5em;
+}
+
+.text-info {
+  width: 100%;
   margin-bottom: .5em;
 }
 
@@ -215,6 +253,7 @@ h2 {
       <div class="container-fluid">
           <div class="row m-0 mt-3 mb-2">
               <h2>정성한끼 주문표</h2>
+              <div class="text-info text-center">(<?=$modTime?> 업데이트)</div>
               <div class="wrap-chart">
                 <?php foreach ($orderData2 as $key => $value) { ?>
                 <table class="table print">
