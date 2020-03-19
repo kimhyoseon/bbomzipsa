@@ -46,11 +46,6 @@ for ($i = 0; $i < 14; $i++) {
   $todaySet = $setWeek[date("w", strtotime($todaystr))];
   $todayFull = $todayKor."({$todayWeek})";
 
-  // 조회 당일이고 현재시간이 조리마감 이후라면 세트반찬은 노출X
-  if ($i == 0 && date('H') > 8) {
-    $todaySet = '';
-  }
-
   // echo '<pre>';
   // print_r($today);
   // print_r($todayKor);
@@ -119,6 +114,11 @@ for ($i = 0; $i < 14; $i++) {
           $total[$todayFull] += $amount;
       }
     }
+  }
+
+  // 조회 당일이고 현재시간이 조리마감 이후라면 세트반찬은 노출X
+  if ($i == 0 && date('H') > 8) {
+    $todaySet = '';
   }
 
   // 세트반찬
