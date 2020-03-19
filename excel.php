@@ -22,6 +22,8 @@ if (!empty($_POST)) {
         } else {
             $excel->sendall($_FILES['input'], $_FILES['output'], null);
         }
+    } else if ($_POST['type'] == 'sendall_lotte') {
+        $excel->sendallLotte($_FILES['input'], $_FILES['output'], null);
     } else if ($_POST['type'] == 'hanki') {
         $excel->jshkCj($_FILES['input']);
     } else if ($_POST['type'] == 'jshk_basket') {
@@ -109,6 +111,7 @@ body {
                 <option value="hanki">정성한끼</option>
                 <option value="jshk_basket">정성한끼 조리표</option>
                 <option value="jshk_sticker">정성한끼 스티커</option>
+                <option value="sendall_lotte">엑셀일괄발송(롯데)</option>
                 <!-- <option value="wmp">위메프</option>                                 -->
                 <!-- <option value="wmp_sendall">위메프일괄발송</option>                                 -->
             </select>
@@ -141,7 +144,7 @@ body {
 </body>
 <script>
 $('select[name=type]').change(function(){
-    if ($(this).val() == 'sendall') {
+    if ($(this).val() == 'sendall' || $(this).val() == 'sendall_lotte') {
         $('.wrap-output, .wrap-direct').show();
     } else {
         $('.wrap-output, .wrap-direct').hide();
