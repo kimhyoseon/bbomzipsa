@@ -39,7 +39,7 @@ foreach ($orderData as $option => $amount) {
 
 // DB 정보 조합
 $accountDb = parse_ini_file("./config/db.ini");
-require_once dirname(__FILE__).'./class/pdo.php';
+require_once './class/pdo.php';
 $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
 $listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date >= ? ORDER BY date ASC", array(date('Ymd')));
