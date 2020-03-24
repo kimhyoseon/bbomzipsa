@@ -14,9 +14,14 @@ $orderData = json_decode(file_get_contents($orderFile), true);
 $modTime = filemtime($orderFile);
 $modTime = date('n월 j일 H시', $modTime);
 
+// echo '<pre>';
+// print_r($orderData);
+// echo '</pre>';
+// exit();
+
 $week = array('일', '월', '화', '수', '목', '금', '토');
 $setWeek = array('', '베스트반찬세트(월요일조리후발송)', '국민반찬세트(화요일조리후발송)', '아들반찬세트(수요일조리후발송)', '엄마반찬세트(목요일조리후발송)', '아빠반찬세트(금요일조리후발송)', '');
-$total = $orderData1 = $orderData2 =array();
+$orderInfo = $totalDelevery = $total = $orderData1 = $orderData2 = array();
 
 foreach ($orderData as $option => $amount) {
   $optionFull = $option;
@@ -30,6 +35,90 @@ foreach ($orderData as $option => $amount) {
   if (empty($orderData1[$date])) $orderData1[$date] = array();
 
   $orderData1[$date][] = [$set, $amount];
+}
+
+// DB 정보 조합
+$accountDb = parse_ini_file("./config/db.ini");
+require_once dirname(__FILE__).'./class/pdo.php';
+$db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+$listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date >= ? ORDER BY date ASC", array(date('Ymd')));
+
+// echo '<pre>';
+// print_r($orderData1);
+// print_r($listDb);
+// echo '</pre>';
+// exit();
+
+if (!empty($listDb)) {
+  foreach ($listDb as $value) {
+    $contents = unserialize($value['contents']);
+    $option = $contents['13'];
+    $options = explode('/', $option);
+    $date = trim(explode(':', $options[0])[1]);
+    if (strpos($date, '반찬세트') === false) {
+      $date = trim(preg_replace("/\([^)]+\)/", "", $date));
+    }
+    $set = trim(explode(':', $options[1])[1]);
+
+    // echo '<pre>';
+    // print_r($date);
+    // echo '</pre>';
+
+    $isInsert = false;
+
+    // id값이 없다면 그냥 추가
+    if (empty($value['id'])) {
+      if (!empty($orderData1[$date])) {
+        foreach ($orderData1[$date] as $k => $v) {
+          if ($set == $v[0]) {
+            $orderData1[$date][$k][1] = $v[1] + 1;
+            $isInsert = true;
+          }
+        }
+      }
+
+      // 못찾은 경우에는 새로 삽입
+      if ($isInsert == false) {
+        $orderData1[$date][] = [$set, 1];
+      }
+
+      if (empty($orderInfo[$date]['DB주문 추가'])) {
+        $orderInfo[$date]['DB주문 추가'] = 1;
+      } else {
+        $orderInfo[$date]['DB주문 추가']++;
+      }
+    // , 구분으로 반찬을 변경한 경우
+    } else if (strpos($set, ',') !== false) {
+      if (!empty($orderData1[$date])) {
+        foreach ($orderData1[$date] as $k => $v) {
+          if (substr($set, 0, 4) == substr($v[0], 0, 4)) {
+            $orderData1[$date][$k][1] = $v[1] - 1;
+
+            // if ($orderData1[$date][$k][1] < 1) {
+            //   unset($orderData1[$date][$k]);
+            // }
+          }
+        }
+      }
+
+      // 변경메뉴는 새로 삽입
+      $orderData1[$date][] = [$set, 1];
+
+      if (empty($orderInfo[$date]['DB주문 변경'])) {
+        $orderInfo[$date]['DB주문 변경'] = 1;
+      } else {
+        $orderInfo[$date]['DB주문 변경']++;
+      }
+    // 그 밖에는 관리자사이트에서 정보가 들어가기 때문에 PASS
+    } else {
+      if (empty($orderInfo[$date]['DB주문 알수없음'])) {
+        $orderInfo[$date]['DB주문 알수없음'] = 1;
+      } else {
+        $orderInfo[$date]['DB주문 알수없음']++;
+      }
+    }
+  }
 }
 
 for ($i = 0; $i < 14; $i++) {
@@ -84,8 +173,13 @@ for ($i = 0; $i < 14; $i++) {
     if (empty($total[$todayFull])) $total[$todayFull] = 0;
   }
 
-  // 정기배송
+  // 정기배송 (수령일(내일) 기준으로 검색 후 오늘에 삽입)
   if (!empty($orderData1[$tomoKor]) && !empty($dailyChan[$tomo])) {
+    // 정보 상세
+    if (!empty($orderInfo[$tomoKor])) {
+      $orderInfo[$todayFull] = $orderInfo[$tomoKor];
+    }
+
     if (empty($orderData2[$todayFull])) $orderData2[$todayFull] = array();
 
     // 주문서를 돌면서
@@ -94,17 +188,31 @@ for ($i = 0; $i < 14; $i++) {
 
       $option = $value[0];
       $amount = $value[1];
+      $menuIndex = false;
 
-      if (strpos($option, '1인') !== false) $menuAmount = 3;
+      if (strpos($option, ',') !== false) {
+        // 괄호안 index를 배열로 추출
+        $menuAmount = 8;
+        preg_match('#\((.*?)\)#', $option, $match);
+        $menuIndex = explode(',', $match[1]);
+        // echo '<pre>';
+        // print_r($menuIndex);
+        // echo '</pre>';
+        // exit();
+      }
+      else if (strpos($option, '1인') !== false) $menuAmount = 3;
       else if (strpos($option, '2인') !== false) $menuAmount = 6;
       else if (strpos($option, '패밀리') !== false) $menuAmount = 8;
 
       if ($menuAmount == 0) exit($option.'올바르지 않은 옵션입니다.');
 
       for ($j = 0; $j < $menuAmount; $j++) {
-          // 주석풀자
-          if (empty($dailyChan[$tomo][$j])) exit($tomoKor.' '.$j.'번째 메뉴를 찾을 수 없습니다.');
-          // if (empty($dailyChan[$tomo][$j])) continue;
+          // if (empty($dailyChan[$tomo][$j])) exit($tomoKor.' '.$j.'번째 메뉴를 찾을 수 없습니다.');
+          if (empty($dailyChan[$tomo][$j])) continue;
+
+          if (!empty($menuIndex)) {
+            if (in_array($j, $menuIndex) == false) continue;
+          }
 
           if (empty($orderData2[$todayFull][$dailyChan[$tomo][$j]])) $orderData2[$todayFull][$dailyChan[$tomo][$j]] = 0;
 
@@ -113,6 +221,9 @@ for ($i = 0; $i < 14; $i++) {
           if (empty($total[$todayFull])) $total[$todayFull] = 0;
           $total[$todayFull] += $amount;
       }
+
+      if (empty($totalDelevery[$todayFull])) $totalDelevery[$todayFull] = 0;
+      $totalDelevery[$todayFull] += $amount;
     }
   }
 
@@ -160,6 +271,9 @@ for ($i = 0; $i < 14; $i++) {
         if (empty($total[$todayFull])) $total[$todayFull] = 0;
         $total[$todayFull] += $amount;
       }
+
+      if (empty($totalDelevery[$todayFull])) $totalDelevery[$todayFull] = 0;
+      $totalDelevery[$todayFull] += $amount;
     }
 
     unset($orderData1[$todaySet]);
@@ -177,6 +291,12 @@ for ($i = 0; $i < 14; $i++) {
 
   if (sizeOf($orderData2) > 6) break;
 }
+
+// echo '<pre>';
+// print_r($orderInfo);
+// print_r($totalDelevery);
+// echo '</pre>';
+// exit();
 
 // echo '<pre>';
 // print_r($orderData2);
@@ -225,6 +345,11 @@ h2 {
   margin-top: .5em;
 }
 
+.text-secondary {
+  font-size: .8em;
+  font-weight: normal;
+}
+
 .text-info {
   width: 100%;
   margin-bottom: .5em;
@@ -266,7 +391,16 @@ h2 {
               <div class="wrap-chart">
                 <?php foreach ($orderData2 as $key => $value) { ?>
                 <table class="table print">
-                  <thead><tr><th scope="col"><?=$key?> (<?=$total[$key]?>개)</th></thead>
+                <!-- // print_r($orderInfo);
+                // print_r($totalDelevery); -->
+                  <thead><tr><th scope="col">
+                    <div><?=$key?> (<?=$total[$key]?>개 / <?=$totalDelevery[$key]?>명)</div>
+                    <?php if (!empty($orderInfo[$key])) { ?>
+                      <?php foreach ($orderInfo[$key] as $k => $v) { ?>
+                        <div class="text-secondary"><?=$k?> <?=$v?></div>
+                      <?php } ?>
+                    <?php } ?>
+                  </th></thead>
                   <tbody>
                     <td>
                     <?php foreach ($value as $k => $v) { ?>

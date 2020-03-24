@@ -22,6 +22,7 @@ if ($_GET && $_GET['excel'] == 1) {
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="/js/jsoneditor.min.js"></script>
 </head>
 <style>
 html,
@@ -112,10 +113,33 @@ body {
           </div>
       </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">주문수정</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <input type="hidden" id="edit-orderdetail-id" />
+          <input type="hidden" id="edit-orderdetail-date" />
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary btn-save-edit-orderdetail">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
 </body>
 
 <script>
   var dataNew = null;
+  var orderDetail = {};
+  var editorJson = null;
 
   function clickMenu(e) {
     var menu = $(e.currentTarget).data('menu');
@@ -170,8 +194,10 @@ body {
       html += '<tr data-id="' + data[i]['id'] + '">';
       html += '<td><input type="text" value="' + data[i]['date'] + '" class="form-control-sm form-control inp-date"/></td>';
       html += '<td>' + contents.join(' / ') + '</td>';
-      html += '<td><button class="btn btn-secondary btn-sm mr-1 btn-edit-order">수정</button></td>';
+      html += '<td><button class="btn btn-secondary btn-sm mr-1 btn-edit-order">수정</button><button class="btn btn-primary btn-sm mr-1 btn-edit-order-detail" data-toggle="modal" data-target="#exampleModal">주문수정</button></td>';
       html += '</tr>';
+
+      orderDetail[data[i]['id']] = data[i]['contents'];
     }
 
     html += '</tbody>';
@@ -400,13 +426,82 @@ body {
             }
         });
     }
-}
+  }
+
+  function editOrderDetail(e) {
+    if (editorJson) editorJson.destroy();
+
+    var row = $(e.currentTarget).closest('tr').eq(0);
+
+    var data = {
+        id: $(row).data('id'),
+        date: $(row).find('.inp-date').val(),
+    };
+
+    var jsonData = JSON.parse(JSON.stringify(orderDetail[data['id']]));
+    var jsonDataConvert = {};
+
+    for (const key in jsonData) {
+      if (jsonData.hasOwnProperty(key)) {
+        jsonDataConvert[key] = {default: jsonData[key]};
+      }
+    }
+
+    $('#edit-orderdetail-id').val(data['id']);
+    $('#edit-orderdetail-date').val(data['date']);
+
+    editorJson = new JSONEditor($(".modal-body").get(0), {
+      theme: 'bootstrap3',
+      schema: {
+        type: "object",
+        title: data['id'],
+        properties: jsonDataConvert
+      }
+    });
+  }
+
+  function saveEditOrderDetail() {
+    var data = {
+        id: $('#edit-orderdetail-id').val(),
+        date: $('#edit-orderdetail-date').val(),
+        contents: editorJson.getValue()
+    };
+
+    $.ajax({
+        type: 'POST',
+        url: '../api/hanki.php',
+        dataType : 'json',
+        timeout: 5000,
+        data: {
+            menu: 'editorder',
+            data: data
+        },
+        success: function (result, textStatus) {
+            console.log(result);
+            console.log(textStatus);
+
+            if (result['result'] == true) {
+                location.reload();
+            }
+        },
+        error: function(result, textStatus, jqXHR) {
+            console.log(result);
+            console.log(textStatus);
+            console.log(jqXHR);
+        },
+        complete: function() {
+        }
+    });
+  }
 
   $(document).ready(function() {
     $(document).on('click', '.list-menu', clickMenu);
     $(document).on('click', '.save-new', saveNew);
     $(document).on('click', '.option-excel', optionExcel);
     $(document).on('click', '.btn-edit-order', editOrder);
+    $(document).on('click', '.btn-edit-order-detail', editOrderDetail);
+    $(document).on('click', '.btn-edit-order-detail', editOrderDetail);
+    $(document).on('click', '.btn-save-edit-orderdetail', saveEditOrderDetail);
   });
 </script>
 

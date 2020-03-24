@@ -129,7 +129,7 @@ class PHPExcelDownload {
             '10mm' => array(6200, 4000),
             '16mm 와이드' => array(14800, 4000),
             '16mm' => array(8000, 4000),
-            '20mm' => array(11200, 4000),
+            '20mm' => array(11000, 4000),
 
             '4mm' => array(9000, 4000),
             '6mm' => array(11500, 4000),
@@ -1404,12 +1404,22 @@ class PHPExcelDownload {
             // 주문리스트를 돌면서
             foreach ($list as $value) {
                 $contents = unserialize($value['contents']);
+                $menuIndex = false;
 
                 // 반찬 가지수만큼 넣어줍니다.
                 $option = $contents[$optionIndex];
+                $options = explode('/', $option);
+                $set = trim(explode(':', $options[1])[1]);
+
                 $menuAmount = 0;
 
-                if (strpos($option, '1인') !== false) $menuAmount = 3;
+                if (strpos($set, ',') !== false) {
+                    // 괄호안 index를 배열로 추출
+                    $menuAmount = 8;
+                    preg_match('#\((.*?)\)#', $set, $match);
+                    $menuIndex = explode(',', $match[1]);
+                }
+                else if (strpos($option, '1인') !== false) $menuAmount = 3;
                 else if (strpos($option, '2인') !== false) $menuAmount = 6;
                 else if (strpos($option, '패밀리') !== false) $menuAmount = 8;
 
@@ -1417,6 +1427,10 @@ class PHPExcelDownload {
 
                 for ($i=0; $i < $menuAmount; $i++) {
                     if (empty($dailyChan[$date][$i])) exit($i.'번째 메뉴를 찾을 수 없습니다.');
+
+                    if (!empty($menuIndex)) {
+                        if (in_array($i, $menuIndex) == false) continue;
+                    }
 
                     $contents[$optionIndex] = '/:'.$dailyChan[$date][$i];
                     $menus[] = $contents;

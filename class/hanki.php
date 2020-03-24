@@ -89,7 +89,12 @@ class Hanki {
       require_once dirname(__FILE__).'/../class/pdo.php';
       $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
-      $result = $db->query("UPDATE smartstore_order_hanki SET date=? WHERE id=?", array($data['date'], $data['id']));
+      if (!empty($data['contents'])) {
+        $data['contents'] = serialize($data['contents']);
+        $result = $db->query("UPDATE smartstore_order_hanki SET contents=? WHERE  date=? AND id=?", array($data['contents'], $data['date'], $data['id']));
+      } else {
+        $result = $db->query("UPDATE smartstore_order_hanki SET date=? WHERE id=?", array($data['date'], $data['id']));
+      }
 
       $db->CloseConnection();
 
