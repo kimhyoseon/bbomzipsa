@@ -43,6 +43,7 @@ require_once './class/pdo.php';
 $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
 $listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date >= ? ORDER BY date ASC", array(date('Ymd')));
+// $listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date < ? ORDER BY date ASC", array(date('Ymd')));
 
 // echo '<pre>';
 // print_r($orderData1);
@@ -54,6 +55,7 @@ if (!empty($listDb)) {
   foreach ($listDb as $value) {
     $contents = unserialize($value['contents']);
     $option = $contents['13'];
+    $amount = $contents['6'];
     $options = explode('/', $option);
     $date = trim(explode(':', $options[0])[1]);
     if (strpos($date, '반찬세트') === false) {
@@ -62,8 +64,9 @@ if (!empty($listDb)) {
     $set = trim(explode(':', $options[1])[1]);
 
     // echo '<pre>';
-    // print_r($date);
+    // print_r($contents);
     // echo '</pre>';
+    // exit();
 
     $isInsert = false;
 
@@ -72,7 +75,7 @@ if (!empty($listDb)) {
       if (!empty($orderData1[$date])) {
         foreach ($orderData1[$date] as $k => $v) {
           if ($set == $v[0]) {
-            $orderData1[$date][$k][1] = $v[1] + 1;
+            $orderData1[$date][$k][1] = $v[1] + $amount;
             $isInsert = true;
           }
         }
@@ -80,7 +83,7 @@ if (!empty($listDb)) {
 
       // 못찾은 경우에는 새로 삽입
       if ($isInsert == false) {
-        $orderData1[$date][] = [$set, 1];
+        $orderData1[$date][] = [$set, $amount];
       }
 
       if (empty($orderInfo[$date]['DB주문 추가'])) {
@@ -93,7 +96,7 @@ if (!empty($listDb)) {
       if (!empty($orderData1[$date])) {
         foreach ($orderData1[$date] as $k => $v) {
           if (substr($set, 0, 4) == substr($v[0], 0, 4)) {
-            $orderData1[$date][$k][1] = $v[1] - 1;
+            $orderData1[$date][$k][1] = $v[1] - $amount;
 
             // if ($orderData1[$date][$k][1] < 1) {
             //   unset($orderData1[$date][$k]);
@@ -103,7 +106,7 @@ if (!empty($listDb)) {
       }
 
       // 변경메뉴는 새로 삽입
-      $orderData1[$date][] = [$set, 1];
+      $orderData1[$date][] = [$set, $amount];
 
       if (empty($orderInfo[$date]['DB주문 변경'])) {
         $orderInfo[$date]['DB주문 변경'] = 1;
