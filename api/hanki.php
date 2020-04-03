@@ -10,7 +10,7 @@ try {
     $hanki = new Hanki();
 
     // $_POST['year'] = '2020';
-    // $_POST['month'] = '2';
+    // $_POST['month'] = '5';
     // echo '<pre>';
     // print_r($hanki->getMenu($_POST));
     // echo '</pre>';

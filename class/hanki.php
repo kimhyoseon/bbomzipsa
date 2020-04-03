@@ -11,8 +11,10 @@ class Hanki {
     public $holiday = array(); // 공휴일
     public $validDay = array(); // 배송일자
     public $allDay = array(); // 배송X일자
+    public $chanCount = array(); // 모든 반찬카운트
     public $year = '';
     public $month = '';
+    public $try = 1;
 
     public function __construct() {
         $this->dailyFile = $_SERVER['DOCUMENT_ROOT'].'/data/dailychan.json';
@@ -128,18 +130,18 @@ class Hanki {
 
             $chans = $this->getBanchanSet($dayOfWeek);
 
-            $sort = array();
+            // $sort = array();
 
-            foreach ($chans as $v) {
-                $sort[] = $this->jshkDataSort[$v];
-            }
+            // foreach ($chans as $v) {
+            //     $sort[] = $this->jshkDataSort[$v];
+            // }
 
-            // 금, 토는 1인 메뉴에 나물도 들어갈 수 있도록 반대 sort
-            if ($dayOfWeek != 5 && $dayOfWeek != 6) {
-              array_multisort($sort, SORT_DESC, $chans);
-            } else {
-              array_multisort($sort, SORT_ASC, $chans);
-            }
+            // // 금, 토는 1인 메뉴에 나물도 들어갈 수 있도록 반대 sort
+            // if ($dayOfWeek != 5 && $dayOfWeek != 6) {
+            //   array_multisort($sort, SORT_DESC, $chans);
+            // } else {
+            //   array_multisort($sort, SORT_ASC, $chans);
+            // }
 
             // 수, 금은 특별식
             if ($dayOfWeek == 3 || $dayOfWeek == 5) {
@@ -147,6 +149,10 @@ class Hanki {
                 // array_unshift($chans, $this->jshkDataSpecial[0]);
                 $chans[] = $this->jshkDataSpecial[0];
                 $chans[] = $this->jshkDataSoup[0];
+
+                // 특별식 카운트 추가
+                // $this->chanCount[$this->jshkDataSpecial[0]]++;
+                // $this->chanCount[$this->jshkDataSoup[0]]++;
 
                 $c = array_shift($this->jshkDataSpecial);
                 $this->jshkDataSpecial[] = $c;
@@ -156,6 +162,12 @@ class Hanki {
 
             $this->allDay[$value] = $chans;
         }
+
+        // 모든 반찬카운트
+        // echo '<pre>';
+        // print_r($this->chanCount);
+        // echo '</pre>';
+        // exit();
 
         return $this->allDay;
     }
@@ -252,10 +264,14 @@ class Hanki {
         for ($i=0; $i < $value['_regular'][0]; $i++) {
           $this->jshkDataLots[] = $key;
         }
+
+        $this->chanCount[$key] = 0; // 반찬선택 총 갯수
       } else if (!empty($value['_special'])) {
         $this->jshkDataSpecial[] = $key;
+        // $this->chanCount[$key] = 0; // 반찬선택 총 갯수
       } else if (!empty($value['_soup'])) {
         $this->jshkDataSoup[] = $key;
+        // $this->chanCount[$key] = 0; // 반찬선택 총 갯수
       }
     }
 
@@ -281,8 +297,54 @@ class Hanki {
     );
     $bans = array();
 
+    $soyTotal = 0;
+    $spicyTotal = 0;
+    $fryTotal = 0;
+
+    // 횟수 출력
+    // echo $this->try;
+    // $this->try++;
+
+    if ($this->try > 200) {
+      exit('Retry');
+    }
+
+    // echo array_sum(array_values($this->chanCount));
+    // echo ',';
+
+    $zeroChan = array();
+
+    // 후반부에서는 0개인 반찬을 강제로 담아줌
+    if (array_sum(array_values($this->chanCount)) > 70) {
+      foreach ($this->chanCount as $k => $v) {
+        if ($v == 0) {
+          $zeroChan[] = $k;
+          if (sizeof($zeroChan) > 1) break;
+        }
+      }
+
+      if (sizeof($zeroChan) < 2) {
+        foreach ($this->chanCount as $k => $v) {
+          if ($v == 1) {
+            $zeroChan[] = $k;
+            if (sizeof($zeroChan) > 1) break;
+          }
+        }
+      }
+    }
+
+    // echo '<pre>';
+    // print_r($zeroChan);
+    // echo '</pre>';
+
     while (sizeof($sets) < 6) {
-      $chan = $this->jshkDataLots[array_rand($this->jshkDataLots)];
+      if (sizeof($zeroChan) > 0) {
+        $chan = $zeroChan[0];
+        array_shift($zeroChan);
+      } else {
+        $chan = $this->jshkDataLots[array_rand($this->jshkDataLots)];
+      }
+
       $price = 0;
 
       if (in_array($chan, $sets)) continue; // 이미 있는 반찬인 경우
@@ -309,44 +371,45 @@ class Hanki {
         }
       }
 
-      $sets[] = $chan;
-    }
+      // 같은부류반찬처리
+      if ($soyTotal > 2 && strpos($chan, '간장') !== false) continue;
+      if ($spicyTotal > 2 && strpos($chan, '매콤') !== false) continue;
+      if ($fryTotal > 3 && strpos($chan, '볶음') !== false) continue;
 
-    $soyTotal = 0;
-    $spicyTotal = 0;
+      // 너무 많이 선택된 반찬은 제외
+      if ($this->chanCount[$chan] > 3) continue;
+
+      // 통과한 반찬은 담아주기
+      $sets[] = $chan;
+
+      // 담은 반찬 카운트
+      if (strpos($chan, '간장') !== false) $soyTotal++;
+      if (strpos($chan, '매콤') !== false) $spicyTotal++;
+      if (strpos($chan, '볶음') !== false) $fryTotal++;
+    }
 
     // 가격 체크
     foreach ($sets as $value) {
       $price += $this->jshkDataPrice[$value];
-
-      if (strpos($value, '간장') !== false) $soyTotal++;
-      if (strpos($value, '매콤') !== false) $spicyTotal++;
-    }
-
-    if ($soyTotal > 2) {
-        return $this->getBanchanSet($dayOfWeek);
-    }
-
-    if ($spicyTotal == 0) {
-        return $this->getBanchanSet($dayOfWeek);
     }
 
     // 21,200원까지만
-    if ($price > 21200) {
-      return $this->getBanchanSet($dayOfWeek);
-    }
-
-    // echo '<pre>';
-    // print_r($price);
-    // print_r($bans);
-    // echo '</pre>';
+    // if ($price > 21200) {
+    //   return $this->getBanchanSet($dayOfWeek);
+    // }
 
     // 뽑기에서 선택된 반찬을 제거
-    foreach ($sets as $value) {
-        if (($key = array_search($value, $this->jshkDataLots)) !== false) {
-            unset($this->jshkDataLots[$key]);
-        }
+    // foreach ($sets as $value) {
+    //     if (($key = array_search($value, $this->jshkDataLots)) !== false) {
+    //         unset($this->jshkDataLots[$key]);
+    //     }
+    // }
+
+    foreach ($sets as $v) {
+      $this->chanCount[$v]++;
     }
+
+    shuffle($sets);
 
     return $sets;
   }
