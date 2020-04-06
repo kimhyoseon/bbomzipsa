@@ -658,7 +658,6 @@ return array(
         '고추장볶음소스' => array(80, 'g', false, ''),
         '간장볶음소스' => array(10, 'g', false, ''),
         '깻잎' => array(10, 'g', true, '국산'),
-        '떡' => array(10, 'g', true, '호주'),
         '고구마' => array(10, 'g', true, '국산'),
         '깨' => array(1, 'g', false, '국산'),
         '참기름' => array(2, 'g', false, '국산'),
