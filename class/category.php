@@ -2,7 +2,7 @@
 class Category
 {
   public $categoryData;
-  private $exceptParentCategories = array('50007053', '50007054', '50007057', '50007061', '50007058', '50007059', '9999');
+  private $exceptParentCategories = array('50007053', '50007054', '9999');
 
 	public function __construct()
 	{
@@ -11,9 +11,9 @@ class Category
 
   public function getAllChildCategoriesById($categoryId, $categories = array())
   {
-    if ($categoryId == 0) return 0;                
+    if ($categoryId == 0) return 0;
 
-    if (empty($this->categoryData['categoryDepthId'][$categoryId])) {            
+    if (empty($this->categoryData['categoryDepthId'][$categoryId])) {
       $categories[] = $categoryId;
     } else {
       for ($i = 0; $i < sizeof($this->categoryData['categoryDepthId'][$categoryId]); $i++) {
