@@ -1563,17 +1563,17 @@ class PHPExcelDownload {
                 else if (strpos($items[$optionIndex], '1인세트A') !== false) $option = array('간장멸치견과류볶음', '건파래무침', '두부매콤조림');
                 else if (strpos($items[$optionIndex], '1인세트B') !== false) $option = array('연근조림', '간장미역줄기볶음', '무말랭이무침');
             } else if (strpos($items[$optionIndex], '아들반찬세트') !== false) {
-                if (strpos($items[$optionIndex], '2인세트') !== false) $option = array('매콤어묵볶음', '계란말이', '메추리알조림', '매콤건새우볶음', '마파두부', '소세지야채볶음');
+                if (strpos($items[$optionIndex], '2인세트') !== false) $option = array('매콤어묵볶음', '계란말이', '메추리알조림', '매콤건새우볶음', '더덕무침', '소세지야채볶음');
                 else if (strpos($items[$optionIndex], '1인세트A') !== false) $option = array('매콤어묵볶음', '계란말이', '메추리알조림');
-                else if (strpos($items[$optionIndex], '1인세트B') !== false) $option = array('매콤건새우볶음', '마파두부', '소세지야채볶음');
+                else if (strpos($items[$optionIndex], '1인세트B') !== false) $option = array('매콤건새우볶음', '더덕무침', '소세지야채볶음');
             } else if (strpos($items[$optionIndex], '엄마반찬세트') !== false) {
                 if (strpos($items[$optionIndex], '2인세트') !== false) $option = array('간장미역줄기볶음', '콩나물무침', '깻잎무침', '새우젓애호박볶음', '아삭이된장무침', '무나물');
                 else if (strpos($items[$optionIndex], '1인세트A') !== false) $option = array('간장미역줄기볶음', '콩나물무침', '깻잎무침');
                 else if (strpos($items[$optionIndex], '1인세트B') !== false) $option = array('새우젓애호박볶음', '아삭이된장무침', '무나물');
             } else if (strpos($items[$optionIndex], '아빠반찬세트') !== false) {
-                if (strpos($items[$optionIndex], '2인세트') !== false) $option = array('계란말이', '매콤멸치볶음', '두부조림', '검은콩조림', '간장가지볶음', '무말랭이무침');
+                if (strpos($items[$optionIndex], '2인세트') !== false) $option = array('계란말이', '매콤멸치볶음', '두부조림', '검은콩조림', '건파래무침', '무말랭이무침');
                 else if (strpos($items[$optionIndex], '1인세트A') !== false) $option = array('계란말이', '매콤멸치볶음', '두부조림');
-                else if (strpos($items[$optionIndex], '1인세트B') !== false) $option = array('검은콩조림', '간장가지볶음', '무말랭이무침');
+                else if (strpos($items[$optionIndex], '1인세트B') !== false) $option = array('검은콩조림', '건파래무침', '무말랭이무침');
             }
         }
 

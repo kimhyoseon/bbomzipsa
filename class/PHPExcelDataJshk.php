@@ -134,7 +134,7 @@ return array(
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 4200, 1),
 
-        '오징어실채' => array(55, 'g', true, '수입'),
+        '오징어실채' => array(55, 'g', true, '페루'),
         '설탕' => array(2, 'g', false, '국산'),
         '맛기름' => array(2, 'g', false, '국산'),
         '간장볶음소스' => array(22, 'g', false, ''),
@@ -147,7 +147,7 @@ return array(
         '_regular' => array(1, 3700, 1),
 
         '감자' => array(150, 'g', true, '국산'),
-        '베이컨' => array(30, 'g', true, '수입'),
+        '베이컨' => array(30, 'g', true, '미국'),
         '간장볶음소스' => array(40, 'g', false, ''),
         '깨' => array(1, 'g', false, '국산'),
     ),
@@ -273,7 +273,7 @@ return array(
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 3700, 1),
 
-        '연근' => array(260, 'g', true, '국내'),
+        '연근' => array(260, 'g', true, '국산'),
         '간장조림소스' => array(150, 'g', false, ''),
         '식초' => array(3, 'g', false, '국산'),
         '맛기름' => array(4, 'g', false, '국산'),
@@ -287,7 +287,7 @@ return array(
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 3700, 1),
 
-        '생땅콩' => array(120, 'g', true, '국산'),
+        '생땅콩' => array(120, 'g', true, '중국'),
         '간장조림소스' => array(170, 'g', false, ''),
         '물엿' => array(10, 'g', false, '국산'),
         '깨' => array(1, 'g', false, '국산'),
@@ -670,7 +670,7 @@ return array(
         '_expired' => array(4, 'days', false, ''),
         '_soup' => 1,
 
-        '소고기(국거리)' => array(50, 'g', true, '국산'),
+        '소고기(국거리)' => array(50, 'g', true, '호주'),
         '참기름' => array(5, 'g', false, '국산'),
         '미역' => array(15, 'g', true, '국산'),
         '물' => array(480, 'g', false, ''),
