@@ -1753,6 +1753,8 @@ class PHPExcelDownload {
         $optionIndex = array_search('옵션정보', array_keys($filterMerged));
         $amountIndex = array_search('수량', array_keys($filterMerged));
         $customerIndex = array_search('수취인명', array_keys($filterMerged));
+        $postIndex = array_search('우편번호', array_keys($filterMerged));
+        $addrIndex = array_search('배송지', array_keys($filterMerged));
 
         foreach ($body as $items) {
             if (empty($items)) continue;
@@ -1760,7 +1762,14 @@ class PHPExcelDownload {
 
             $cookName = $this->getShortOptionJshk($items[$optionIndex]);
             $amount = $items[$amountIndex];
-            $customer = $items[$customerIndex];
+            $addr = $items[$addrIndex];
+            $addrs = explode(' ', $addr);
+            $customer = $items[$customerIndex].'('.$addrs[1].')';
+
+            // echo '<pre>';
+            // print_r($addr);
+            // echo '</pre>';
+            // exit();
 
             // 고객주의점
             if (empty($customers[$customer])) {
@@ -1854,6 +1863,11 @@ class PHPExcelDownload {
                 }
             }
         }
+
+        echo '<pre>';
+        print_r($customers);
+        echo '</pre>';
+        exit();
 
         // 소스상세 계산
         foreach ($sourceTotal as $ingredientName => $weight) {
