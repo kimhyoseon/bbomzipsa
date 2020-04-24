@@ -1864,10 +1864,10 @@ class PHPExcelDownload {
             }
         }
 
-        echo '<pre>';
-        print_r($customers);
-        echo '</pre>';
-        exit();
+        // echo '<pre>';
+        // print_r($customers);
+        // echo '</pre>';
+        // exit();
 
         // 소스상세 계산
         foreach ($sourceTotal as $ingredientName => $weight) {
