@@ -399,7 +399,7 @@ return array(
     ),
     '건파래무침' => array( // 160g 2019-10-09
         '_total' => array(150, 'g', false, ''),
-        '_expired' => array(7, 'days', false, ''),
+        '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3700, 2),
 
         '건파래' => array(35, 'g', true, '국산'),
