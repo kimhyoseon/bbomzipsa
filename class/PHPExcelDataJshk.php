@@ -72,7 +72,7 @@ return array(
     ),
     '간장새송이버섯볶음' => array(
         '_total' => array(150, 'g', false, ''),
-        '_expired' => array(7, 'days', false, ''),
+        '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 2),
 
         '새송이버섯' => array(200, 'g', true, '국산'),
@@ -86,7 +86,7 @@ return array(
     ),
     '간장느타리버섯볶음' => array( // 170g 2019-09-29
         '_total' => array(150, 'g', false, ''),
-        '_expired' => array(7, 'days', false, ''),
+        '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3700, 2),
 
         '느타리버섯' => array(240, 'g', true, '국산'),
