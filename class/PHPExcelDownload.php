@@ -1427,7 +1427,7 @@ class PHPExcelDownload {
                 }
                 else if (strpos($option, '1인') !== false) $menuAmount = 3;
                 else if (strpos($option, '2인') !== false) $menuAmount = 6;
-                else if (strpos($option, '패밀리') !== false) $menuAmount = 6;
+                else if (strpos($option, '패밀리') !== false) $menuAmount = 8;
 
                 if ($menuAmount == 0) exit($option.'올바르지 않은 옵션입니다.');
 
