@@ -1597,12 +1597,12 @@ class PHPExcelDownload {
     public function jshkCj($files) {
         list($filter, $filterMerged, $body) = $this->jshkDataFilter($files);
 
-        // echo '<pre>';
-        // print_r($filter);
-        // print_r($filterMerged);
-        // print_r($body);
-        // echo '</pre>';
-        // exit();
+        echo '<pre>';
+        print_r($filter);
+        print_r($filterMerged);
+        print_r($body);
+        echo '</pre>';
+        exit();
 
         $filterArray = array();
         $filterIndex = array();
@@ -1639,10 +1639,10 @@ class PHPExcelDownload {
             $bodyOptimized[] = $bodyRow;
         }
 
-        echo '<pre>';
-        print_r($bodyOptimized);
-        echo '</pre>';
-        exit();
+        // echo '<pre>';
+        // print_r($bodyOptimized);
+        // echo '</pre>';
+        // exit();
 
         $data = $bodyOptimized;
         $cntRow = sizeof($bodyOptimized);
