@@ -1432,7 +1432,7 @@ class PHPExcelDownload {
                 if ($menuAmount == 0) exit($option.'올바르지 않은 옵션입니다.');
 
                 for ($i=0; $i < $menuAmount; $i++) {
-                    if (empty($dailyChan[$date][$i])) exit($i.'번째 메뉴를 찾을 수 없습니다.');
+                    // if (empty($dailyChan[$date][$i])) exit($i.'번째 메뉴를 찾을 수 없습니다.');
 
                     if (!empty($menuIndex)) {
                         if (in_array($i, $menuIndex) == false) continue;
