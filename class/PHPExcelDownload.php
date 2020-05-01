@@ -1258,6 +1258,11 @@ class PHPExcelDownload {
             $objPHPExcel->setActiveSheetIndex(0);
             $sheetData = $objPHPExcel->getActiveSheet()->toArray();
 
+            echo '<pre>';
+            print_r($sheetData);
+            echo '</pre>';
+            exit();
+
             // $filter = array(
             //     '수량' => '수량',
             //     '상품명' => '상품명',
@@ -1597,12 +1602,12 @@ class PHPExcelDownload {
     public function jshkCj($files) {
         list($filter, $filterMerged, $body) = $this->jshkDataFilter($files);
 
-        echo '<pre>';
-        print_r($filter);
-        print_r($filterMerged);
-        print_r($body);
-        echo '</pre>';
-        exit();
+        // echo '<pre>';
+        // print_r($filter);
+        // print_r($filterMerged);
+        // print_r($body);
+        // echo '</pre>';
+        // exit();
 
         $filterArray = array();
         $filterIndex = array();
