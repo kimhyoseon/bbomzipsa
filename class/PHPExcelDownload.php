@@ -1258,10 +1258,10 @@ class PHPExcelDownload {
             $objPHPExcel->setActiveSheetIndex(0);
             $sheetData = $objPHPExcel->getActiveSheet()->toArray();
 
-            echo '<pre>';
-            print_r($sheetData);
-            echo '</pre>';
-            exit();
+            // echo '<pre>';
+            // print_r($sheetData);
+            // echo '</pre>';
+            // exit();
 
             // $filter = array(
             //     '수량' => '수량',
@@ -1396,6 +1396,12 @@ class PHPExcelDownload {
         // $date = '20200303'; // 테스트
 
         $list = $db->query("SELECT * FROM smartstore_order_hanki WHERE date=? ", array($date));
+
+        echo '<pre>';
+        print_r($date);
+        print_r($list);
+        echo '</pre>';
+        exit();
 
         if (!empty($list)) {
             $date = date('Ymd', strtotime('+1 days')); // 메뉴에서는 수령날짜로 조회
