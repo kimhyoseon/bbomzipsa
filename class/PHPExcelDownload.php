@@ -1485,20 +1485,20 @@ class PHPExcelDownload {
                 $date = date("Ymd", $timestamp);
                 $dateNow = date("Ymd", $timestampNow);
 
-                echo '<pre>';
-                print_r($month);
-                echo '<br/>';
-                print_r($day);
-                echo '<br/>';
-                print_r($timestamp);
-                echo '<br/>';
-                print_r($timestampNow);
-                echo '<br/>';
-                print_r($date);
-                echo '<br/>';
-                print_r($dateNow);
-                echo '</pre>';
-                exit();
+                // echo '<pre>';
+                // print_r($month);
+                // echo '<br/>';
+                // print_r($day);
+                // echo '<br/>';
+                // print_r($timestamp);
+                // echo '<br/>';
+                // print_r($timestampNow);
+                // echo '<br/>';
+                // print_r($date);
+                // echo '<br/>';
+                // print_r($dateNow);
+                // echo '</pre>';
+                // exit();
 
                 // 아침에 출력해서 조리하니 내일 수령까지는 가능
 
