@@ -1397,12 +1397,6 @@ class PHPExcelDownload {
 
         $list = $db->query("SELECT * FROM smartstore_order_hanki WHERE date=? ", array($date));
 
-        echo '<pre>';
-        print_r($date);
-        print_r($list);
-        echo '</pre>';
-        exit();
-
         if (!empty($list)) {
             $date = date('Ymd', strtotime('+1 days')); // 메뉴에서는 수령날짜로 조회
 
@@ -1490,6 +1484,15 @@ class PHPExcelDownload {
                 $timestampNow = time();
                 $date = date("Ymd", $timestamp);
                 $dateNow = date("Ymd", $timestampNow);
+
+                echo '<pre>';
+                print_r($month);
+                print_r($day);
+                print_r($timestamp);
+                print_r($timestampNow);
+                print_r($date);
+                print_r($dateNow);
+                echo '</pre>';
 
                 // 아침에 출력해서 조리하니 내일 수령까지는 가능
 
