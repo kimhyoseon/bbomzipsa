@@ -1,4 +1,4 @@
-mmio<?php
+<?php
 include_once('./class/PHPExcel.php');
 
 class PHPExcelDownload {
