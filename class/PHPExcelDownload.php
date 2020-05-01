@@ -1493,6 +1493,7 @@ class PHPExcelDownload {
                 print_r($date);
                 print_r($dateNow);
                 echo '</pre>';
+                exit();
 
                 // 아침에 출력해서 조리하니 내일 수령까지는 가능
 
