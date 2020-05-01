@@ -1487,10 +1487,15 @@ class PHPExcelDownload {
 
                 echo '<pre>';
                 print_r($month);
+                echo '<br/>';
                 print_r($day);
+                echo '<br/>';
                 print_r($timestamp);
+                echo '<br/>';
                 print_r($timestampNow);
+                echo '<br/>';
                 print_r($date);
+                echo '<br/>';
                 print_r($dateNow);
                 echo '</pre>';
                 exit();
