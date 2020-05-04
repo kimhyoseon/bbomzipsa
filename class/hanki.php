@@ -377,7 +377,7 @@ class Hanki {
       if ($fryTotal > 3 && strpos($chan, '볶음') !== false) continue;
 
       // 너무 많이 선택된 반찬은 제외
-      if ($this->chanCount[$chan] > 3) continue;
+      if ($this->chanCount[$chan] > 4) continue;
 
       // 통과한 반찬은 담아주기
       $sets[] = $chan;
@@ -394,9 +394,9 @@ class Hanki {
     }
 
     // 21,200원까지만
-    // if ($price > 21200) {
-    //   return $this->getBanchanSet($dayOfWeek);
-    // }
+    if ($price > 21200) {
+      return $this->getBanchanSet($dayOfWeek);
+    }
 
     // 뽑기에서 선택된 반찬을 제거
     // foreach ($sets as $value) {
@@ -410,6 +410,11 @@ class Hanki {
     }
 
     shuffle($sets);
+
+    // echo '<pre>';
+    // print_r($sets);
+    // echo '</pre>';
+    // exit();
 
     return $sets;
   }
