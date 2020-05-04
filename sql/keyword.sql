@@ -186,6 +186,10 @@ INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '태그(120)', '', 1000, 7);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '태그(170)', '', 1000, 7);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '안내장', '', 1000, 7);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '안내장밴드', '', 1000, 7);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '가정용혈압계', '기본형', 5, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '가정용혈압계', '고급형', 5, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '가정용혈압계', '아답터', 5, 4);
 
 
 -- 상품별 판매수

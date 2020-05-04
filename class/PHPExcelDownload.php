@@ -127,7 +127,7 @@ class PHPExcelDownload {
             '짐볼 75' => array(7900, 3000),
 
             '8mm' => array(5900, 4000),
-            '10mm' => array(6200, 4000),
+            '10mm' => array(6000, 4000),
             '16mm 와이드' => array(14800, 4000),
             '16mm' => array(8000, 4000),
             '20mm' => array(11000, 4000),
