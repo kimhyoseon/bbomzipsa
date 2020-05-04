@@ -154,10 +154,12 @@ class Hanki {
                 // $this->chanCount[$this->jshkDataSpecial[0]]++;
                 // $this->chanCount[$this->jshkDataSoup[0]]++;
 
-                $c = array_shift($this->jshkDataSpecial);
-                $this->jshkDataSpecial[] = $c;
-                $c = array_shift($this->jshkDataSoup);
-                $this->jshkDataSoup[] = $c;
+                if ($dayOfWeek == 5) {
+                  $c = array_shift($this->jshkDataSpecial);
+                  $this->jshkDataSpecial[] = $c;
+                  $c = array_shift($this->jshkDataSoup);
+                  $this->jshkDataSoup[] = $c;
+                }
             }
 
             $this->allDay[$value] = $chans;
