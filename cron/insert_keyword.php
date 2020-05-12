@@ -10,15 +10,14 @@ $accountDb = parse_ini_file("../config/db.ini");
 
 require_once '../class/pdo.php';
 
-$db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
-
-$keywordsBest = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../crawler/log/naverkeyword.json');
+$keywordsBest = file_get_contents('/home/dev/crawler/log/naverkeyword.json');
 $keywordsBest = json_decode($keywordsBest, true);
 
 $keywordsBest = array_unique($keywordsBest);
 
 if (!empty($keywordsBest)) {
     echo sizeof($keywordsBest).'개 저장 시작'.PHP_EOL;
+    $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
     foreach (array_chunk($keywordsBest, 20) as $keywordChunk) {
         if (!empty($keywordChunk)) {
