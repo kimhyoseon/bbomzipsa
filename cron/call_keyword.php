@@ -12,7 +12,7 @@ require_once '/home/dev/ppomzipsa/class/pdo.php';
 require_once '/home/dev/ppomzipsa/class/category.php';
 require_once '/home/dev/ppomzipsa/class/curl_async.php';
 
-$queryWheres = $queryParams = array();          
+$queryWheres = $queryParams = array();
 
 /**
  * 제외 카테고리 설정
@@ -50,8 +50,8 @@ $queryParams['raceIndex'] = 2;
 /**
  * 경쟁률 0이 아닌
  */
-$queryWheres[] = "raceIndex > :raceIndexNot";
-$queryParams['raceIndexNot'] = 0;
+// $queryWheres[] = "raceIndex > :raceIndexNot";
+// $queryParams['raceIndexNot'] = 0;
 
 /**
  * 5000개 제한
@@ -62,7 +62,7 @@ $queryParams['limit'] = 5000;
  * 쿼리 정리
  */
 if (!empty($queryWheres)) {
-    $queryWheres = implode(' AND ', $queryWheres);                        
+    $queryWheres = implode(' AND ', $queryWheres);
 } else {
     $queryWheres = '';
 }
@@ -79,8 +79,8 @@ if (!empty($keywords)) {
     echo sizeof($keywords).'개 키워드 수집 시작'.PHP_EOL;
 
     foreach (array_chunk($keywords, 5) as $keywordChunk) {
-        foreach ($keywordChunk as $keyword) {    
-            $id = $keyword['keyword']; 
+        foreach ($keywordChunk as $keyword) {
+            $id = $keyword['keyword'];
             $curlAsync->$id(array(
                 //'url' => 'http://localhost/api/keyword.php',
                 'url' => 'http://ppomzipsa.com/api/keyword.php',
@@ -92,9 +92,9 @@ if (!empty($keywords)) {
         }
 
         foreach ($keywordChunk as $keyword) {
-            $id = $keyword['keyword']; 
+            $id = $keyword['keyword'];
             $collectResultJSON = $curlAsync->$id();
-            // $collectResult = json_decode($collectResultJSON, true);            
+            // $collectResult = json_decode($collectResultJSON, true);
 
             // $changeRaceIndex = $keyword['raceIndex'] - $collectResult['raceIndex'];
 
