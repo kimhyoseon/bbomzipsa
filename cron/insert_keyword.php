@@ -1,6 +1,6 @@
 <?php
 /**
- * selenium으로 추출한 네이버 트렌드 쇼핑인사이트 BEST 500 키워드 추출 결과를 DB에 삽입 
+ * selenium으로 추출한 네이버 트렌드 쇼핑인사이트 BEST 500 키워드 추출 결과를 DB에 삽입
  */
 ini_set("display_errors", 1);
 ini_set('max_execution_time', '0');
@@ -12,7 +12,7 @@ require_once '../class/pdo.php';
 
 $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
-$keywordsBest = file_get_contents('../data/naverkeyword.json');
+$keywordsBest = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../crawler/log/naverkeyword.json');
 $keywordsBest = json_decode($keywordsBest, true);
 
 $keywordsBest = array_unique($keywordsBest);

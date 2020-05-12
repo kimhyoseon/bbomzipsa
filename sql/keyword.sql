@@ -116,7 +116,7 @@ INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상
 -- 검정 2개, 검정 + 회색
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '수면안대', '검정', 100, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '수면안대', '회색', 100, 4);
-INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '수면안대', '핫핑크', 100, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '수면안대', '핑크', 100, 4);
 -- 벚꽃색 + 실리콘마개
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '가정용대야', '벚꽃색', 100, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '가정용대야', '실리콘마개', 100, 4);
@@ -143,13 +143,14 @@ INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '압박양말', 'M', 100, 15);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '압박양말', 'L', 100, 15);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '귀지압패치', '1+1 (1200매)', 100, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부자재', '귀혈자리지도', '', 100, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '압진기', '압진기', 100, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '실리콘패치', '원형', 100, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '머리끈세트', '블랙/one size', 100, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '머리끈세트', '네이비/one size', 100, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '머리끈세트', '스카이블루/one size', 100, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '머리끈세트', '핑크/one size', 100, 4);
-INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '아이스롤러', '', 100, 15);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '아이스롤러', '아이스롤러', 100, 15);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '타투스티커', 'A', 3, 15);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '타투스티커', 'C', 5, 15);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '타투스티커', 'D', 5, 15);
