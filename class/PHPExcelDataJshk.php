@@ -423,6 +423,21 @@ return array(
         '깨' => array(1, 'g', false, '국산'),
         '참기름' => array(1, 'g', false, '국산'),
     ),
+    '새우젓애호박복음' => array( // 170g 2019-10-09
+        '_total' => array(150, 'g', false, ''),
+        '_expired' => array(4, 'days', false, ''),
+        '_regular' => array(2, 3200, 2),
+
+        '애호박' => array(170, 'g', true, '국산'),
+        '모듬야채' => array(20, 'g', true, '국산'),
+        '맛기름' => array(1, 'g', false, '국산'),
+        '들기름' => array(1, 'g', false, '국산'),
+        '무침소스' => array(4, 'g', false, ''),
+        '마늘' => array(3, 'g', false, '국산'),
+        '새우젓' => array(3, 'g', false, '국산'),
+        '깨' => array(1, 'g', false, '국산'),
+        '참기름' => array(1, 'g', false, '국산'),
+    ),
     '들깨무나물' => array( // 210g 2019-10-09
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
