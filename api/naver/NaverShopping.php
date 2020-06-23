@@ -5,15 +5,15 @@
  */
 class NaverShopping
 {
-    const URL_NAVER_SHOPPING = 'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=';    
-    const URL_NAVER_MAIN = 'https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&query=';    
+    const URL_NAVER_SHOPPING = 'https://search.shopping.naver.com/search/all?cat_id=&frm=NVSHATC&query=';
+    const URL_NAVER_MAIN = 'https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&query=';
 
     private $code = 200;
 
     private $debug = false;
     private $refresh = false;
 
-    private $data = array(        
+    private $data = array(
         'keyword' => null, // 검색 키워드
         'relKeywords' => '', // 연관쇼핑
         'hotKeywords' => '', // 많이 사용되는 키워드
@@ -75,7 +75,7 @@ class NaverShopping
     public function getData()
     {
         return $this->data;
-    }    
+    }
 
     private function setCode($code)
     {
@@ -192,7 +192,7 @@ class NaverShopping
             $keywordstoolFiltered[] = $value['relKeyword'];
         }
 
-        return $keywordstoolFiltered;        
+        return $keywordstoolFiltered;
     }
 
     /**
@@ -305,7 +305,7 @@ class NaverShopping
             $this->setCode(400);
             return false;
         }
-        
+
         $xPath = $this->getXpath(self::URL_NAVER_SHOPPING.urlencode($this->data['keyword']));
 
         if (!$xPath) {
@@ -322,29 +322,31 @@ class NaverShopping
         $categoryTexts = array();
         $hotKeywords = array();
 
-        $nodeTotalItems = $xPath->query("//a[@class='_productSet_total']");
-
+        $nodeTotalItems = $xPath->query("//div[@class='seller_filter_area']/ul/li");
         if ($nodeTotalItems->length == 0) {
             $this->setCode(204);
             return false;
-        }        
+        }
 
         $this->data['totalItems'] = filter_var(trim($nodeTotalItems[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
-        $this->data['raceIndex'] = @round($this->data['totalItems'] / $this->data['monthlyQcCnt'], 4);        
+        $this->data['raceIndex'] = @round($this->data['totalItems'] / $this->data['monthlyQcCnt'], 4);
+
 
         if ($this->data['raceIndex'] > 10) $this->data['ignored'] = 1;
 
-        $nodeRelKeywords = $xPath->query("//div[@class='co_relation_srh']/ul/li/a");
+        $nodeRelKeywords = $xPath->query("//div[@class='relatedTags_relation_srh__1CleC']/ul/li/a");
 
         if ($nodeRelKeywords->length > 0) {
             foreach ($nodeRelKeywords as $nodeRelKeyword) {
                 $relKeywords[] = trim($nodeRelKeyword->nodeValue);
             }
+        }
 
+        if (!empty($relKeywords)) {
             $this->data['relKeywords'] = implode(',', $relKeywords);
         }
 
-        $nodeItems = $xPath->query("//div[@class='search_list basis']/ul/li");
+        $nodeItems = $xPath->query("//ul[@class='list_basis']/div/div/div/div");
 
         if ($nodeItems->length == 0) {
             $this->setCode(204);
@@ -354,40 +356,56 @@ class NaverShopping
         if ($nodeItems->length > 0) {
             $totalSalesPrice = 0;
             foreach ($nodeItems as $nodeItem) {
-                $nodeTitles = $xPath->query("descendant::a[@class='tit']", $nodeItem);
+                $nodeTitles = $xPath->query("descendant::div[@class='basicList_title__3P9Q7']", $nodeItem);
                 if ($nodeTitles->length > 0) {
                     $titles[] = trim($nodeTitles[0]->nodeValue);
                 }
 
-                $nodePrices = $xPath->query("descendant::span[@class='price']/em/span", $nodeItem);
+                $nodePrices = $xPath->query("descendant::span[@class='price_num__2WUXn']", $nodeItem);
                 if ($nodePrices->length > 0) {
-                    $nodePrice = $nodePrices[($nodePrices->length - 1)];
-                    $prices[] = filter_var(trim($nodePrice->nodeValue), FILTER_SANITIZE_NUMBER_INT);
+                    $prices[] = filter_var(trim($nodePrices[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
                 }
 
-                $nodeSells = $xPath->query("descendant::span[@class='etc']/span[contains(., '구매건수')]", $nodeItem);
-                if ($nodeSells->length > 0) {
-                    $sells[] = filter_var(trim($nodeSells[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
+                $nodeInfos = $xPath->query("descendant::div[@class='basicList_etc_box__1Jzg6']/a", $nodeItem);
 
-                    if ($nodePrices->length > 0) {
-                        $sellsPrice[] = filter_var(trim($nodePrice->nodeValue), FILTER_SANITIZE_NUMBER_INT) * filter_var(trim($nodeSells[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
+                if ($nodeInfos->length > 0) {
+                    foreach ($nodeInfos as $nodeInfo) {
+                        $textInfo = trim($nodeInfo->nodeValue);
+
+                        if (strpos($textInfo, '리뷰') !== false) {
+                            $reviews[] = filter_var($textInfo, FILTER_SANITIZE_NUMBER_INT);
+                        } else if (strpos($textInfo, '구매') !== false) {
+                            $sells[] = filter_var($textInfo, FILTER_SANITIZE_NUMBER_INT);
+                            if ($nodePrices->length > 0) {
+                                $sellsPrice[] = filter_var($textInfo, FILTER_SANITIZE_NUMBER_INT) * filter_var(trim($nodePrices[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
+                            }
+                        }
                     }
                 }
 
-                $nodeReviews = $xPath->query("descendant::span[@class='etc']/a[contains(., '리뷰')]|descendant::span[@class='etc']/span[contains(., '리뷰')]", $nodeItem);
-                if ($nodeReviews->length > 0) {
-                    $reviews[] = filter_var(trim($nodeReviews[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
-                }
+                // $nodeSells = $xPath->query("descendant::span[@class='etc']/span[contains(., '구매건수')]", $nodeItem);
+                // if ($nodeSells->length > 0) {
+                //     $sells[] = filter_var(trim($nodeSells[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
+
+                //     if ($nodePrices->length > 0) {
+                //         $sellsPrice[] = filter_var(trim($nodePrice->nodeValue), FILTER_SANITIZE_NUMBER_INT) * filter_var(trim($nodeSells[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
+                //     }
+                // }
+
+                // $nodeReviews = $xPath->query("descendant::span[@class='etc']/a[contains(., '리뷰')]|descendant::span[@class='etc']/span[contains(., '리뷰')]", $nodeItem);
+                // if ($nodeReviews->length > 0) {
+                //     $reviews[] = filter_var(trim($nodeReviews[0]->nodeValue), FILTER_SANITIZE_NUMBER_INT);
+                // }
 
                 if (empty($this->data['category']) || $this->data['category'] == '9999') {
-                    $nodeAd = $xPath->query("descendant::a[@class='ad_stk']", $nodeItem);
+                    $nodeAd = $xPath->query("descendant::button[@class='ad_ad_stk__12U34']", $nodeItem);
                     if ($nodeAd->length > 0) continue;
 
-                    $nodeCategories = $xPath->query("descendant::span[@class='depth']/a", $nodeItem);
+                    $nodeCategories = $xPath->query("descendant::div[@class='basicList_depth__2QIie']/a", $nodeItem);
                     if ($nodeCategories->length > 0) {
                         foreach ($nodeCategories as $category) {
                             $categoryTexts[] = $category->nodeValue;
-                            $this->data['category'] = filter_var(trim($category->getAttribute('class')), FILTER_SANITIZE_NUMBER_INT);
+                            $this->data['category'] = filter_var(trim($category->getAttribute('href')), FILTER_SANITIZE_NUMBER_INT);
                         }
 
                         $this->data['categoryTexts'] = implode(',', $categoryTexts);
@@ -447,18 +465,21 @@ class NaverShopping
 
                 $this->data['hotKeywords'] = implode(',', $hotKeywordTexts);
             }
-        }   
-        
-        // 메인쇼핑검색 여부        
-        $xPathMain = $this->getXpath(self::URL_NAVER_MAIN.$this->data['keyword']);        
+        }
 
-        if ($xPathMain) {            
-            $nodeMainShopping = $xPathMain->query("//div[@class='dsc_ncaution2 _shopping_info_area']");                        
+        // 메인쇼핑검색 여부
+        $xPathMain = $this->getXpath(self::URL_NAVER_MAIN.$this->data['keyword']);
 
-            if ($nodeMainShopping->length > 0) {            
+        if ($xPathMain) {
+            $nodeMainShopping = $xPathMain->query("//div[@class='dsc_ncaution2 _shopping_info_area']");
+
+            if ($nodeMainShopping->length > 0) {
                 $this->data['hasMainShoppingSearch'] = 1;
-            }     
-        }                
+            }
+        }
+
+        print_r($this->data);
+        exit();
 
         if ($this->debug) {
             print_r('[crawlingNaverShopping]');
@@ -476,27 +497,33 @@ class NaverShopping
     }
 
     private function getXpath($url)
-    {        
+    {
         if (empty($url)) {
             $this->setCode(400);
             return false;
-        }                
+        }
 
         $ch = curl_init();
         $timeout = 5;
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        $headers = [
+            'Cache-Control: no-cache',
+            'Content-Type: application/x-www-form-urlencoded; charset=utf-8',
+            'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0',
+        ];
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         $html = curl_exec($ch);
         curl_close($ch);
 
         $dom = new DOMDocument();
 
-        @$dom->loadHTML($html);  
-        
+        @$dom->loadHTML($html);
+
         // print_r($url);
-        // print_r($html);      
-        // print_r($dom);      
+        // print_r($html);
+        // print_r($dom);
 
         return new DOMXPath($dom);
     }
