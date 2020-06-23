@@ -478,9 +478,6 @@ class NaverShopping
             }
         }
 
-        print_r($this->data);
-        exit();
-
         if ($this->debug) {
             print_r('[crawlingNaverShopping]');
             print_r($relKeywords);
