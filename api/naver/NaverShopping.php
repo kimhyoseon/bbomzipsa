@@ -373,7 +373,11 @@ class NaverShopping
                         $textInfo = trim($nodeInfo->nodeValue);
 
                         if (strpos($textInfo, '리뷰') !== false) {
-                            $reviews[] = filter_var($textInfo, FILTER_SANITIZE_NUMBER_INT);
+                            $nodeInfo2 = $xPath->query("descendant::em[@class='basicList_num__1yXM9']", $nodeInfo);
+                            if ($nodeInfo2->length > 0) {
+                                $textInfo = trim($nodeInfo2[0]->nodeValue);
+                                $reviews[] = filter_var($textInfo, FILTER_SANITIZE_NUMBER_INT);
+                            }
                         } else if (strpos($textInfo, '구매') !== false) {
                             $sells[] = filter_var($textInfo, FILTER_SANITIZE_NUMBER_INT);
                             if ($nodePrices->length > 0) {
