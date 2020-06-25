@@ -324,7 +324,7 @@ class NaverShopping
 
         $nodeTotalItems = $xPath->query("//div[@class='seller_filter_area']/ul/li");
         if ($nodeTotalItems->length == 0) {
-            $this->setCode(204);
+            $this->setCode(400);
             return false;
         }
 
@@ -346,10 +346,11 @@ class NaverShopping
             $this->data['relKeywords'] = implode(',', $relKeywords);
         }
 
-        $nodeItems = $xPath->query("//ul[@class='list_basis']/div/div/div/div");
+        // $nodeItems = $xPath->query("//ul[@class='list_basis']/div/div/div/div");
+        $nodeItems = $xPath->query("//li[contains(@class, 'basicList_item__2XT81')]");
 
         if ($nodeItems->length == 0) {
-            $this->setCode(204);
+            $this->setCode(400);
             return false;
         }
 

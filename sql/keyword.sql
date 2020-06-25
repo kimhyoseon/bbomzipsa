@@ -48,6 +48,8 @@ UPDATE keywords SET id = @COUNT:=@COUNT+1;
 
 ALTER TABLE keywords MODIFY COLUMN avgSellPrice int(20) unsigned default 0;
 ALTER TABLE keywords MODIFY COLUMN raceIndex decimal(10,4) unsigned default 0;
+UPDATE keywords SET category=9999, modDate='2020-01-01 00:00:00' WHERE category=9999 AND totalItems=0 AND id=40;
+UPDATE keywords SET category=9999, modDate='2020-01-01 00:00:00' WHERE id=40;
 
 drop table keywords_rel;
 
