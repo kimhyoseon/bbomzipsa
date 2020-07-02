@@ -67,6 +67,12 @@ try {
              */
             $queryWheres[] = "ignored != :ignored";
             $queryParams['ignored'] = 1;
+
+            /**
+             * 네이버 쇼핑 키워드만
+             */
+            $queryWheres[] = "hasMainShoppingSearch = :hasMainShoppingSearch";
+            $queryParams['hasMainShoppingSearch'] = 1;
         }
     } else {
         define('PAGING', 9999);
