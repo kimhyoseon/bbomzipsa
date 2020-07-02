@@ -332,7 +332,7 @@ class NaverShopping
         $this->data['raceIndex'] = @round($this->data['totalItems'] / $this->data['monthlyQcCnt'], 4);
 
 
-        if ($this->data['raceIndex'] > 10) $this->data['ignored'] = 1;
+        // if ($this->data['raceIndex'] > 10) $this->data['ignored'] = 1;
 
         $nodeRelKeywords = $xPath->query("//div[@class='relatedTags_relation_srh__1CleC']/ul/li/a");
 
