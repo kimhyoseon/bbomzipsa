@@ -61,7 +61,7 @@ try {
         }
 
         // 키워드검색이 아닌 경우
-        if (!empty(KEYWORD)) {
+        if (empty(KEYWORD)) {
             /**
              * ignore 키워드 제외
              */
