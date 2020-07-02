@@ -10,16 +10,16 @@ try {
 
     if (DEBUG == true) define('PAGE', 1);
     else define('PAGE', filter_input(INPUT_POST, 'page', FILTER_SANITIZE_NUMBER_INT));
-    
+
     define('CATEGORY', filter_input(INPUT_POST, 'category', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY));
 
     if (DEBUG == true) define('DETAILID', filter_input(INPUT_GET, 'detailId'));
-    else define('DETAILID', filter_input(INPUT_POST, 'detailId', FILTER_SANITIZE_NUMBER_INT));        
+    else define('DETAILID', filter_input(INPUT_POST, 'detailId', FILTER_SANITIZE_NUMBER_INT));
 
     if (DEBUG == true) define('KEYWORD', filter_input(INPUT_GET, 'keyword'));
-    else define('KEYWORD', filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING));        
+    else define('KEYWORD', filter_input(INPUT_POST, 'keyword', FILTER_SANITIZE_STRING));
 
-    if (!PAGE) throw new Exception(null, 400);    
+    if (!PAGE) throw new Exception(null, 400);
 
     $accountDb = parse_ini_file("../config/db.ini");
 
@@ -43,44 +43,47 @@ try {
         } else if (!empty(KEYWORD)) {
             define('PAGING', 9999);
             $queryWheres[] = "keyword LIKE :keyword";
-            $queryParams['keyword'] = '%'.KEYWORD.'%';        
+            $queryParams['keyword'] = '%'.KEYWORD.'%';
         /**
          * 전체검색인 경우 예외 카테고리 제외
          */
-        } else { 
+        } else {
             define('PAGING', 100);
             require_once '../class/category.php';
-            $category = new Category();        
+            $category = new Category();
             $exceptCategoryAll = $category->getExceptCategories();
 
             $queryWheres[] = "category NOT IN (:category)";
-            $queryParams['category'] = $exceptCategoryAll;            
+            $queryParams['category'] = $exceptCategoryAll;
 
             $queryWheres[] = "highReview > :highReview";
             $queryParams['highReview'] = 100;
         }
-    } else {
-        define('PAGING', 9999);                
 
-        $relIds = $db->query("SELECT keywords_rel_id FROM keywords_rel WHERE keywords_id=?", array(DETAILID));                
+        // 키워드검색이 아닌 경우
+        if (!empty(KEYWORD)) {
+            /**
+             * ignore 키워드 제외
+             */
+            $queryWheres[] = "ignored != :ignored";
+            $queryParams['ignored'] = 1;
+        }
+    } else {
+        define('PAGING', 9999);
+
+        $relIds = $db->query("SELECT keywords_rel_id FROM keywords_rel WHERE keywords_id=?", array(DETAILID));
 
         if (empty($relIds)) throw new Exception(null, 204);
-        
+
         $relIdsArray = [];
 
         foreach ($relIds as $value) {
             $relIdsArray[] = $value['keywords_rel_id'];
-        }                
+        }
 
         $queryWheres[] = "id IN (:id)";
         $queryParams['id'] = $relIdsArray;
-    }    
-
-    /**
-     * ignore 키워드 제외
-     */
-    // $queryWheres[] = "ignored != :ignored";
-    // $queryParams['ignored'] = 1;    
+    }
 
     if (!empty($queryWheres)) {
         $queryWheres = implode(' AND ', $queryWheres);
@@ -90,10 +93,10 @@ try {
     }
 
     $queryParams['offset'] = (PAGE - 1) * PAGING;
-    $queryParams['paging'] = PAGING;            
+    $queryParams['paging'] = PAGING;
 
     // DB 조회
-    $list = $db->query("SELECT * FROM keywords WHERE raceIndex != 0 AND saleIndex != 0 {$queryWheres} ORDER BY raceIndex ASC LIMIT :offset, :paging", $queryParams);    
+    $list = $db->query("SELECT * FROM keywords WHERE raceIndex != 0 AND saleIndex != 0 {$queryWheres} ORDER BY raceIndex ASC LIMIT :offset, :paging", $queryParams);
 
     if (empty($list)) throw new Exception(null, 204);
 
