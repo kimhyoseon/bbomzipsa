@@ -56,7 +56,7 @@ $queryParams['raceIndex'] = 2;
 /**
  * 5000개 제한
  */
-$queryParams['limit'] = 5000;
+$queryParams['limit'] = 5;
 
 /**
  * 쿼리 정리
@@ -70,10 +70,10 @@ if (!empty($queryWheres)) {
 // DB 조회
 $keywords = $db->query("SELECT keyword, modDate, raceIndex FROM keywords WHERE {$queryWheres} ORDER BY modDate ASC, raceIndex ASC LIMIT :limit", $queryParams);
 
-// echo '<pre>';
-// print_r($keywords);
-// echo '</pre>';
-// exit();
+echo '<pre>';
+print_r($keywords);
+echo '</pre>';
+exit();
 
 if (!empty($keywords)) {
     echo sizeof($keywords).'개 키워드 수집 시작'.PHP_EOL;
