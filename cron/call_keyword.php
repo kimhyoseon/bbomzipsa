@@ -56,7 +56,7 @@ $queryParams['raceIndex'] = 2;
 /**
  * 5000개 제한
  */
-$queryParams['limit'] = 5;
+$queryParams['limit'] = 50;
 
 /**
  * 쿼리 정리
