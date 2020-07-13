@@ -73,6 +73,12 @@ try {
              */
             $queryWheres[] = "hasMainShoppingSearch = :hasMainShoppingSearch";
             $queryParams['hasMainShoppingSearch'] = 1;
+
+            /**
+             * 판매, 리뷰 각각 100이상
+             */
+            $queryWheres[] = "highReview > 100";
+            $queryWheres[] = "highSell > 100";
         }
     } else {
         define('PAGING', 9999);
