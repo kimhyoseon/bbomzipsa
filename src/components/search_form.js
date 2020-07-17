@@ -154,9 +154,9 @@ class SearchForm extends React.Component {
 
         this.state.items.push(items);
 
-        if (items.ignored != 2) {
-          this.state.itemsIds.push(items.id);
-        }
+        // if (items.ignored != 2) {
+        //   this.state.itemsIds.push(items.id);
+        // }
       } else {
         for (let index = 0; index < items.length; index++) {
           this.pushItems(items[index]);
