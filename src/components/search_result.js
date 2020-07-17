@@ -11,16 +11,16 @@ class SearchResult extends React.Component {
 
     this.state = {
       openResult: false,
-      isSearching: false,      
+      isSearching: false,
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.openResult = this.openResult.bind(this);
     this.link1688 = this.link1688.bind(this);
     this.selectKeyword = this.selectKeyword.bind(this);
-    this.handleSubmitIgnore = this.handleSubmitIgnore.bind(this);    
-    this.searchKeywordDetail = this.searchKeywordDetail.bind(this);        
-    this.refreshItem = this.refreshItem.bind(this);        
+    this.handleSubmitIgnore = this.handleSubmitIgnore.bind(this);
+    this.searchKeywordDetail = this.searchKeywordDetail.bind(this);
+    this.refreshItem = this.refreshItem.bind(this);
 	}
 
 	keywordRow() {
@@ -89,9 +89,9 @@ class SearchResult extends React.Component {
       let linkNaverShopping = (!mobileCheck) ?'https://search.shopping.naver.com/search/all.nhn?cat_id=&frm=NVSHATC&query=' + item.keyword : 'https://msearch.shopping.naver.com/search/all?frm=NVSHSRC&cat_id=&pb=true&mall=&query=' + item.keyword;
       let linkGoogleSearch = 'http://www.google.com/search?q=' + item.keyword + '+위탁+사입+도매';
 
-      let isDefualtIgnoreChecked = (item.ignored == 2) ? false : true;
+      // let isDefualtIgnoreChecked = (item.ignored == 2) ? false : true;
 
-      this.tableSort.refresh();     
+      this.tableSort.refresh();
 
       return (
         <tr key={item.keyword}>
@@ -99,7 +99,7 @@ class SearchResult extends React.Component {
         <td className="align-middle text-center">
           <label>
             {item.keyword}
-            <input type="checkbox" name="id[]" value={item.id} onChange={() => this.selectKeyword(item.id)} defaultChecked={isDefualtIgnoreChecked} />
+            <input type="checkbox" name="id[]" value={item.id} onChange={() => this.selectKeyword(item.id)} /*defaultChecked={isDefualtIgnoreChecked}*/ />
           </label>
         </td>
         <td className="align-middle text-right">{this.numberWithCommas(item.totalItems)}개</td>
@@ -117,16 +117,16 @@ class SearchResult extends React.Component {
           {refresh}
           <span className="box-etc float-left"><a href={linkNaverShopping} target="_blank" title="네이버쇼핑 바로가기"><img src={iconNaverShopping} width="20" height="20" className="d-inline-block align-middle"/></a></span>
           <span className="box-etc float-left"><a href={linkGoogleSearch} target="_blank" title="구글검색 바로가기"><img src={iconGoogle} width="20" height="20" className="d-inline-block align-middle"/></a></span>
-          <span className="box-etc float-left"><a href="#" title="1688 바로가기" data-keyword={item.keyword} onClick={this.link1688}><img src={icon1688} width="20" height="20" className="d-inline-block align-middle"/></a></span>                              
+          <span className="box-etc float-left"><a href="#" title="1688 바로가기" data-keyword={item.keyword} onClick={this.link1688}><img src={icon1688} width="20" height="20" className="d-inline-block align-middle"/></a></span>
         </td>
 			</tr>);
       }
-    );      
+    );
 
 		return (
 			<tbody>{listItems}</tbody>
 		);
-  }  
+  }
 
   link1688(event) {
     event.preventDefault();
@@ -134,12 +134,12 @@ class SearchResult extends React.Component {
     let keyword = $(event.target).parent().data('keyword');
     if (!keyword) return false;
 
-    if (this.state.isSearching) {    
+    if (this.state.isSearching) {
       return false;
     }
 
     this.state.isSearching = true;
-        
+
     $.ajax({
       type: "POST",
       url: this.props.result.urlApi + '/translate.php',
@@ -157,9 +157,9 @@ class SearchResult extends React.Component {
         if (!result.translatedText) {
           Layer.toast('번역에 실패했습니다.');
           return false;
-        }        
-        
-        window.open("https://s.1688.com/selloffer/offer_search.htm?keywords=" + result.translatedText);        
+        }
+
+        window.open("https://s.1688.com/selloffer/offer_search.htm?keywords=" + result.translatedText);
       }, this),
       error: $.proxy(function(result, textStatus, jqXHR) {
         Layer.toast('통신 오류입니다. 잠시 후 다시 시도해주세요.');
@@ -172,23 +172,23 @@ class SearchResult extends React.Component {
 
   getOpenResultClass() {
      return (!this.state.openResult) ? " d-none d-sm-block" : ""
-  }  
+  }
 
-  selectKeyword(id) {       
-    var index = this.props.result.itemsIds.indexOf(id);    
+  selectKeyword(id) {
+    var index = this.props.result.itemsIds.indexOf(id);
     if (index !== -1) {
       this.props.result.itemsIds.splice(index, 1);
     } else {
       this.props.result.itemsIds.push(id);
-    }    
-    this.setState(this.state);    
+    }
+    this.setState(this.state);
   }
 
   extraFunc() {
     if (this.props.result.itemsIds.length == 0) return false;
-    
+
 		return (
-      <div>        
+      <div>
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb">
             <li key="ignore" className="breadcrumb-item">
@@ -200,16 +200,16 @@ class SearchResult extends React.Component {
 		);
   }
 
-  handleSubmitIgnore() {            
+  handleSubmitIgnore() {
     if (this.props.result.itemsIds.length == 0) {
-      Layer.toast('키워드를 선택해주세요.');            
+      Layer.toast('키워드를 선택해주세요.');
       return false;
-    }    
+    }
 
     var careIds = [];
     $("input[name='id[]']:not(:checked)").each(function(){
       careIds.push(parseInt($(this).val()));
-    });        
+    });
 
     $('#btn-search-submit, .btn-search-categoty').addClass('disabled');
 
@@ -221,7 +221,7 @@ class SearchResult extends React.Component {
       url: this.props.result.urlApi + '/ignore.php',
       data: {
         ids: this.props.result.itemsIds,
-        idsCared: careIds
+        // idsCared: careIds
       },
       success: $.proxy(function (result, textStatus) {
         if (!result || textStatus != 'success') {
@@ -230,10 +230,10 @@ class SearchResult extends React.Component {
         }
 
         // console.log(result);
-        
-        for (let index = 0; index < this.props.result.itemsIds.length; index++) {          
+
+        for (let index = 0; index < this.props.result.itemsIds.length; index++) {
           $('input[name="id[]"][value=' + this.props.result.itemsIds[index] + ']').closest('tr').hide();
-        }        
+        }
 
         this.props.result.itemsIds = [];
         this.setState(this.state);
@@ -242,7 +242,7 @@ class SearchResult extends React.Component {
         Layer.toast('통신 오류입니다. 잠시 후 다시 시도해주세요.');
       }, this),
       complete: $.proxy(function() {
-        $('#btn-search-submit, .btn-search-categoty').removeClass('disabled');        
+        $('#btn-search-submit, .btn-search-categoty').removeClass('disabled');
       }, this)
     });
   }
@@ -252,15 +252,15 @@ class SearchResult extends React.Component {
 
     this.props.result.page = 1;
     this.props.result.relkeyword = null;
-    this.props.result.modeSearch = 'd';    
-    this.props.result.detailId = id;    
-    
+    this.props.result.modeSearch = 'd';
+    this.props.result.detailId = id;
+
     this.props.search();
   }
 
   refreshItem(e, keyword) {
     if (e) e.preventDefault();
-    if (!keyword) return false;        
+    if (!keyword) return false;
 
     $.ajax({
       type: "POST",
@@ -272,21 +272,21 @@ class SearchResult extends React.Component {
         if (!result || textStatus != 'success') {
           Layer.toast(textStatus);
           return false;
-        }        
+        }
 
         for (let index = 0; index < this.props.result.items.length; index++) {
-          if (this.props.result.items[index].keyword == result.keyword) {                        
+          if (this.props.result.items[index].keyword == result.keyword) {
             this.props.result.items[index] = result;
             this.setState(this.state);
             return true;
           }
-        }        
+        }
       }, this),
       error: $.proxy(function(result, textStatus, jqXHR) {
         Layer.toast('통신 오류입니다. 잠시 후 다시 시도해주세요.');
       }, this),
       complete: $.proxy(function() {
-        $('#btn-search-submit, .btn-search-categoty').removeClass('disabled');        
+        $('#btn-search-submit, .btn-search-categoty').removeClass('disabled');
       }, this)
     });
   }
