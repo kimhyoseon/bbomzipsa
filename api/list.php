@@ -80,6 +80,7 @@ try {
             $queryWheres[] = "highReview > 100";
             $queryWheres[] = "highSell > 100";
         }
+    // 연관키워드 검색
     } else {
         define('PAGING', 9999);
 

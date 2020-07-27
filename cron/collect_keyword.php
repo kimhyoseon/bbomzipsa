@@ -66,6 +66,7 @@ try {
     // $allRelkeywords = array_slice($allRelkeywords, 0, 2);
 
     $collectRelkeywords = $allRelkeywords;
+    $collectRelkeywords[] = $KEYWORD; // 자기자신도 포함
     $addRelkeywords = array();
     $times = 0;
     $total = 0;
