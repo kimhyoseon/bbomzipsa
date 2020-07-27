@@ -5,12 +5,12 @@
 try {
     ini_set("display_errors", 1);
     ini_set('max_execution_time', '0');
-    ini_set('memory_limit', '-1');        
-    
+    ini_set('memory_limit', '-1');
+
     $KEYWORD = '니플패치';
     $REL_KEYWORD = '젖꼭지패치,젖꼭지패드,젖꼭지밴드,젖꼭지커버,젖꼭지가리개,여자젖꼭지패치,여자젖꼭지패드,여자젖꼭지밴드,여자젖꼭지커버,여자젖꼭지가리개,실리콘젖꼭지패치,실리콘젖꼭지패드,실리콘젖꼭지밴드,실리콘젖꼭지커버,실리콘젖꼭지가리개';
 
-    $db = null;    
+    $db = null;
 
     if (empty($KEYWORD)) {
         throw new Exception(null, 400);
@@ -20,7 +20,7 @@ try {
         throw new Exception(null, 400);
     }
 
-    // 계정    
+    // 계정
     $accountDb = parse_ini_file("../config/db.ini");
 
     require_once '../class/pdo.php';
@@ -28,20 +28,20 @@ try {
     require_once '../api/naver/NaverShopping.php';
     require_once '../class/curl_async.php';
 
-    $curlAsync = new CurlAsync();        
+    $curlAsync = new CurlAsync();
 
-    $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);    
+    $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
     // 검색 키워드 정보 가져오기
     $curlAsync->$KEYWORD(array(
-        'url' => 'http://localhost/api/keyword.php',        
+        'url' => 'http://localhost/api/keyword.php',
         // 'url' => 'http://ppomzipsa.com/api/keyword.php',
         'post' => array(
             'keyword' => $KEYWORD,
         )
     ));
-    
-    $keywordResult = json_decode($curlAsync->$KEYWORD(), true);    
+
+    $keywordResult = json_decode($curlAsync->$KEYWORD(), true);
 
     if (!$keywordResult || !$keywordResult['id']) {
         throw new Exception(null, 400);
@@ -51,18 +51,18 @@ try {
     $allRelkeywords = @explode(',', $REL_KEYWORD);
 
     if (empty($allRelkeywords)) throw new Exception(null, 400);
-    
+
     // 테스트 2개
-    // $allRelkeywords = array_slice($allRelkeywords, 0, 2);        
-    
+    // $allRelkeywords = array_slice($allRelkeywords, 0, 2);
+
     $collectRelkeywords = $allRelkeywords;
-    $addRelkeywords = array();    
-    $total = 0;    
-        
+    $addRelkeywords = array();
+    $total = 0;
+
     foreach (array_chunk($collectRelkeywords, 5) as $keywordChunk) {
         foreach ($keywordChunk as $keyword) {
             $curlAsync->$keyword(array(
-                'url' => 'http://localhost/api/keyword.php',                    
+                'url' => 'http://localhost/api/keyword.php',
                 // 'url' => 'http://ppomzipsa.com/api/keyword.php',
                 'post' => array(
                     'keyword' => $keyword,
@@ -78,12 +78,12 @@ try {
             $colletResult = json_decode($colletResult, true);
 
             // 수집된 정보를 검색 키워드와 연결
-            if ($colletResult['id']) {
+            if ($colletResult['id'] && $colletResult['hasMainShoppingSearch'] == 1) {
                 // 연결여부 확인
                 $queryWheres = array(
                     'keywords_id = :keywords_id',
                     'keywords_rel_id = :keywords_rel_id'
-                );          
+                );
 
                 $queryParams = array(
                     'keywords_id' => $keywordResult['id'],
@@ -91,7 +91,7 @@ try {
                 );
 
                 if (!empty($queryWheres)) {
-                    $queryWheres = implode(' AND ', $queryWheres);                        
+                    $queryWheres = implode(' AND ', $queryWheres);
                 } else {
                     $queryWheres = '';
                 }
@@ -104,24 +104,24 @@ try {
                         return ':'.$val;
                     }, $dbName);
                     $dbName = implode(',', $dbName);
-                    $dbValues = implode(',', $dbValues);                        
+                    $dbValues = implode(',', $dbValues);
 
                     $dbResult = $db->query("INSERT INTO keywords_rel ({$dbName}) VALUES({$dbValues})", $queryParams);
                 }
 
                 // echo '<pre>';
-                // print_r($dbResult);                        
+                // print_r($dbResult);
                 // echo '</pre>';
-                // exit();    
+                // exit();
             }
         }
-        
-        sleep(1);
-    }        
-    
-    $db->CloseConnection();    
 
-    echo "[{$KEYWORD}]와 연관된 {$total}개의 키워드 수집완료.".PHP_EOL;    
+        sleep(1);
+    }
+
+    $db->CloseConnection();
+
+    echo "[{$KEYWORD}]와 연관된 {$total}개의 키워드 수집완료.".PHP_EOL;
 } catch (Exception $e) {
     if (!empty($db)) $db->CloseConnection();
     echo $e->getCode().PHP_EOL;
