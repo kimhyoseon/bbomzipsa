@@ -79,7 +79,7 @@ class SearchResult extends React.Component {
       const detail = (item.hasDetail != 1) ? '' : (<span className="box-etc float-left"><button onClick={() => this.searchKeywordDetail(item.id)} className="btn badge badge-secondary winter">연관키워드</button></span>);
       const mainShoppingSearch = (item.hasMainShoppingSearch != 1) ? '' : (<span className="box-etc float-left" data-toggle="tooltip" data-placement="right" title="네이버메인 쇼핑검색 키워드"><i className="fas fa-home"></i></span>);
       const refresh = (<span className="box-etc float-left"><a href="#" onClick={(e) => this.refreshItem(e, item.keyword)}><i className="fas fa-sync"></i></a></span>);
-      const ranking = (item.ranking && item.ranking > -1) ? (<span className="box-etc float-left"><span className="badge badge-secondary">{item.ranking}</span></span>) : '';
+      const ranking = (item.ranking > -1) ? (<span className="box-etc float-left"><span className="badge badge-secondary">{item.ranking}</span></span>) : '';
 
       let category = ''
       if (item.categoryTexts) {
