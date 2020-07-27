@@ -77,8 +77,8 @@ try {
 
             $colletResult = json_decode($colletResult, true);
 
-            // 수집된 정보를 검색 키워드와 연결
-            if ($colletResult['id'] && $colletResult['hasMainShoppingSearch'] == 1) {
+            // 수집된 정보를 검색 키워드와 연결 (네이버쇼핑검색인 경우만 + 같은 카테고리만)
+            if ($colletResult['id'] && $colletResult['hasMainShoppingSearch'] == 1 && $colletResult['category'] == $keywordResult['category']) {
                 // 연결여부 확인
                 $queryWheres = array(
                     'keywords_id = :keywords_id',
