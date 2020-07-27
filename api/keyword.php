@@ -47,9 +47,19 @@ try {
     if (!empty($row)) {
         $hasDetail = $db->row("SELECT * FROM keywords_rel WHERE keywords_id=? LIMIT 1", array($row['id']));
 
-        if (!empty($hasDetail)) $oNaverShopping->setData(array(
-            'hasDetail' => 1
-        ));
+        if (!empty($hasDetail)) {
+            $oNaverShopping->setData(array(
+                'hasDetail' => 1
+            ));
+
+            $ranking = $db->row("SELECT * FROM keywords_ranking WHERE keywords_rel_id=? ORDER BY DATE DESC LIMIT 1", array($row['id']));
+
+            if (!empty($ranking)) {
+                $oNaverShopping->setData(array(
+                    'ranking' => $ranking['ranking']
+                ));
+            }
+        }
     }
 
     if (!$oNaverShopping->needUpdate()) {

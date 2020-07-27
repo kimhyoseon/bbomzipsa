@@ -25,6 +25,8 @@ class SearchResult extends React.Component {
 
 	keywordRow() {
 		const listItems = this.props.result.items.map((item) => {
+      // console.log(item);
+
       let ttipPrice = '최저:' + this.numberWithCommas(item.lowPrice) + '원, 최대:'+ this.numberWithCommas(item.highPrice) + '원';
       let ttipRaceIndex = '증감:' + item.raceIndexChange;
       let ttipSaleIndex = '평균구매수:' + this.numberWithCommas(item.avgSell) + '건, 평균리뷰수:'+ this.numberWithCommas(item.avgReview) + '건, 평균매출액:'+ this.numberWithCommas(item.avgSellPrice) + '원';
@@ -77,6 +79,7 @@ class SearchResult extends React.Component {
       const detail = (item.hasDetail != 1) ? '' : (<span className="box-etc float-left"><button onClick={() => this.searchKeywordDetail(item.id)} className="btn badge badge-secondary winter">연관키워드</button></span>);
       const mainShoppingSearch = (item.hasMainShoppingSearch != 1) ? '' : (<span className="box-etc float-left" data-toggle="tooltip" data-placement="right" title="네이버메인 쇼핑검색 키워드"><i className="fas fa-home"></i></span>);
       const refresh = (<span className="box-etc float-left"><a href="#" onClick={(e) => this.refreshItem(e, item.keyword)}><i className="fas fa-sync"></i></a></span>);
+      const ranking = (item.ranking && item.ranking > -1) ? (<span className="box-etc float-left"><span className="badge badge-secondary">{item.ranking}</span></span>) : '';
 
       let category = ''
       if (item.categoryTexts) {
@@ -110,6 +113,7 @@ class SearchResult extends React.Component {
         <td className={"align-middle" + this.getOpenResultClass()} ><small>{category}</small></td>
         <td className={"align-middle" + this.getOpenResultClass()} data-toggle="tooltip" data-placement="right" title={item.hotKeywords}><small>{hotKeyword}</small></td>
         <td className={"align-middle" + this.getOpenResultClass()}>
+          {ranking}
           {mainShoppingSearch}
           {detail}
           {device}

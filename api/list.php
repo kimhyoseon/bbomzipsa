@@ -109,7 +109,13 @@ try {
     $queryParams['paging'] = PAGING;
 
     // DB 조회
-    $list = $db->query("SELECT * FROM keywords WHERE raceIndex != 0 AND saleIndex != 0 {$queryWheres} ORDER BY raceIndex ASC LIMIT :offset, :paging", $queryParams);
+    // 연관키워드 검색
+    if (!empty($relIds) || !empty($queryParams['keyword'])) {
+        $list = $db->query("SELECT * FROM keywords LEFT JOIN keywords_ranking ON keywords_ranking.keywords_rel_id = keywords.id AND keywords_ranking.date = (SELECT kr.date FROM keywords_ranking AS kr WHERE kr.keywords_rel_id = keywords.id ORDER BY DATE DESC LIMIT 1) WHERE raceIndex != 0 AND saleIndex != 0 {$queryWheres} ORDER BY raceIndex ASC LIMIT :offset, :paging", $queryParams);
+    // 그 외 모두
+    } else {
+        $list = $db->query("SELECT * FROM keywords WHERE raceIndex != 0 AND saleIndex != 0 {$queryWheres} ORDER BY raceIndex ASC LIMIT :offset, :paging", $queryParams);
+    }
 
     if (empty($list)) throw new Exception(null, 204);
 
