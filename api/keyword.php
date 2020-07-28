@@ -101,6 +101,7 @@ try {
     $result['modDate'] = date('Y-m-d H:i:s');
     $resultForDb = array_filter($result);
     unset($resultForDb['hasDetail']);
+    unset($resultForDb['ranking']);
 
     // 업데이트
     if (!empty($row) && !empty($row['id'])) {
