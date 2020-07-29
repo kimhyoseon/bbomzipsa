@@ -481,6 +481,11 @@ class PHPExcelDownload {
                                     if (strpos($row[array_search('상품명', array_keys($filterMerged))], '리프팅밴드') !== false) {
                                         $row[array_search('상품명', array_keys($filterMerged))] = '마사지롤러';
                                     }
+                                // 좌욕기 > 약쑥
+                                } else if (strpos($v, '약쑥') !== false) {
+                                    if (strpos($row[array_search('상품명', array_keys($filterMerged))], '가정용대야') !== false) {
+                                        $row[array_search('상품명', array_keys($filterMerged))] = '천연약쑥';
+                                    }
                                 }
 
                                 // 특이옵션 처리
