@@ -470,6 +470,25 @@ class PHPExcelDownload {
                                 $_v = $this->getShortOptionJshk($v);
                                 $row[array_search('상품명', array_keys($filterMerged))] = '['.$row[array_search('상품명', array_keys($filterMerged))].'] '.$_v;
                             } else {
+                                // echo '<pre>';
+                                // print_r($v);
+                                // echo '</pre>';
+                                // exit();
+
+                                // 예외옵션상품 처리
+                                // 리프팅밴드 > 마사지롤러
+                                if (strpos($v, '롤러') !== false) {
+                                    if (strpos($row[array_search('상품명', array_keys($filterMerged))], '리프팅밴드') !== false) {
+                                        $row[array_search('상품명', array_keys($filterMerged))] = '마사지롤러';
+                                    }
+                                }
+
+                                // 특이옵션 처리
+                                // if (in_array($value, array('리프팅밴드') == true)) {
+                                //     if (strpos($title, '수면안대') !== false) {
+                                //     }
+                                // }
+
                                 $_v = $this->getShortOption($v);
                                 $row[array_search('상품명', array_keys($filterMerged))] = $row[array_search('상품명', array_keys($filterMerged))].' ['.$_v.']';
                             }
