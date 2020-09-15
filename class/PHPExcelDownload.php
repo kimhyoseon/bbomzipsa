@@ -513,6 +513,12 @@ class PHPExcelDownload {
                             }
                         }
 
+                        if ($filterIndexReverse[$k] == '수취인명') {
+                            if (mb_strlen($v) < 2) {
+                                $v = $v.'님';
+                            }
+                        }
+
                         $row[array_search($filterIndexReverse[$k], array_keys($filterMerged))] = $v;
                     }
                 }
