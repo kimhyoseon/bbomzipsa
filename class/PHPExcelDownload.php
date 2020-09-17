@@ -2535,11 +2535,11 @@ class PHPExcelDownload {
             $rowArray[] = $value;
         }
 
-        echo '<pre>';
-        print_r($postInputDirect);
-        print_r($inputDirect);
-        echo '</pre>';
-        exit;
+        // echo '<pre>';
+        // print_r($postInputDirect);
+        // print_r($inputDirect);
+        // echo '</pre>';
+        // exit;
 
         return $inputDirect;
     }
