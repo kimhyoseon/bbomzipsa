@@ -2517,6 +2517,7 @@ class PHPExcelDownload {
     public function convertDirectDataToInputExcelData($data) {
         if (empty($data)) return false;
 
+        $data = str_replace(' + ', "+", $data);
         $postInputDirect = preg_split('/[\s]+/', $data);
         $inputDirect = array(array('운송장번호', '받는분'));
         $rowIndex = 1;
@@ -2534,11 +2535,11 @@ class PHPExcelDownload {
             $rowArray[] = $value;
         }
 
-        // echo '<pre>';
-        // print_r($postInputDirect);
-        // print_r($inputDirect);
-        // echo '</pre>';
-        // exit;
+        echo '<pre>';
+        print_r($postInputDirect);
+        print_r($inputDirect);
+        echo '</pre>';
+        exit;
 
         return $inputDirect;
     }
