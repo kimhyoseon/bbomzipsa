@@ -382,7 +382,7 @@ class Hanki {
       if ($fryTotal > 3 && strpos($chan, '조림') !== false) continue;
 
       // 너무 많이 선택된 반찬은 제외
-      if ($this->chanCount[$chan] > 4) continue;
+      if ($this->chanCount[$chan] > 3) continue;
 
       // 통과한 반찬은 담아주기
       $sets[] = $chan;
