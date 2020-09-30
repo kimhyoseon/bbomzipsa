@@ -154,12 +154,12 @@ class Hanki {
                 // $this->chanCount[$this->jshkDataSpecial[0]]++;
                 // $this->chanCount[$this->jshkDataSoup[0]]++;
 
-                if ($dayOfWeek == 5) {
-                  $c = array_shift($this->jshkDataSpecial);
-                  $this->jshkDataSpecial[] = $c;
-                  $c = array_shift($this->jshkDataSoup);
-                  $this->jshkDataSoup[] = $c;
-                }
+                // if ($dayOfWeek == 5) {
+                $c = array_shift($this->jshkDataSpecial);
+                $this->jshkDataSpecial[] = $c;
+                $c = array_shift($this->jshkDataSoup);
+                $this->jshkDataSoup[] = $c;
+                // }
             }
 
             $this->allDay[$value] = $chans;
@@ -296,6 +296,8 @@ class Hanki {
       '콩' => array('검은콩', '땅콩'),
       '생무침' => array('오이', '깻잎'),
       '무' => array('무나물', '무생채'),
+      '장조림' => array('메추리알조림', '계란장조림'),
+      '부침' => array('계란말이', '분홍소세지'),
     );
     $bans = array();
 
@@ -377,6 +379,7 @@ class Hanki {
       if ($soyTotal > 2 && strpos($chan, '간장') !== false) continue;
       if ($spicyTotal > 2 && strpos($chan, '매콤') !== false) continue;
       if ($fryTotal > 3 && strpos($chan, '볶음') !== false) continue;
+      if ($fryTotal > 3 && strpos($chan, '조림') !== false) continue;
 
       // 너무 많이 선택된 반찬은 제외
       if ($this->chanCount[$chan] > 4) continue;
