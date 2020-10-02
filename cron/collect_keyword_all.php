@@ -69,6 +69,8 @@ try {
                     'keyword' => $keyword,
                 )
             ));
+
+            sleep(1);
         }
 
         foreach ($keywordChunk as $keyword) {
@@ -119,8 +121,6 @@ try {
                 echo '[Fail]'.$keyword.PHP_EOL;
             }
         }
-
-        sleep(1);
     }
 
     $db->CloseConnection();
