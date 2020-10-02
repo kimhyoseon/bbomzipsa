@@ -69,8 +69,6 @@ try {
                     'keyword' => $keyword,
                 )
             ));
-
-            sleep(1);
         }
 
         foreach ($keywordChunk as $keyword) {
@@ -116,11 +114,15 @@ try {
                 // print_r($dbResult);
                 // echo '</pre>';
                 // exit();
-            // 실패시
-            } else {
+
+                // 실패시
+            }
+            if (empty($colletResult['id'])) {
                 echo '[Fail]'.$keyword.PHP_EOL;
             }
         }
+
+        sleep(1);
     }
 
     $db->CloseConnection();
