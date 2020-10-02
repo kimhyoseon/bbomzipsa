@@ -71,7 +71,7 @@ try {
                 )
             ));
 
-            sleep(1);
+            sleep(2);
         }
 
         foreach ($keywordChunk as $keyword) {
