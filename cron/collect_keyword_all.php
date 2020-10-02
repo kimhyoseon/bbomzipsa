@@ -70,6 +70,8 @@ try {
                     'refresh' => 1,
                 )
             ));
+
+            sleep(2);
         }
 
         foreach ($keywordChunk as $keyword) {
@@ -115,9 +117,9 @@ try {
                 // print_r($dbResult);
                 // echo '</pre>';
                 // exit();
-
-                // 실패시
             }
+
+            // 실패시
             if (empty($colletResult['id'])) {
                 echo '[Fail]'.$keyword.PHP_EOL;
             }
