@@ -84,6 +84,8 @@ try {
                         'keyword' => $keyword,
                     )
                 ));
+
+                sleep(0.1)
             }
 
             foreach ($keywordChunk as $keyword) {
