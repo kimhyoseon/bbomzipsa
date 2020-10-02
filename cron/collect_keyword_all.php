@@ -114,6 +114,9 @@ try {
                 // print_r($dbResult);
                 // echo '</pre>';
                 // exit();
+            // 실패시
+            } else {
+                echo '[Fail]'.$keyword.PHP_EOL;
             }
         }
 
