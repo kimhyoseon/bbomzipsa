@@ -85,6 +85,8 @@ try {
                         'refresh' => 1,
                     )
                 ));
+
+                sleep(1);
             }
 
             foreach ($keywordChunk as $keyword) {
