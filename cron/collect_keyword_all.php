@@ -67,6 +67,7 @@ try {
                 // 'url' => 'http://ppomzipsa.com/api/keyword.php',
                 'post' => array(
                     'keyword' => $keyword,
+                    'refresh' => 1,
                 )
             ));
         }
