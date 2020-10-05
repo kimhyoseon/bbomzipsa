@@ -382,7 +382,7 @@ return array(
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 1),
 
-        '계란' => array(4, '개', true, '국산'),
+        '감자' => array(4, '개', true, '국산'),
         '당근' => array(0.3, '개', true, '국산'),
         '간장조림소스' => array(150, 'g', false, ''),
         '깨' => array(1, 'g', false, '국산'),
@@ -718,7 +718,8 @@ return array(
 
         '단호박' => array(0.3, '개', true, '국산'),
         '옥수수' => array(1, 'g', false, '국산'),
-        '양파' => array(1, 'g', false, '국산'),
+        '호박씨' => array(1, 'g', false, '중국'),
+        '해바라기씨' => array(1, 'g', false, '중국'),
         '건포도' => array(1, 'g', false, '국산'),
         '마요네즈' => array(1, 'g', false, '국산'),
     ),
