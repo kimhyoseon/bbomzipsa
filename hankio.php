@@ -13,11 +13,30 @@ if (!file_exists($chanFile)) exit('식단정보를 찾을 수 없습니다.');
 $dailyChan = json_decode(file_get_contents($chanFile), true);
 $orderData1 = json_decode(file_get_contents($orderFile1), true);
 $orderData2 = json_decode(file_get_contents($orderFile2), true);
-$orderData = array_merge($orderData1, $orderData2);
+$orderData = [];
+if (!empty($orderData1)) {
+  foreach ($orderData1 as $option => $amount) {
+    if (empty($orderData[$option])) {
+      $orderData[$option] = $amount;
+    } else {
+      $orderData[$option] = $orderData[$option] + $amount;
+    }
+  }
+}
+if (!empty($orderData2)) {
+  foreach ($orderData2 as $option => $amount) {
+    if (empty($orderData[$option])) {
+      $orderData[$option] = $amount;
+    } else {
+      $orderData[$option] = $orderData[$option] + $amount;
+    }
+  }
+}
 $modTime = filemtime($orderFile2);
 $modTime = date('n월 j일 H시', $modTime);
 
 // echo '<pre>';
+// print_r($orderData2);
 // print_r($orderData);
 // echo '</pre>';
 // exit();
