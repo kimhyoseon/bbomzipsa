@@ -3,15 +3,18 @@ ini_set("memory_limit" , -1);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$orderFile = $_SERVER['DOCUMENT_ROOT'].'/../crawler/log/jshk_order_data.json';
+$orderFile1 = $_SERVER['DOCUMENT_ROOT'].'/../crawler/log/jshk_order_data_new.json';
+$orderFile2 = $_SERVER['DOCUMENT_ROOT'].'/../crawler/log/jshk_order_data_old.json';
 $chanFile = $_SERVER['DOCUMENT_ROOT'].'/data/dailychan.json';
 
 if (!file_exists($orderFile)) exit('주문정보를 찾을 수 없습니다.');
 if (!file_exists($chanFile)) exit('식단정보를 찾을 수 없습니다.');
 
 $dailyChan = json_decode(file_get_contents($chanFile), true);
-$orderData = json_decode(file_get_contents($orderFile), true);
-$modTime = filemtime($orderFile);
+$orderData1 = json_decode(file_get_contents($orderFile1), true);
+$orderData2 = json_decode(file_get_contents($orderFile2), true);
+$orderData = array_merge($orderData1, $orderData2);
+$modTime = filemtime($orderFile1);
 $modTime = date('n월 j일 H시', $modTime);
 
 // echo '<pre>';
