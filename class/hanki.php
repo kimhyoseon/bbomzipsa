@@ -414,6 +414,11 @@ class Hanki {
       return $this->getBanchanSet($dayOfWeek);
     }
 
+    // 골고루인지 확인 (조림, 볶음은 최소 1개씩 포함)
+    if ($fryTotal < 1 || $boilTotal < 1) {
+      return $this->getBanchanSet($dayOfWeek);
+    }
+
     // 뽑기에서 선택된 반찬을 제거
     // foreach ($sets as $value) {
     //     if (($key = array_search($value, $this->jshkDataLots)) !== false) {
