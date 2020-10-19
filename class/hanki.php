@@ -298,12 +298,14 @@ class Hanki {
       '무' => array('무나물', '무생채'),
       '장조림' => array('메추리알조림', '계란장조림'),
       '부침' => array('계란말이', '분홍소세지'),
+      '계란' => array('계란말이', '계란장조림'),
     );
     $bans = array();
 
     $soyTotal = 0;
     $spicyTotal = 0;
     $fryTotal = 0;
+    $boilTotal = 0;
 
     // 횟수 출력
     // echo $this->try;
@@ -376,13 +378,17 @@ class Hanki {
       }
 
       // 같은부류반찬처리
-      if ($soyTotal > 2 && strpos($chan, '간장') !== false) continue;
-      if ($spicyTotal > 2 && strpos($chan, '매콤') !== false) continue;
-      if ($fryTotal > 3 && strpos($chan, '볶음') !== false) continue;
-      if ($fryTotal > 3 && strpos($chan, '조림') !== false) continue;
+      if ($soyTotal > 1 && strpos($chan, '간장') !== false) continue;
+      if ($spicyTotal > 1 && strpos($chan, '매콤') !== false) continue;
+      if ($fryTotal > 2 && strpos($chan, '볶음') !== false) continue;
+      if ($boilTotal > 2 && strpos($chan, '조림') !== false) continue;
 
       // 너무 많이 선택된 반찬은 제외
       if ($this->chanCount[$chan] > 3) continue;
+
+      // 특정반찬은 횟수제한 (최대 2회)
+      if ($chan == '우엉조림' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '수제단호박샐러드' && $this->chanCount[$chan] > 1) continue;
 
       // 통과한 반찬은 담아주기
       $sets[] = $chan;
@@ -391,7 +397,12 @@ class Hanki {
       if (strpos($chan, '간장') !== false) $soyTotal++;
       if (strpos($chan, '매콤') !== false) $spicyTotal++;
       if (strpos($chan, '볶음') !== false) $fryTotal++;
+      if (strpos($chan, '조림') !== false) $boilTotal++;
     }
+
+    // echo '<pre>';
+    // print_r($soyTotal.'/'.$soyTotal.'/'.$soyTotal.'/'.$soyTotal);
+    // echo '</pre>';
 
     // 가격 체크
     foreach ($sets as $value) {
