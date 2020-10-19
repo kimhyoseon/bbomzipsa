@@ -192,7 +192,7 @@ return array(
         '당면' => array(50, 'g', true, '국산'),
         '부추' => array(20, 'g', true, '국산'),
         '돼지고기(다진)' => array(30, 'g', true, '국산'),
-        '목이버섯' => array(1, 'g', true, '국산'),
+        '목이버섯' => array(1, 'g', true, '중국'),
         '양파' => array(1, 'g', false, '국산'),
         '당근' => array(1, 'g', true, '국산'),
         '맛간장' => array(1, 'g', false, '국산'),
