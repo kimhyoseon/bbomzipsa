@@ -299,7 +299,7 @@ class Hanki {
       '장조림' => array('메추리알조림', '계란장조림'),
       '부침' => array('계란말이', '분홍소세지'),
       '계란' => array('계란말이', '계란장조림'),
-      '무침' => array('더덕무침', '고들빼기무침', '무말랭이무침'),
+      '무침' => array('더덕무침', '고들빼기무침', '무말랭이무침', '오징어젓갈'),
     );
     $bans = array();
 
@@ -390,6 +390,10 @@ class Hanki {
       // 특정반찬은 횟수제한 (최대 2회)
       if ($chan == '우엉조림' && $this->chanCount[$chan] > 1) continue;
       if ($chan == '수제단호박샐러드' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '오징어젓갈' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '고들빼기무침' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '더덕무침' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '무말랭이무침' && $this->chanCount[$chan] > 1) continue;
 
       // 통과한 반찬은 담아주기
       $sets[] = $chan;
