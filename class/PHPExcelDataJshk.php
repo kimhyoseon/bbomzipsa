@@ -202,6 +202,7 @@ return array(
     '숙주부추볶음' => array( // 2020-09-30
         '_total' => array(150, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
+        '_regular' => array(2, 3200, 1),
 
         '숙주나물' => array(250, 'g', true, '국산'),
         '부추' => array(20, 'g', true, '국산'),
@@ -453,7 +454,7 @@ return array(
     '매콤콩나물무침' => array(  // 2020-09-30
         '_total' => array(200, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
-        '_regular' => array(2, 3200, 2),
+        '_regular' => array(2, 3200, 1),
 
         '콩나물' => array(200, 'g', true, '국산'),
         '모듬야채' => array(18, 'g', true, '국산'),
@@ -660,16 +661,19 @@ return array(
     '오징어젓갈' => array( // 2019-10-21
         '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
+        '_regular' => array(1, 3200, 1),
 
         '오징어' => array(100, 'g', false, '중국'),
         '참기름' => array(1, 'g', false, '국산'),
         '깨' => array(1, 'g', false, '국산'),
         '물엿' => array(1, 'g', false, '중국'),
         '마늘' => array(1, 'g', false, '중국'),
+        '청양고추' => array(1, 'g', true, '국산'),
         '고춧가루' => array(1, 'g', false, '중국'),
         '설탕' => array(1, 'g', false, '중국'),
         '소금' => array(1, 'g', false, '중국'),
         '멸치액젓' => array(1, 'g', false, '수입'),
+        'L-글루탐산나트륨' => array(1, 'g', false, '수입'),
     ),
     '낙지젓갈' => array( // 2019-10-21
         '_total' => array(150, 'g', false, ''),
