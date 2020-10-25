@@ -192,6 +192,18 @@ INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('부
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '가정용혈압계', '기본형', 5, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '가정용혈압계', '고급형', 5, 4);
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '가정용혈압계', '아답터', 5, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '짐볼', '55cm (블루)', 0, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '짐볼', '55cm (와일드핑크)', 120, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '짐볼', '55cm (더스티블루)', 0, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '짐볼', '65cm (레드)', 0, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '짐볼', '65cm (블루)', 0, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '짐볼', '65cm (라임크림)', 0, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '짐볼', '65cm (라일락)', 0, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '짐볼', '65cm (라벤더)', 120, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '짐볼', '75cm (블루)', 0, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '짐볼', '75cm (루비와인)', 0, 4);
+INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '짐볼', '75cm (무드인디고)', 0, 4);
+
 
 
 -- 상품별 판매수
@@ -295,3 +307,9 @@ WHERE yad.yoona_apt_id IN (SELECT id FROM yoona_apt WHERE code_sigoongoo = '4146
 GROUP BY yad.yoona_apt_id, yad.size
 ORDER BY calc_sooicper DESC
 LIMIT 100;
+
+
+-- 연관검색어 삭제
+select id from keywords where keyword='방충망청소';
+delete from keywords_rel where keywords_id='83422' and keywords_rel_id in (select id from keywords where keyword='');
+delete from keywords_rel where keywords_id='83422' and keywords_rel_id in (select id from keywords where keyword='');
