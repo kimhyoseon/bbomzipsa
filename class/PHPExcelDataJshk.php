@@ -732,7 +732,7 @@ return array(
     '버터바싹불고기' => array( // 150g 2019-10-17
         '_total' => array(150, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
-        '_special' => 1,
+        // '_special' => 1,
 
         '소고기(불고기)' => array(230, 'g', true, '호주'),
         '간장볶음소스' => array(60, 'g', false, ''),
