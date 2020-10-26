@@ -622,7 +622,7 @@ return array(
         '멸치액젓' => array(1, 'g', false, '수입'),
     ),
     '더덕무침' => array( // 2019-10-21
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(180, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(1, 3200, 1),
 
@@ -633,7 +633,7 @@ return array(
         'L-글루탐산나트륨' => array(1, 'g', false, '수입'),
     ),
     '고들빼기무침' => array( // 2019-10-21
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(180, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(1, 3200, 1),
 
