@@ -8,7 +8,7 @@ try {
     ini_set('memory_limit', '-1');
 
     // 수집된 키워드 가져오기
-    $keywordsBest = file_get_contents('/home/dev/crawler/log/naverkeyword.json');
+    $keywordsBest = file_get_contents('C:/dev/crawler/log/naverkeyword.json');
     $keywordsBest = json_decode($keywordsBest, true);
 
     $keywordsBest = array_unique($keywordsBest);
@@ -55,11 +55,8 @@ try {
         sleep(1);
     }
 
-    $db->CloseConnection();
-
     echo "[{$total}개의 키워드 수집완료.".PHP_EOL;
 } catch (Exception $e) {
-    if (!empty($db)) $db->CloseConnection();
     echo $e->getCode().PHP_EOL;
     echo $e->getMessage().PHP_EOL;
 }

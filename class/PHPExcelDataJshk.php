@@ -664,6 +664,7 @@ return array(
         '_regular' => array(1, 3200, 1),
 
         '오징어' => array(100, 'g', false, '중국'),
+        '무' => array(0.1, '개', true, '국산'),
         '참기름' => array(1, 'g', false, '국산'),
         '깨' => array(1, 'g', false, '국산'),
         '물엿' => array(1, 'g', false, '중국'),
