@@ -34,10 +34,10 @@ if (!empty($orderData1)) {
 }
 if (!empty($orderData2)) {
   foreach ($orderData2 as $option => $amount) {
-    if (empty($orderData[$option])) {
-      $orderData[$option] = $amount;
+    if (empty($orderData[$amount['opt']])) {
+      $orderData[$amount['opt']]] = $amount;
     } else {
-      $orderData[$option] = $orderData[$option] + $amount;
+      $orderData[$amount['opt']]] = $orderData[$amount['opt']]] + $amount['amount']];
     }
   }
 }
