@@ -230,6 +230,13 @@ create table smartstore_order_hanki (
 );
 delete from smartstore_order_hanki;
 
+-- 정성한끼 발주확인 주문
+drop table smartstore_order_hanki_wait;
+create table smartstore_order_hanki_wait (
+    opt varchar(50) NOT NULL default '' comment '옵션',
+    amount smallint NOT NULL default 0 comment '수량'
+);
+
 
 drop table yoona_apt;
 create table yoona_apt (

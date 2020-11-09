@@ -4,16 +4,25 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 $orderFile1 = $_SERVER['DOCUMENT_ROOT'].'/../crawler/log/jshk_order_data_new.json';
-$orderFile2 = $_SERVER['DOCUMENT_ROOT'].'/../crawler/log/jshk_order_data_old.json';
+// $orderFile2 = $_SERVER['DOCUMENT_ROOT'].'/../crawler/log/jshk_order_data_old.json';
 $chanFile = $_SERVER['DOCUMENT_ROOT'].'/data/dailychan.json';
 
-if (!file_exists($orderFile2)) exit('주문정보를 찾을 수 없습니다.');
+// if (!file_exists($orderFile2)) exit('주문정보를 찾을 수 없습니다.');
 if (!file_exists($chanFile)) exit('식단정보를 찾을 수 없습니다.');
 
 $dailyChan = json_decode(file_get_contents($chanFile), true);
 $orderData1 = json_decode(file_get_contents($orderFile1), true);
-$orderData2 = json_decode(file_get_contents($orderFile2), true);
+// $orderData2 = json_decode(file_get_contents($orderFile2), true);
+
+// DB 정보 조합
+$accountDb = parse_ini_file("./config/db.ini");
+require_once './class/pdo.php';
+$db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+$orderData2 = $db->query("SELECT * FROM smartstore_order_hanki_wait;");
+
 $orderData = [];
+
 if (!empty($orderData1)) {
   foreach ($orderData1 as $option => $amount) {
     if (empty($orderData[$option])) {
@@ -32,7 +41,7 @@ if (!empty($orderData2)) {
     }
   }
 }
-$modTime = filemtime($orderFile2);
+$modTime = filemtime($orderFile1);
 $modTime = date('n월 j일 H시', $modTime);
 
 // echo '<pre>';
@@ -58,11 +67,6 @@ foreach ($orderData as $option => $amount) {
 
   $orderData1[$date][] = [$set, $amount];
 }
-
-// DB 정보 조합
-$accountDb = parse_ini_file("./config/db.ini");
-require_once './class/pdo.php';
-$db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
 $listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date >= ? ORDER BY date ASC", array(date('Ymd')));
 // $listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date < ? ORDER BY date ASC", array(date('Ymd')));
@@ -137,10 +141,10 @@ if (!empty($listDb)) {
       }
     // 그 밖에는 관리자사이트에서 정보가 들어가기 때문에 PASS
     } else {
-      if (empty($orderInfo[$date]['DB주문 알수없음'])) {
-        $orderInfo[$date]['DB주문 알수없음'] = 1;
+      if (empty($orderInfo[$date]['DB주문 별도주문추가'])) {
+        $orderInfo[$date]['DB주문 별도주문추가'] = 1;
       } else {
-        $orderInfo[$date]['DB주문 알수없음']++;
+        $orderInfo[$date]['DB주문 별도주문추가']++;
       }
     }
   }
