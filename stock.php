@@ -22,7 +22,7 @@ body {
   height: 100%;
 }
 
-body {    
+body {
   background-color: #f5f5f5;
 }
 
@@ -34,7 +34,7 @@ body {
 }
 </style>
 
-<body>  
+<body>
     <div class="container-fluid">
         <h3>재고관리</h3>
         <table class="table table-striped">
@@ -51,7 +51,7 @@ body {
                     <th scope="col" width="100"></th>
                 </tr>
             </thead>
-            <tbody id="list-item">                
+            <tbody id="list-item">
                 <tr>
                     <td></td>
                     <td><input type="text" class="form-control-sm form-control inp-category"/></td>
@@ -65,7 +65,28 @@ body {
                 </tr>
             </tbody>
         </table>
-    </div>    
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">히스토리</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <input type="hidden" id="edit-orderdetail-id" />
+          <input type="hidden" id="edit-orderdetail-date" />
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary btn-save-edit-orderdetail">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
 </body>
 
 <script>
@@ -73,25 +94,25 @@ function init() {
     $.ajax({
         type: 'POST',
         url: '../api/stock.php',
-        dataType : 'json',        
+        dataType : 'json',
         timeout: 5000,
         data: {
             menu: 'list'
         },
         success: function (result, textStatus) {
             console.log(result);
-            console.log(textStatus); 
+            console.log(textStatus);
 
             if (result) {
                 var html = '';
                 for (let index = 0; index < result.length; index++) {
                     const element = result[index];
                     var color = 'green';
-                    
+
                     if (element.remain == null) color = 'gray'
                     else if (element.remain < 5) color = 'red';
-                    else if (element.remain < 15) color = 'orange';                    
-                    
+                    else if (element.remain < 15) color = 'orange';
+
                     html += '<tr data-id="' + element.id + '">';
                     html += '<td>' + element.id + '</td>';
                     html += '<td><input type="text" value="' + element.category + '" class="form-control-sm form-control inp-category"/></td>';
@@ -101,7 +122,7 @@ function init() {
                     html += '<td><input type="text" value="' + element.period + '" class="form-control-sm form-control inp-period"/></td>';
                     html += '<td>' + element.sale_cnt + '</td>';
                     html += '<td><font color="' + color + '">' + element.remain + '</font></td>';
-                    html += '<td><button class="btn btn-secondary btn-sm mr-1 btn-edit">수정</button><button class="btn btn-danger btn-sm btn-del">삭제</button></td>';
+                    html += '<td><button class="btn btn-info btn-sm mr-1 btn-history" data-toggle="modal" data-target="#exampleModal">히스토리</button><button class="btn btn-secondary btn-sm mr-1 btn-edit">수정</button><button class="btn btn-danger btn-sm btn-del">삭제</button></td>';
                     html += '</tr>';
                 }
 
@@ -114,15 +135,15 @@ function init() {
             console.log(jqXHR);
         },
         complete: function() {
-        } 
+        }
     });
 
-    return false;  
+    return false;
 }
 
 function editAmount(e) {
     if (confirm("수정하시겠습니까?")) {
-        var row = $(e.currentTarget).closest('tr').eq(0);         
+        var row = $(e.currentTarget).closest('tr').eq(0);
 
         var data = {
             id: $(row).data('id'),
@@ -131,20 +152,20 @@ function editAmount(e) {
             opt: $(row).find('.inp-opt').val(),
             amount: $(row).find('.inp-amount').val(),
             period: $(row).find('.inp-period').val(),
-        };               
+        };
 
         $.ajax({
             type: 'POST',
             url: '../api/stock.php',
-            dataType : 'json',        
+            dataType : 'json',
             timeout: 5000,
             data: {
                 menu: 'edit',
-                data: data                
+                data: data
             },
             success: function (result, textStatus) {
                 console.log(result);
-                console.log(textStatus); 
+                console.log(textStatus);
 
                 if (result['result'] == true) {
                     location.reload();
@@ -156,14 +177,14 @@ function editAmount(e) {
                 console.log(jqXHR);
             },
             complete: function() {
-            } 
+            }
         });
     }
 }
 
 function addAmount(e) {
     if (confirm("추가하시겠습니까?")) {
-        var row = $(e.currentTarget).closest('tr').eq(0);         
+        var row = $(e.currentTarget).closest('tr').eq(0);
 
         var data = {
             category: $(row).find('.inp-category').val(),
@@ -171,20 +192,20 @@ function addAmount(e) {
             opt: $(row).find('.inp-opt').val(),
             amount: $(row).find('.inp-amount').val(),
             period: $(row).find('.inp-period').val(),
-        };        
+        };
 
         $.ajax({
             type: 'POST',
             url: '../api/stock.php',
-            dataType : 'json',        
+            dataType : 'json',
             timeout: 5000,
             data: {
                 menu: 'add',
-                data: data                
+                data: data
             },
             success: function (result, textStatus) {
                 console.log(result);
-                console.log(textStatus); 
+                console.log(textStatus);
 
                 if (result['result'] == true) {
                     location.reload();
@@ -196,31 +217,31 @@ function addAmount(e) {
                 console.log(jqXHR);
             },
             complete: function() {
-            } 
+            }
         });
     }
 }
 
 function delAmount(e) {
     if (confirm("삭제하시겠습니까?")) {
-        var row = $(e.currentTarget).closest('tr').eq(0);         
+        var row = $(e.currentTarget).closest('tr').eq(0);
 
         var data = {
-            id: $(row).data('id'),            
-        };          
+            id: $(row).data('id'),
+        };
 
         $.ajax({
             type: 'POST',
             url: '../api/stock.php',
-            dataType : 'json',        
+            dataType : 'json',
             timeout: 5000,
             data: {
-                menu: 'del',
-                data: data                
+                menu: 'history',
+                data: data
             },
             success: function (result, textStatus) {
                 console.log(result);
-                console.log(textStatus); 
+                console.log(textStatus);
 
                 if (result['result'] == true) {
                     location.reload();
@@ -232,17 +253,59 @@ function delAmount(e) {
                 console.log(jqXHR);
             },
             complete: function() {
-            } 
+            }
         });
     }
+}
+
+function showHistory(e) {
+    var row = $(e.currentTarget).closest('tr').eq(0);
+
+    var data = {
+        id: $(row).data('id'),
+    };
+
+    $.ajax({
+        type: 'POST',
+        url: '../api/stock.php',
+        dataType : 'json',
+        timeout: 5000,
+        data: {
+            menu: 'history',
+            data: data
+        },
+        success: function (result, textStatus) {
+            console.log(result);
+            console.log(textStatus);
+
+            var html = '';
+            html += '<ul class="list-group">';
+            for (let index = 0; index < result.length; index++) {
+                html += '<li class="list-group-item">' + result[index]['regDate'] + ' / ' + result[index]['amount'] + '개 추가</li>';
+            }
+            html += '</ul>';
+
+            $(".modal-body").html(html);
+        },
+        error: function(result, textStatus, jqXHR) {
+            console.log(result);
+            console.log(textStatus);
+            console.log(jqXHR);
+
+            $(".modal-body").html("<p>내역이 없습니다.</p>");
+        },
+        complete: function() {
+        }
+    });
 }
 
 $(document).ready(function() {
     init();
 
-    $(document).on('click', '.btn-edit', editAmount);    
-    $(document).on('click', '.btn-add', addAmount);    
-    $(document).on('click', '.btn-del', delAmount);    
+    $(document).on('click', '.btn-edit', editAmount);
+    $(document).on('click', '.btn-add', addAmount);
+    $(document).on('click', '.btn-del', delAmount);
+    $(document).on('click', '.btn-history', showHistory);
 });
 </script>
 

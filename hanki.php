@@ -500,7 +500,6 @@ body {
     $(document).on('click', '.option-excel', optionExcel);
     $(document).on('click', '.btn-edit-order', editOrder);
     $(document).on('click', '.btn-edit-order-detail', editOrderDetail);
-    $(document).on('click', '.btn-edit-order-detail', editOrderDetail);
     $(document).on('click', '.btn-save-edit-orderdetail', saveEditOrderDetail);
   });
 </script>
