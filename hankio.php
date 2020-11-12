@@ -262,7 +262,7 @@ for ($i = 0; $i < 14; $i++) {
   }
 
   // 세트반찬
-  if (!empty($orderData1[$todaySet])) {
+  if (!empty($orderData1[$todaySet]) && !empty($todaySet)) {
     if (empty($orderData2[$todayFull])) $orderData2[$todayFull] = array();
 
     // 주문서를 돌면서
