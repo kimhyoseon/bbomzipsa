@@ -44,11 +44,11 @@ if (!empty($orderData2)) {
 $modTime = filemtime($orderFile1);
 $modTime = date('n월 j일 H시', $modTime);
 
-// echo '<pre>';
-// print_r($orderData2);
-// print_r($orderData);
-// echo '</pre>';
-// exit();
+echo '<pre>';
+print_r($orderData2);
+print_r($orderData);
+echo '</pre>';
+exit();
 
 $week = array('일', '월', '화', '수', '목', '금', '토');
 $setWeek = array('', '베스트반찬세트(월요일조리후발송)', '국민반찬세트(화요일조리후발송)', '아들반찬세트(수요일조리후발송)', '엄마반찬세트(목요일조리후발송)', '아빠반찬세트(금요일조리후발송)', '');
