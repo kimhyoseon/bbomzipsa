@@ -45,7 +45,6 @@ $modTime = filemtime($orderFile1);
 $modTime = date('n월 j일 H시', $modTime);
 
 // echo '<pre>';
-// print_r($orderData1);
 // print_r($orderData2);
 // print_r($orderData);
 // echo '</pre>';
@@ -165,15 +164,14 @@ for ($i = 0; $i < 14; $i++) {
   $todaySet = $setWeek[date("w", strtotime($todaystr))];
   $todayFull = $todayKor."({$todayWeek})";
 
-  echo '<pre>';
-  print_r($today);
-  print_r($todayKor);
-  print_r($tomo);
-  print_r($tomoKor);
-  print_r($todayWeek);
-  print_r($todaySet);
-  echo '</pre>';
-  exit();
+  // echo '<pre>';
+  // print_r($today);
+  // print_r($todayKor);
+  // print_r($tomo);
+  // print_r($tomoKor);
+  // print_r($todayWeek);
+  // echo '</pre>';
+  // exit();
 
   // 기본찬 0개로 깔기
   if (!empty($dailyChan[$tomo])) {
@@ -264,7 +262,7 @@ for ($i = 0; $i < 14; $i++) {
   }
 
   // 세트반찬
-  if (!empty($orderData1[$todaySet]) && !empty($todaySet)) {
+  if (!empty($orderData1[$todaySet])) {
     if (empty($orderData2[$todayFull])) $orderData2[$todayFull] = array();
 
     // 주문서를 돌면서
