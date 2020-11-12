@@ -45,6 +45,7 @@ $modTime = filemtime($orderFile1);
 $modTime = date('n월 j일 H시', $modTime);
 
 echo '<pre>';
+print_r($orderData1);
 print_r($orderData2);
 print_r($orderData);
 echo '</pre>';
