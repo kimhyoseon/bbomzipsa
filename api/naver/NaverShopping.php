@@ -476,7 +476,7 @@ class NaverShopping
         $xPathMain = $this->getXpath(self::URL_NAVER_MAIN.$this->data['keyword']);
 
         if ($xPathMain) {
-            $nodeMainShopping = $xPathMain->query("//div[@class='sp_shop_default section _shopping_root']");
+            $nodeMainShopping = $xPathMain->query("//div[contains(@class, '_shopping_root')]");
 
             if ($nodeMainShopping->length > 0) {
                 $this->data['hasMainShoppingSearch'] = 1;
