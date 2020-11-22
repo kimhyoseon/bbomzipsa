@@ -29,7 +29,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '간장명엽채볶음' => array(
-        '_total' => array(110, 'g', false, ''),
+        '_total' => array(100, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 3200, 1),
 
@@ -42,7 +42,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '간장어묵볶음' => array( // 210g 2019-10-17
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 2700, 1),
 
@@ -56,7 +56,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '어묵마늘쫑볶음' => array( // 2020-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 3200, 1),
 
@@ -164,7 +164,7 @@ return array(
         '깨' => array(1, 'g', false, '국산'),
     ),
     '마늘쫑베이컨볶음' => array( // 180 2019-10-21
-        '_total' => array(180, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 4200, 1),
 
@@ -253,7 +253,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '매콤어묵볶음' => array( // 210g 2019-10-17
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 2700, 1),
 
@@ -307,7 +307,7 @@ return array(
 
     // 조림
     '우엉조림' => array( // 200g 2019-09-30
-        '_total' => array(180, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(1, 3700, 1),
 
@@ -321,7 +321,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '연근조림' => array( // 200g 2019-09-30
-        '_total' => array(180, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 3700, 1),
 
@@ -335,7 +335,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '땅콩조림' => array( // 200g 2019-09-30
-        '_total' => array(180, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 3700, 1),
 
@@ -346,7 +346,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '검은콩조림' => array( // 200g 2019-09-30
-        '_total' => array(180, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 4200, 1),
 
@@ -357,7 +357,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '메추리알조림' => array( // 200g 2019-10-09
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3700, 1),
 
@@ -368,7 +368,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '계란장조림' => array( // 2020-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 1),
 
@@ -379,7 +379,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '감자조림' => array( // 2020-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 1),
 
@@ -390,7 +390,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '소불고기장조림' => array( // 200g 2020-01-31
-        '_total' => array(180, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
 
         '소고기' => array(90, 'g', true, '호주'),
@@ -403,7 +403,7 @@ return array(
         '물엿' => array(2, 'g', false, '국산'),
     ),
     '돼지고기장조림' => array( // 200g 2019-10-06
-        '_total' => array(180, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
 
         '돼지고기(장조림)' => array(70, 'g', true, '국산'),
@@ -416,7 +416,7 @@ return array(
         '물엿' => array(2, 'g', false, '국산'),
     ),
     '두부조림' => array( // 220g 2019-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(1, 3200, 1),
 
@@ -427,7 +427,7 @@ return array(
         '참기름' => array(6, 'g', false, '국산'),
     ),
     '두부매콤조림' => array( // 220g 2019-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(1, 3200, 1),
 
@@ -441,7 +441,7 @@ return array(
 
     // 나물
     '콩나물무침' => array( // 200g 2019-10-10
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 2),
 
@@ -452,7 +452,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '매콤콩나물무침' => array(  // 2020-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 1),
 
@@ -464,7 +464,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '숙주나물무침' => array( // 220g 2019-10-10
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
 
         '숙주나물' => array(200, 'g', true, '국산'),
@@ -474,7 +474,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     // '시금치무침' => array(
-    //     '_total' => array(200, 'g', false, ''),
+    //     '_total' => array(170, 'g', false, ''),
     //     '_expired' => array(4, 'days', false, ''),
     //     '_regular' => array(2, 3700, 2),
 
@@ -510,7 +510,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '들깨무나물' => array( // 210g 2019-10-09
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(1, 2700, 2),
 
@@ -524,7 +524,7 @@ return array(
         '다시육수' => array(8, 'g', true, '국산'),
     ),
     '무나물' => array( // 220g 2019-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(1, 2700, 2),
 
@@ -537,7 +537,7 @@ return array(
         '다시육수' => array(11, 'g', true, '국산'),
     ),
     '무생채' => array( // 220g 2019-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 2700, 2),
 
@@ -552,7 +552,7 @@ return array(
         '대파' => array(9, 'g', false, '국산'),
     ),
     '새콤무생채' => array( // 220g 2019-10-03
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(2, 2700, 2),
 
@@ -610,7 +610,7 @@ return array(
     //     '해바라기씨' => array(8, 'g', true, '중국'),
     // ),
     '무말랭이무침' => array( // 2019-10-21
-        '_total' => array(180, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(1, 3200, 1),
 
@@ -622,7 +622,7 @@ return array(
         '멸치액젓' => array(1, 'g', false, '수입'),
     ),
     '더덕무침' => array( // 2019-10-21
-        '_total' => array(180, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(1, 3200, 1),
 
@@ -633,7 +633,7 @@ return array(
         'L-글루탐산나트륨' => array(1, 'g', false, '수입'),
     ),
     '고들빼기무침' => array( // 2019-10-21
-        '_total' => array(180, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
         '_regular' => array(1, 3200, 1),
 
@@ -645,7 +645,7 @@ return array(
         'L-글루탐산나트륨' => array(1, 'g', false, '수입'),
     ),
     '깻잎장아찌' => array( // 2019-10-21
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(7, 'days', false, ''),
 
         '깻잎' => array(100, 'g', false, '중국'),
@@ -692,7 +692,7 @@ return array(
 
     // 부침
     '계란말이' => array(
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 1),
 
@@ -704,7 +704,7 @@ return array(
         '깨' => array(1, 'g', false, '국산'),
     ),
     '분홍소세지' => array( // 2020-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 1),
 
@@ -717,7 +717,7 @@ return array(
 
     // 샐러드
     '수제단호박샐러드' => array( // 2020-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 1),
 
@@ -755,7 +755,7 @@ return array(
         '참기름' => array(2, 'g', false, '국산'),
     ),
     '매콤돼지불고기' => array( // 180g 2019-10-12
-        '_total' => array(180, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_special' => 1,
 
@@ -767,7 +767,7 @@ return array(
         '참기름' => array(2, 'g', false, '국산'),
     ),
     '매콤닭갈비' => array( // 200g 2020-03-02
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_special' => 1,
 
@@ -781,7 +781,7 @@ return array(
         '참기름' => array(2, 'g', false, '국산'),
     ),
     '매콤코다리조림' => array( // 2020-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_special' => 1,
 
@@ -797,7 +797,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '매콤콩나물불고기' => array( // 2020-09-30
-        '_total' => array(200, 'g', false, ''),
+        '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_special' => 1,
 
