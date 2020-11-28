@@ -77,10 +77,9 @@ create table smartstore_stock (
 );
 
 create table smartstore_stock_history (
-    id int(11) NOT NULL AUTO_INCREMENT comment 'ID',
+    id int(11) NOT NULL comment 'ID',
     amount int(11) default 0 comment '재고',
     regDate datetime default current_timestamp,
-    PRIMARY KEY (id)
 );
 
 INSERT INTO smartstore_stock (category, title, opt, amount, period) VALUES ('상품', '땅콩볼', '검정', 100, 4);

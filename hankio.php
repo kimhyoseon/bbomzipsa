@@ -182,22 +182,22 @@ for ($i = 0; $i < 14; $i++) {
       if (empty($orderData2[$todayFull][$value])) $orderData2[$todayFull][$value] = 0;
     }
 
-    // 세트반찬
-    if (strpos($todaySet, '베스트반찬세트') !== false) {
-        $option = array('매콤진미채무침', '계란말이', '매콤어묵볶음', '감자베이컨볶음', '메추리알조림', '더덕무침');
-    } else if (strpos($todaySet, '국민반찬세트') !== false) {
-        $option = array('간장멸치견과류볶음', '건파래무침', '두부매콤조림', '연근조림', '간장미역줄기볶음', '무말랭이무침');
-    } else if (strpos($todaySet, '아들반찬세트') !== false) {
-        $option = array('매콤어묵볶음', '계란말이', '메추리알조림', '매콤건새우볶음', '더덕무침', '소세지야채볶음');
-    } else if (strpos($todaySet, '엄마반찬세트') !== false) {
-        $option = array('간장미역줄기볶음', '콩나물무침', '깻잎무침', '새우젓애호박볶음', '아삭이된장무침', '무나물');
-    } else if (strpos($todaySet, '아빠반찬세트') !== false) {
-        $option = array('계란말이', '매콤멸치볶음', '두부조림', '검은콩조림', '건파래무침', '무말랭이무침');
-    }
+    // // 세트반찬
+    // if (strpos($todaySet, '베스트반찬세트') !== false) {
+    //     $option = array('매콤진미채무침', '계란말이', '매콤어묵볶음', '감자베이컨볶음', '메추리알조림', '더덕무침');
+    // } else if (strpos($todaySet, '국민반찬세트') !== false) {
+    //     $option = array('간장멸치견과류볶음', '건파래무침', '두부매콤조림', '연근조림', '간장미역줄기볶음', '무말랭이무침');
+    // } else if (strpos($todaySet, '아들반찬세트') !== false) {
+    //     $option = array('매콤어묵볶음', '계란말이', '메추리알조림', '매콤건새우볶음', '더덕무침', '소세지야채볶음');
+    // } else if (strpos($todaySet, '엄마반찬세트') !== false) {
+    //     $option = array('간장미역줄기볶음', '콩나물무침', '깻잎무침', '새우젓애호박볶음', '아삭이된장무침', '무나물');
+    // } else if (strpos($todaySet, '아빠반찬세트') !== false) {
+    //     $option = array('계란말이', '매콤멸치볶음', '두부조림', '검은콩조림', '건파래무침', '무말랭이무침');
+    // }
 
-    foreach ($option as $v) {
-      if (empty($orderData2[$todayFull][$v])) $orderData2[$todayFull][$v] = 0;
-    }
+    // foreach ($option as $v) {
+    //   if (empty($orderData2[$todayFull][$v])) $orderData2[$todayFull][$v] = 0;
+    // }
 
     if (empty($total[$todayFull])) $total[$todayFull] = 0;
   }
