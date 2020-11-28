@@ -318,7 +318,8 @@ for ($i = 0; $i < 14; $i++) {
     }
   }
 
-  if (sizeOf($orderData2) > 6) break;
+  // 14일치 노출
+  if (sizeOf($orderData2) > 14) break;
 }
 
 // echo '<pre>';
