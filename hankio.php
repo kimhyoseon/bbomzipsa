@@ -74,7 +74,7 @@ if (date('H') < 8) {
   $todayDate = date('Ymd', strtotime('+ 1 days'));
 }
 
-$listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date >= ? ORDER BY date ASC", array());
+$listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date >= ? ORDER BY date ASC", array($todayDate));
 // $listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date < ? ORDER BY date ASC", array(date('Ymd')));
 
 // echo '<pre>';
