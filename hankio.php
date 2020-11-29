@@ -68,7 +68,13 @@ foreach ($orderData as $option => $amount) {
   $orderData1[$date][] = [$set, $amount];
 }
 
-$listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date >= ? ORDER BY date ASC", array(date('Ymd')));
+if (date('H') < 8) {
+  $todayDate = date('Ymd');
+} else {
+  $todayDate = date('Ymd', strtotime('+ 1 days'));
+}
+
+$listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date >= ? ORDER BY date ASC", array());
 // $listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date < ? ORDER BY date ASC", array(date('Ymd')));
 
 // echo '<pre>';
