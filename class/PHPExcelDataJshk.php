@@ -204,7 +204,7 @@ return array(
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 1),
 
-        '숙주나물' => array(250, 'g', true, '국산'),
+        '숙주나물' => array(220, 'g', true, '국산'),
         '부추' => array(20, 'g', true, '국산'),
         '쪽파' => array(1, 'g', true, '국산'),
         '굴소스' => array(1, 'g', false, '홍콩'),
@@ -445,7 +445,7 @@ return array(
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 2),
 
-        '콩나물' => array(200, 'g', true, '국산'),
+        '콩나물' => array(220, 'g', true, '국산'),
         '모듬야채' => array(18, 'g', true, '국산'),
         '무침소스' => array(15, 'g', false, ''),
         '깨' => array(1, 'g', false, '국산'),
@@ -456,7 +456,7 @@ return array(
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3200, 1),
 
-        '콩나물' => array(200, 'g', true, '국산'),
+        '콩나물' => array(220, 'g', true, '국산'),
         '모듬야채' => array(18, 'g', true, '국산'),
         '무침소스' => array(15, 'g', false, ''),
         '고춧가루' => array(1, 'g', false, '국산'),
@@ -467,7 +467,7 @@ return array(
         '_total' => array(170, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
 
-        '숙주나물' => array(200, 'g', true, '국산'),
+        '숙주나물' => array(220, 'g', true, '국산'),
         '모듬야채' => array(12, 'g', true, '국산'),
         '무침소스' => array(15, 'g', false, ''),
         '깨' => array(1, 'g', false, '국산'),
