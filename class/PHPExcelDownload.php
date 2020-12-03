@@ -1427,7 +1427,7 @@ class PHPExcelDownload {
         $menus = array();
         $optionIndex = array_search('옵션정보', array_keys($filterMerged));
         $date = date('Ymd'); // 오늘자로 조회
-        $date = date('Ymd', strtotime('+1 days'))); // 오늘자로 조회
+        $date = date('Ymd', strtotime('+1 days')); // 오늘자로 조회
         // $date = '20200303'; // 테스트
 
         $list = $db->query("SELECT * FROM smartstore_order_hanki WHERE date=? ", array($date));
