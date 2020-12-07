@@ -236,6 +236,7 @@ for ($i = 0; $i < 14; $i++) {
         // exit();
       }
       else if (strpos($option, '1인') !== false) $menuAmount = 3;
+      else if (strpos($option, '1.5인') !== false) $menuAmount = 5;
       else if (strpos($option, '2인') !== false) $menuAmount = 6;
       else if (strpos($option, '패밀리') !== false) $menuAmount = 8;
 

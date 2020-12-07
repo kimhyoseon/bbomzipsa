@@ -507,11 +507,15 @@ class Hanki {
             $ym = $m.'월'.$d.'일'.'('.$dayKor[$dayOfWeek].')';
 
             // $var = ltrim($var, '0');
-            $data[] = array($ym, '1인세트(3개)', 0, 20, '', 'Y');
-            $data[] = array($ym, '2인세트(6개)', 7000, 20, '', 'Y');
 
             if (sizeOf($value) > 6) {
-                $data[] = array($ym, '패밀리세트(8개)', 14000, 20, '', 'Y');
+              $data[] = array($ym, '1인세트(3개)', 0, 20, '', 'Y');
+              $data[] = array($ym, '1.5인세트(5개)', 8000, 20, '', 'Y');
+              $data[] = array($ym, '2인세트(6개)', 8000, 20, '', 'Y');
+              $data[] = array($ym, '패밀리세트(8개)', 16000, 20, '', 'Y');
+            } else {
+              $data[] = array($ym, '1인세트(3개)', 0, 20, '', 'Y');
+              $data[] = array($ym, '2인세트(6개)', 8000, 20, '', 'Y');
             }
         }
 
