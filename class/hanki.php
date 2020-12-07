@@ -394,6 +394,12 @@ class Hanki {
       if ($chan == '고들빼기무침' && $this->chanCount[$chan] > 1) continue;
       if ($chan == '더덕무침' && $this->chanCount[$chan] > 1) continue;
       if ($chan == '무말랭이무침' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '시금치무침' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '아삭이된장무침' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '오이부추무침' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '깻잎무침' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '땅콩조림' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '검은콩조림' && $this->chanCount[$chan] > 1) continue;
 
       // 통과한 반찬은 담아주기
       $sets[] = $chan;
