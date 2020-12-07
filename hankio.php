@@ -236,7 +236,7 @@ for ($i = 0; $i < 14; $i++) {
         // exit();
       }
       else if (strpos($option, '1인') !== false) $menuAmount = 3;
-      else if (strpos($option, '1.5인') !== false) $menuAmount = 5;
+      else if (strpos($option, '1.5인') !== false) $menuAmount = 3;
       else if (strpos($option, '2인') !== false) $menuAmount = 6;
       else if (strpos($option, '패밀리') !== false) $menuAmount = 8;
 
@@ -256,6 +256,20 @@ for ($i = 0; $i < 14; $i++) {
 
           if (empty($total[$todayFull])) $total[$todayFull] = 0;
           $total[$todayFull] += $amount;
+      }
+
+      // 1.5인 메인+국 처리
+      if (strpos($option, '1.5인') !== false) {
+        for ($j = 7; $j < 8; $j++) {
+          if (empty($dailyChan[$tomo][$j])) continue;
+          if (!empty($menuIndex))
+            if (in_array($j, $menuIndex) == false) continue;
+          }
+          if (empty($orderData2[$todayFull][$dailyChan[$tomo][$j]])) $orderData2[$todayFull][$dailyChan[$tomo][$j]] = 0;
+          $orderData2[$todayFull][$dailyChan[$tomo][$j]] += $amount;
+          if (empty($total[$todayFull])) $total[$todayFull] = 0;
+          $total[$todayFull] += $amount;
+        }
       }
 
       if (empty($totalDelevery[$todayFull])) $totalDelevery[$todayFull] = 0;
