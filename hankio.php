@@ -262,7 +262,7 @@ for ($i = 0; $i < 14; $i++) {
       if (strpos($option, '1.5인') !== false) {
         for ($j = 7; $j < 8; $j++) {
           if (empty($dailyChan[$tomo][$j])) continue;
-          if (!empty($menuIndex))
+          if (!empty($menuIndex)) {
             if (in_array($j, $menuIndex) == false) continue;
           }
           if (empty($orderData2[$todayFull][$dailyChan[$tomo][$j]])) $orderData2[$todayFull][$dailyChan[$tomo][$j]] = 0;
