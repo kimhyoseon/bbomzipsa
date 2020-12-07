@@ -92,6 +92,7 @@ body {
             <div class="col">
               <select name="year" class="form-control form-control-lg">
                 <option value="2020">2020</option>
+                <option value="2021">2021</option>
               </select>
             </div>
             <div class="col">
