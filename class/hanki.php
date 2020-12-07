@@ -388,6 +388,7 @@ class Hanki {
       if ($this->chanCount[$chan] > 3) continue;
 
       // 특정반찬은 횟수제한 (최대 2회)
+      if ($chan == '잡채' && $this->chanCount[$chan] > 1) continue;
       if ($chan == '우엉조림' && $this->chanCount[$chan] > 1) continue;
       if ($chan == '수제단호박샐러드' && $this->chanCount[$chan] > 1) continue;
       if ($chan == '오징어젓갈' && $this->chanCount[$chan] > 1) continue;
