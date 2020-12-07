@@ -38,6 +38,7 @@ class PHPExcelDownload {
         '미마마스크' => '미마마스크',
         '방석' => '도넛방석',
         '짐볼' => '짐볼',
+        '루프' => '아이워너 루프밴드',
         '반찬' => '신선식품',
         '오늘의국' => '신선식품',
     );
@@ -291,7 +292,7 @@ class PHPExcelDownload {
                     }
                 }
             } else {
-                if (!in_array($value[$filterIndex['상품번호']], array('4529428871', '4530770714'))) continue;
+                if (!in_array($value[$filterIndex['상품번호']], array('4529428871', '4530770714', '4324723046', '5186994701'))) continue;
 
                 $row = array();
 
@@ -346,6 +347,8 @@ class PHPExcelDownload {
                     $optionInfo[1] = str_replace(')', '', $optionInfo[1]);
                     $option = '';
 
+                    if ($optionInfo[1] == '무드인디고') $optionInfo[1] = '블루인디고';
+
                     if (in_array($optionInfo[1], array('블루', '레드'))) {
                         $option = "안티버스트 짐볼 {$optionInfo[0]} ({$optionInfo[1]})";
                     } else {
@@ -368,9 +371,17 @@ class PHPExcelDownload {
                     }
 
                     $bodyOptimized[$key][$optionIndex] = $option;
+                } else if (strpos($value[$optionIndex], '강도') !== false) {
+                    $option = trim(explode(':', $value[$optionIndex])[1]);
+
+                    $titleIndex = array_search('상품명', array_keys($filterMerged));
+                    $title = $body[$key][$titleIndex];
+                    $title = $this->getShortName($title);
+                    $option = "{$title} ({$option})";
+
+                    $bodyOptimized[$key][$optionIndex] = $option;
                 }
             }
-
 
             $messageIndex = array_search('배송메세지', array_keys($filter));
             if (!empty($bodyOptimized[$key][$messageIndex])) {
