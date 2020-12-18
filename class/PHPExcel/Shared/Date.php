@@ -154,11 +154,6 @@ class PHPExcel_Shared_Date
      */
     public static function ExcelToPHPObject($dateValue = 0)
     {
-        // 2020-12-18 엄청 큰 dateValue 에러 수정
-        if ($dateValue > 100000) {
-            $dateValue = 100000;
-        }
-
         $dateTime = self::ExcelToPHP($dateValue);
         $days = floor($dateTime / 86400);
         $time = round((($dateTime / 86400) - $days) * 86400);
