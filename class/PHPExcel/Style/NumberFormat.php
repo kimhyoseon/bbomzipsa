@@ -455,6 +455,8 @@ class PHPExcel_Style_NumberFormat extends PHPExcel_Style_Supervisor implements P
     private static function formatAsDate(&$value, &$format)
     {
         // // 2020-12-18 숫자를 날짜로 착각하는 에러 수정 (날짜는 53493.2139843 이런 형태임)
+        return;
+
         if (strpos($value, '.') === false) {
             return;
         }
