@@ -1451,7 +1451,7 @@ class PHPExcelDownload {
         $date = date('Ymd'); // 오늘자로 조회
 
         // ** 특정날짜로 조회하기 (조리일기준) **
-        // $date = '20210104';
+        // $date = '20210105';
 
         $list = $db->query("SELECT * FROM smartstore_order_hanki WHERE date=? ", array($date));
 
@@ -1484,6 +1484,7 @@ class PHPExcelDownload {
                     $menuIndex = explode(',', $match[1]);
                 }
                 else if (strpos($option, '1인') !== false) $menuAmount = 3;
+                else if (strpos($option, '1.5인') !== false) $menuAmount = 3;
                 else if (strpos($option, '2인') !== false) $menuAmount = 6;
                 else if (strpos($option, '패밀리') !== false) $menuAmount = 8;
 
@@ -1498,6 +1499,16 @@ class PHPExcelDownload {
 
                     $contents[$optionIndex] = '/:'.$dailyChan[$date][$i];
                     $menus[] = $contents;
+                }
+
+                // 1.5인 메인+국 처리
+                if (strpos($option, '1.5인') !== false) {
+                    for ($i = 6; $i < 8; $i++) {
+                        if (empty($dailyChan[$date][$i])) exit($i.'번째 메뉴를 찾을 수 없습니다.');
+
+                        $contents[$optionIndex] = '/:'.$dailyChan[$date][$i];
+                        $menus[] = $contents;
+                    }
                 }
             }
         }
