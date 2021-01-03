@@ -2,6 +2,7 @@
 include_once('./class/PHPExcel.php');
 
 class PHPExcelDownload {
+    CONST JSHK_DATE = ''; // ** 특정날짜로 조회하기 (조리일기준) **
     CONST TEST = false;
     CONST SHORTNAME = array(
         '두피마사지기' => '샴푸브러쉬',
@@ -1448,10 +1449,12 @@ class PHPExcelDownload {
     public function getRegularMenu($db, $filterMerged) {
         $menus = array();
         $optionIndex = array_search('옵션정보', array_keys($filterMerged));
-        $date = date('Ymd'); // 오늘자로 조회
 
-        // ** 특정날짜로 조회하기 (조리일기준) **
-        // $date = '20210105';
+        if (!empty(self::JSHK_DATE)) {
+            $date = self::JSHK_DATE;
+        } else {
+            $date = date('Ymd'); // 오늘자로 조회
+        }
 
         $list = $db->query("SELECT * FROM smartstore_order_hanki WHERE date=? ", array($date));
 
@@ -2403,9 +2406,15 @@ class PHPExcelDownload {
                     // 재료
                     $row[] = '사용재료 : '.implode(', ', $ingredientsSum);
 
+                    if (!empty(self::JSHK_DATE)) {
+                        $date = self::JSHK_DATE;
+                    } else {
+                        $date = date('Ymd'); // 오늘자로 조회
+                    }
+
                     // 내용
-                    $nextTime = strtotime('+'.$ingredients['_expired'][0].' '.$ingredients['_expired'][1]);
-                    $contents[] = '만든날짜 : '.date('Y년 m월 d일').' ('.$week[date("w")].')';
+                    $nextTime = strtotime('+'.$ingredients['_expired'][0].' '.$ingredients['_expired'][1], strtotime($date));
+                    $contents[] = '만든날짜 : '.date('Y년 m월 d일', strtotime($date)).' ('.$week[date("w", strtotime($date))].')';
                     $contents[] = '유통기한 : '.date('Y년 m월 d일', $nextTime).' ('.$week[date("w", $nextTime)].')';
                     $contents[]  = '보관방법 : 냉장보관';
                     $contents[] = '판매업체 : 정성한끼';
