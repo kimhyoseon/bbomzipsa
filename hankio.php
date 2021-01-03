@@ -260,7 +260,7 @@ for ($i = 0; $i < 14; $i++) {
 
       // 1.5인 메인+국 처리
       if (strpos($option, '1.5인') !== false) {
-        for ($j = 7; $j < 8; $j++) {
+        for ($j = 6; $j < 8; $j++) {
           if (empty($dailyChan[$tomo][$j])) continue;
           if (!empty($menuIndex)) {
             if (in_array($j, $menuIndex) == false) continue;
