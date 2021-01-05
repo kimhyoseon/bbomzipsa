@@ -2,7 +2,7 @@
 include_once('./class/PHPExcel.php');
 
 class PHPExcelDownload {
-    CONST JSHK_DATE = ''; // ** 특정날짜로 조회하기 (조리일기준) **
+    CONST JSHK_DATE = date('Ymd', strtotime('+1 days')); // ** 특정날짜로 조회하기 (조리일기준) **
     CONST TEST = false;
     CONST SHORTNAME = array(
         '두피마사지기' => '샴푸브러쉬',
