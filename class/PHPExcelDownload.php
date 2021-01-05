@@ -44,7 +44,7 @@ class PHPExcelDownload {
     );
 
     public function __construct() {
-        self::JSHK_DATE = date('Ymd', strtotime('+1 days')); // ** 특정날짜로 조회하기 (조리일기준) **
+        $this->jshkDate = date('Ymd', strtotime('+1 days')); // ** 특정날짜로 조회하기 (조리일기준) **
     }
 
     public function __destruct() {
@@ -1450,8 +1450,8 @@ class PHPExcelDownload {
         $menus = array();
         $optionIndex = array_search('옵션정보', array_keys($filterMerged));
 
-        if (!empty(self::JSHK_DATE)) {
-            $date = self::JSHK_DATE;
+        if (!empty($this->jshkDate)) {
+            $date = $this->jshkDate;
         } else {
             $date = date('Ymd'); // 오늘자로 조회
         }
@@ -2406,8 +2406,8 @@ class PHPExcelDownload {
                     // 재료
                     $row[] = '사용재료 : '.implode(', ', $ingredientsSum);
 
-                    if (!empty(self::JSHK_DATE)) {
-                        $date = self::JSHK_DATE;
+                    if (!empty($this->jshkDate)) {
+                        $date = $this->jshkDate;
                     } else {
                         $date = date('Ymd'); // 오늘자로 조회
                     }
