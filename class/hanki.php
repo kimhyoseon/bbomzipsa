@@ -357,9 +357,9 @@ class Hanki {
       if (in_array($chan, $sets)) continue; // 이미 있는 반찬인 경우
 
       // 월요일 또는 화요일인 경우 1번분류 반찬만 (야채X)
-      if ($dayOfWeek == 2 || $dayOfWeek == 3) {
-        if ($this->jshkDataType[$chan] == 2) continue;
-      }
+      // if ($dayOfWeek == 2 || $dayOfWeek == 3) {
+      //   if ($this->jshkDataType[$chan] == 2) continue;
+      // }
 
       // 중복반찬처리1
       if (!empty($bans)) {
@@ -384,8 +384,8 @@ class Hanki {
       if ($fryTotal > 2 && strpos($chan, '볶음') !== false) continue;
       if ($boilTotal > 2 && strpos($chan, '조림') !== false) continue;
 
-      // 너무 많이 선택된 반찬은 제외
-      if ($this->chanCount[$chan] > 3) continue;
+      // 너무 많이 선택된 반찬은 제외 (1반찬당 최대 3회)
+      if ($this->chanCount[$chan] > 2) continue;
 
       // 특정반찬은 횟수제한 (최대 2회)
       if ($chan == '잡채' && $this->chanCount[$chan] > 1) continue;
@@ -401,6 +401,15 @@ class Hanki {
       if ($chan == '깻잎무침' && $this->chanCount[$chan] > 1) continue;
       if ($chan == '땅콩조림' && $this->chanCount[$chan] > 1) continue;
       if ($chan == '검은콩조림' && $this->chanCount[$chan] > 1) continue;
+
+      // 같은부류반찬은 횟수제한 (최대 2~3회)
+      if ($chan == '간장멸치견과류볶음' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '간장멸치볶음' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '매콤멸치견과류볶음' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '매콤멸치볶음' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '간장어묵볶음' && $this->chanCount[$chan] > 1) continue;
+      if ($chan == '매콤어묵볶음' && $this->chanCount[$chan] > 2) continue;
+      if ($chan == '어묵마늘쫑볶음' && $this->chanCount[$chan] > 1) continue;
 
       // 통과한 반찬은 담아주기
       $sets[] = $chan;
@@ -422,9 +431,9 @@ class Hanki {
     }
 
     // 21,200원까지만
-    if ($price > 21200) {
-      return $this->getBanchanSet($dayOfWeek);
-    }
+    // if ($price > 21200) {
+    //   return $this->getBanchanSet($dayOfWeek);
+    // }
 
     // 골고루인지 확인 (조림, 볶음은 최소 1개씩 포함)
     if ($fryTotal < 1 || $boilTotal < 1) {
