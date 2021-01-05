@@ -444,6 +444,30 @@ class Hanki {
 
     shuffle($sets);
 
+    // 1인세트가 최대한 겹치지 않도록 순서변경 (2021-01-05)
+    $lastChars = [];
+    for ($i=0; $i<3 ; $i++) {
+      $lastChar = mb_substr($sets[$i], -1);
+
+      if (in_array($lastChar, $lastChars) == false) {
+        $lastChars[] = $lastChar;
+      // 중복되는 반찬종류인 경우
+      } else {
+        for ($j=3; $j<6 ; $j++) {
+          $lastCharBench = mb_substr($sets[$j], -1);
+
+          // 다른 반찬들 중 중복되지 않는 반찬이 있다면 순서를 바꿔주자
+          if (in_array($lastCharBench, $lastChars) == false) {
+            $tmpSet = $sets[$j];
+            $sets[$j] = $sets[$i];
+            $sets[$i] = $tmpSet;
+            $lastChars[] = $lastCharBench;
+            break;
+          }
+        }
+      }
+    }
+
     // echo '<pre>';
     // print_r($sets);
     // echo '</pre>';

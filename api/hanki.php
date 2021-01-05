@@ -9,8 +9,8 @@ try {
     include_once($_SERVER['DOCUMENT_ROOT'].'/class/hanki.php');
     $hanki = new Hanki();
 
-    // $_POST['year'] = '2020';
-    // $_POST['month'] = '9';
+    // $_POST['year'] = '2021';
+    // $_POST['month'] = '2';
     // echo '<pre>';
     // print_r($hanki->getMenu($_POST));
     // echo '</pre>';
