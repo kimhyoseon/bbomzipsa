@@ -1703,6 +1703,7 @@ class PHPExcelDownload {
         $stock = array();
         $sort = array();
         $addrMerge = array();
+        $preBody = array();
         $bodyOptimized = array();
 
         $optionIndex = array_search('옵션정보', array_keys($filterMerged));
@@ -1728,8 +1729,78 @@ class PHPExcelDownload {
                 }
             }
 
-            $bodyOptimized[] = $bodyRow;
+            $preBody[] = $bodyRow;
         }
+
+        // 각각의 반찬이 아닌 세트로 변경 (2021-01-13)
+        $unique = '';
+        $count = 0;
+
+        // echo '<pre>';
+        // print_r($preBody);
+        // echo '</pre>';
+        // exit();
+
+        foreach ($preBody as $key => $value) {
+            if ($unique != '' && $unique != $value[5] || $key + 1 == sizeof($preBody)) {
+                // 마지막 라인인 경우 +1
+                if ($key + 1 == sizeof($preBody)) {
+                    $count++;
+                }
+
+                $title = '';
+
+                // 갯수별 타이틀 생성
+                if ($count == 3) {
+                    $title = '1인세트(3개)';
+                } else if ($count == 5) {
+                    $title = '1.5인세트(5개)';
+                } else if ($count == 6) {
+                    $title = '2인세트(6개)';
+                } else if ($count == 8) {
+                    $title = '패밀리세트(8개)';
+                }
+
+                // 1.5를 2인 위로 올리자
+                if ($count == 5) {
+                    $count = 7;
+                }
+
+                // 상품명을 쌓인 갯수에 대한 메뉴로 변경
+                $row[7] = '[신선식품 반찬] '.$title;
+
+                // 쌓였던 갯수를 파악후 바디에 넣어줌
+                $bodyOptimized[] = $row;
+
+                $count = 1;
+            } else {
+                // 주소로 유니크값을 잡는다
+                $count++;
+                $row = $value;
+            }
+
+            $unique = $value[5];
+        }
+
+        // 정렬
+        $sortName = array();
+        $sortCount = array();
+
+        foreach ($bodyOptimized as $key => $value) {
+            $sortName[] = $value[0];
+        }
+
+        array_multisort($sortName, SORT_DESC, $bodyOptimized);
+
+        foreach ($bodyOptimized as $key => $value) {
+            if (strpos($value[7], '1.5인') !== false) {
+                $sortCount[] = '[신선식품 반찬] 3.5인세트(5개)';
+            } else {
+                $sortCount[] = $value[7];
+            }
+        }
+
+        array_multisort($sortCount, SORT_ASC, $bodyOptimized);
 
         // echo '<pre>';
         // print_r($bodyOptimized);
@@ -2069,6 +2140,55 @@ class PHPExcelDownload {
         // 고객
         $data[] = array('', '', '', '');
         $data[] = array('고객별 주문', '', '', '');
+
+        // 고객 주문반찬별 정렬 (2021-01-13)
+        // 복합정렬이라 따로 key만 정렬해서 붙여넣음
+        $sortCustomers = array();
+        $sortNames = array();
+        $frameNames = array();
+
+        foreach ($customers as $customerName => $customerData) {
+            $sortNames[] = $customerName;
+            $frameNames[] = $customerName;
+        }
+
+        // echo '<pre>';
+        // print_r($sortNames);
+        // echo '</pre>';
+        // exit();
+
+        array_multisort($sortNames, SORT_ASC, $frameNames);
+
+        // echo '<pre>';
+        // print_r($frameNames);
+        // echo '</pre>';
+
+        foreach ($frameNames as $name) {
+            $count = sizeof($customers[$name]['cook']);
+
+            if ($count == 5) {
+                $count = 7;
+            }
+
+            $sortCustomers[] = $count;
+        }
+
+        array_multisort($sortCustomers, SORT_ASC, $frameNames);
+
+        $customersSorted = array();
+
+        foreach ($frameNames as $name) {
+            $customersSorted[$name] = $customers[$name];
+        }
+
+        // echo '<pre>';
+        // print_r($frameNames);
+        // print_r($customers);
+        // print_r($customersSorted);
+        // echo '</pre>';
+        // exit();
+
+        $customers = $customersSorted;
 
         foreach ($customers as $customerName => $customerData) {
             $order = array();
