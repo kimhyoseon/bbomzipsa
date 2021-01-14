@@ -2178,32 +2178,51 @@ class PHPExcelDownload {
         $customersSorted = array();
 
         foreach ($frameNames as $name) {
-            $customersSorted[$name] = $customers[$name];
+            $sets = array();
+            foreach ($customers[$name]['cook'] as $chan => $amount) {
+                $sets[] = $chan.$amount;
+            }
+
+            $set = implode(', ', $sets);
+
+            if (!empty($customers[$name]['caution'])) {
+                $frameNames .= ' (※'.implode(', ', $customers[$name]['caution']).')';
+            }
+
+            if (empty($customersSorted[$set])) {
+                $customersSorted[$set] = array();
+            }
+
+            $customersSorted[$set][] = $name;
         }
 
         // echo '<pre>';
-        // print_r($frameNames);
-        // print_r($customers);
         // print_r($customersSorted);
         // echo '</pre>';
         // exit();
 
         $customers = $customersSorted;
 
-        foreach ($customers as $customerName => $customerData) {
-            $order = array();
+        foreach ($customers as $set => $customerData) {
+            $sets = explode(', ', $set);
+            $setName = '';
 
-            foreach ($customerData['cook'] as $cookName => $amount) {
-                $order[] = $cookName.$amount;
+            if (sizeof($sets) == 3) {
+                $setName = '1인세트(3개)';
+            } else if (sizeof($sets) == 6) {
+                $setName = '2인세트(6개)';
+            } else if (sizeof($sets) == 5) {
+                $setName = '1.5인세트(5개)';
+            } else if (sizeof($sets) == 8) {
+                $setName = '패밀리세트(8개)';
             }
 
-            if (!empty($customerData['caution'])) {
-                $customerName .= ' (※'.implode(', ', $customerData['caution']).')';
-            }
+            $setName = $setName.' / (총 '.sizeof($customerData).'명)';
 
-            $data[] = array($customerName);
-            $data[] = array(implode(', ', $order));
-            $customerRow = $customerRow + 2;
+            $data[] = array($setName);
+            $data[] = array($set);
+            $data[] = array(implode(', ', $customerData));
+            $customerRow = $customerRow + 3;
         }
 
         // 소스 없앰
@@ -2341,9 +2360,15 @@ class PHPExcelDownload {
         $lineCustomer = 0;
         for ($i = $indexStartCustomer + 1; $i <= $indexEndCustomer; $i++) {
             $excel->setActiveSheetIndex(0)->mergeCells("A{$i}:D{$i}");
-            if ($lineCustomer % 2 == 1) {
+            if ($lineCustomer % 3 == 2) {
+                $excel->getActiveSheet()->getRowDimension($i)->setRowHeight(80);
+                $excel->setActiveSheetIndex(0)->getStyle("A{$i}:A{$i}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+            } else if ($lineCustomer % 3 == 1) {
                 $excel->getActiveSheet()->getRowDimension($i)->setRowHeight(40);
                 $excel->setActiveSheetIndex(0)->getStyle("A{$i}:A{$i}")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+            } else if ($lineCustomer % 3 == 0) {
+                $excel->setActiveSheetIndex(0)->getStyle("A{$i}:A{$i}")->getFont()->setBold(true);
+                $excel->setActiveSheetIndex(0)->getStyle("A{$i}:A{$i}")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             }
             $lineCustomer++;
         }
