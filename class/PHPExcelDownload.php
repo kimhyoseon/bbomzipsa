@@ -2857,6 +2857,9 @@ class PHPExcelDownload {
                 if (strpos($title, '벚꽃색 + 실리콘마개') !== false) {
                     $newStock2 = $this->setStockUpdateAdd($newStock2, '가정용대야__벚꽃색', $amount);
                     $newStock2 = $this->setStockUpdateAdd($newStock2, '가정용대야__실리콘마개', $amount);
+                } else if (strpos($title, '벚꽃색+마개') !== false) {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '가정용대야__벚꽃색', $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '가정용대야__실리콘마개', $amount);
                 } else {
                     $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);
                 }
