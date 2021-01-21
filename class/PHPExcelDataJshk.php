@@ -474,11 +474,11 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '시금치무침' => array(
-        '_total' => array(170, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3700, 2),
 
-        '시금치' => array(200, 'g', true, '국산'),
+        '시금치' => array(180, 'g', true, '국산'),
         '무침소스' => array(10, 'g', false, ''),
         '깨' => array(1, 'g', false, '국산'),
         '참기름' => array(1, 'g', false, '국산'),
