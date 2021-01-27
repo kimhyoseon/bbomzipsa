@@ -98,7 +98,8 @@ body {
 #btn-hanki,
 .wrap-direct,
 .inp-direct,
-.wrap-output {
+.wrap-output,
+.wrap-date {
   display: none;
 }
 </style>
