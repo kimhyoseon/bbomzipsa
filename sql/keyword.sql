@@ -225,7 +225,7 @@ INSERT INTO smartstore_order (id, date, sale_cnt) VALUES (1, '20200104', 30);
 INSERT INTO smartstore_order (id, date, sale_cnt) VALUES (1, '20200105', 40);
 INSERT INTO smartstore_order (id, date, sale_cnt) VALUES (1, '20200106', 50);
 
--- 정성한끼 정기주문
+-- 정성한끼 정기주문 (DROP)
 drop table smartstore_order_hanki;
 create table smartstore_order_hanki (
     id BIGINT unsigned NOT NULL comment '상품주문번호',
@@ -242,6 +242,29 @@ create table smartstore_order_hanki_wait (
     opt varchar(50) NOT NULL default '' comment '옵션',
     amount smallint NOT NULL default 0 comment '수량'
 );
+
+-- 정성한끼 정기주문
+drop table smartstore_order_jshk;
+create table smartstore_order_jshk (
+    id int(11) NOT NULL AUTO_INCREMENT,
+    item_order_no BIGINT unsigned NOT NULL default 0 comment '상품주문번호',
+    date char(8) NOT NULL comment '수령일',
+    menu char(25) NOT NULL default '' comment '세트메뉴',
+    name varchar(25) NOT NULL default '' comment '수취인명',
+    quantity tinyint NOT NULL default 1 comment '수량',
+    tel1 varchar(15) NOT NULL default '' comment '수취인연락처1',
+    tel2 varchar(15) NOT NULL default '' comment '수취인연락처2',
+    address varchar(255) NOT NULL default '' comment '배송지',
+    message varchar(255) NOT NULL default '' comment '배송메세지',
+    deposit varchar(100) NOT NULL default '' comment '입금정보',
+    PRIMARY KEY (id),
+    INDEX date (date),
+    INDEX item_order_no (item_order_no)
+);
+
+DELETE FROM smartstore_order_jshk;
+INSERT INTO smartstore_order_jshk (item_order_no, address, date) VALUES ('2020122292521761', '수정된 배송지', '20210128');
+INSERT INTO smartstore_order_jshk (date, menu, name, quantity, tel1, address, message) VALUES ('20210128', '2인세트(6개)', '홍길동', '1', '010-9878-6713', '경기도 화성시 남양읍 남양로862번길 16 (남양읍) 화성남양뉴타운A5행복주택, 602동 602호', '노크하지마세요.');
 
 
 drop table yoona_apt;

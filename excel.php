@@ -3,8 +3,13 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 if (!empty($_POST)) {
-    include_once('./class/PHPExcelDownload.php');
-    $excel = new PHPExcelDownload();
+    if (strpos($_POST['type'], 'jshk') !== false) {
+        include_once('./class/PHPExcelDownloadJshk.php');
+        $excel = new PHPExcelDownload();
+    } else {
+        include_once('./class/PHPExcelDownload.php');
+        $excel = new PHPExcelDownload();
+    }
 
     if ($_POST['type'] == 'korspo') {
         $excel->korspo($_FILES['input']);
@@ -24,12 +29,12 @@ if (!empty($_POST)) {
         }
     } else if ($_POST['type'] == 'sendall_lotte') {
         $excel->sendallLotte($_FILES['input'], $_FILES['output'], null);
-    } else if ($_POST['type'] == 'hanki') {
-        $excel->jshkCj($_FILES['input']);
+    } else if ($_POST['type'] == 'jshk') {
+        $excel->jshk($_FILES['input'], $_POST['date']);
     } else if ($_POST['type'] == 'jshk_basket') {
-        $excel->jshkBasket($_FILES['input']);
+        $excel->jshkBasket($_FILES['input'], $_POST['date']);
     } else if ($_POST['type'] == 'jshk_sticker') {
-        $excel->jshkSticker($_FILES['input']);
+        $excel->jshkSticker($_FILES['input'], $_POST['date']);
     }
 }
 ?>
@@ -108,7 +113,7 @@ body {
                 <option value="sendall">엑셀일괄발송</option>
                 <option value="korspo">코리아스포츠</option>
                 <option value="korspo_price">코리아스포츠(계산서)</option>
-                <option value="hanki">정성한끼</option>
+                <option value="jshk">정성한끼</option>
                 <option value="jshk_basket">정성한끼 조리표</option>
                 <option value="jshk_sticker">정성한끼 스티커</option>
                 <option value="sendall_lotte">엑셀일괄발송(롯데)</option>
@@ -136,6 +141,21 @@ body {
             </div>
         </div>
 
+        <div class="form-group wrap-date">
+            <select id="date" name="date" class="form-control">
+                <?php
+                $week = array("일" , "월"  , "화" , "수" , "목" , "금" ,"토") ;
+                for ($i=1; $i < 10; $i++) {
+                    $date = date('Ymd', strtotime("+{$i} days"));
+                    $selected = '';
+                    $yoil = $week[date('w', strtotime("+{$i} days"))];
+                    if ($i == 2) $selected = 'selected="selected"';
+                ?>
+                    <option <?=$selected?> value="<?=$date?>" ><?=$date?> (<?=$yoil?>)</option>
+                <?php } ?>
+            </select>
+        </div>
+
         <div class="form-group">
             <button id="btn-submit" class="btn btn-lg btn-primary btn-block" type="submit">변환하기</button>
             <button id="btn-hanki" class="btn btn-lg btn-primary btn-block" type="button">다운받기</button>
@@ -150,13 +170,11 @@ $('select[name=type]').change(function(){
         $('.wrap-output, .wrap-direct').hide();
     }
 
-    // if ($(this).val() == 'hanki') {
-    //     $('#btn-submit').hide();
-    //     $('#btn-hanki').show();
-    // } else {
-    //     $('#btn-submit').show();
-    //     $('#btn-hanki').hide();
-    // }
+    if ($(this).val().indexOf('jshk') != -1) {
+        $('.wrap-date').show();
+    } else {
+        $('.wrap-date').hide();
+    }
 });
 
 $('.input-direct').change(function(){

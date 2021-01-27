@@ -80,23 +80,106 @@ class Hanki {
     }
 
     /**
+     * 주문자 검색
+     */
+    function getSearch($data) {
+      $keyword = $data['keyword'];
+      $offset = $data['offset'];
+
+      if (empty($keyword)) return false;
+
+      $accountDb = parse_ini_file("../config/db.ini");
+      require_once dirname(__FILE__).'/../class/pdo.php';
+      $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+      $list = $db->query("SELECT * FROM smartstore_order_jshk WHERE name like '%{$keyword}%' OR deposit like '%{$keyword}%' OR tel1 like '%{$keyword}%' ORDER BY date DESC LIMIT {$offset}, 1");
+
+      $db->CloseConnection();
+
+      if (empty($list)) return false;
+
+      return $list[0];
+  }
+
+    /**
+     * 정기배송 주문 등록
+     */
+    function addOrder($data) {
+      if (empty($data)) return false;
+      if (empty($data['date'])) return false;
+      if (empty($data['menu'])) return false;
+
+      $accountDb = parse_ini_file("../config/db.ini");
+      require_once dirname(__FILE__).'/../class/pdo.php';
+      $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+      // ,가 있을경우 처리
+      $date = $data['date'];
+      unset($data['date']);
+
+      $dates = explode(',', $date);
+
+      // date 수만큼 insert
+      foreach ($dates as $value) {
+        $data['date'] = trim($value);
+
+        $dbName = array_keys($data, true);
+        $dbValues = array_map(function ($val) {
+            return ':'.$val;
+        }, $dbName);
+        $dbName = implode(',', $dbName);
+        $dbValues = implode(',', $dbValues);
+
+        $result = $db->query("INSERT INTO smartstore_order_jshk ({$dbName}) VALUES({$dbValues})", $data);
+      }
+
+      $db->CloseConnection();
+
+      return $result;
+    }
+
+    /**
      * 정기배송 주문 수정
      */
     function editOrder($data) {
       if (empty($data)) return false;
       if (empty($data['id'])) return false;
       if (empty($data['date'])) return false;
+      if (empty($data['menu'])) return false;
+
+      $id = $data['id'];
+      unset($data['id']);
 
       $accountDb = parse_ini_file("../config/db.ini");
       require_once dirname(__FILE__).'/../class/pdo.php';
       $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
-      if (!empty($data['contents'])) {
-        $data['contents'] = serialize($data['contents']);
-        $result = $db->query("UPDATE smartstore_order_hanki SET contents=? WHERE  date=? AND id=?", array($data['contents'], $data['date'], $data['id']));
-      } else {
-        $result = $db->query("UPDATE smartstore_order_hanki SET date=? WHERE id=?", array($data['date'], $data['id']));
-      }
+      $dbUpdate = array_map(function ($key) {
+          return $key.' = :'.$key;
+      }, array_keys($data, true));
+      $dbUpdate = implode(', ', $dbUpdate);
+
+      $result = $db->query("UPDATE smartstore_order_jshk SET {$dbUpdate} WHERE id = {$id}", $data);
+
+      $db->CloseConnection();
+
+      return $result;
+    }
+
+    /**
+     * 정기배송 주문 삭제
+     */
+    function delOrder($data) {
+      if (empty($data)) return false;
+      if (empty($data['id'])) return false;
+
+      $id = $data['id'];
+
+      $accountDb = parse_ini_file("../config/db.ini");
+      require_once dirname(__FILE__).'/../class/pdo.php';
+      $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+      $result = $db->query("DELETE FROM smartstore_order_jshk WHERE id = {$id}");
 
       $db->CloseConnection();
 

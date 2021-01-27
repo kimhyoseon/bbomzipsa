@@ -74,8 +74,7 @@ if (date('H') < 8) {
   $todayDate = date('Ymd', strtotime('+ 1 days'));
 }
 
-$listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date >= ? ORDER BY date ASC", array($todayDate));
-// $listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date < ? ORDER BY date ASC", array(date('Ymd')));
+$listDb = $db->query("SELECT * FROM smartstore_order_jshk WHERE date >= ? ORDER BY date ASC", array($todayDate));
 
 // echo '<pre>';
 // print_r($orderData1);
@@ -85,73 +84,25 @@ $listDb = $db->query("SELECT * FROM smartstore_order_hanki WHERE date >= ? ORDER
 
 if (!empty($listDb)) {
   foreach ($listDb as $value) {
-    $contents = unserialize($value['contents']);
-    $option = $contents['13'];
-    $amount = $contents['6'];
-    $options = explode('/', $option);
-    $date = trim(explode(':', $options[0])[1]);
-    if (strpos($date, '반찬세트') === false) {
-      $date = trim(preg_replace("/\([^)]+\)/", "", $date));
-    }
-    $set = trim(explode(':', $options[1])[1]);
-
-    // echo '<pre>';
-    // print_r($contents);
-    // echo '</pre>';
-    // exit();
+    $amount = $value['quantity'];
+    $date = $value['date'];
+    $dateKor = date('n월j일', strtotime($date));
+    $set = $value['menu'];
 
     $isInsert = false;
 
-    // id값이 없다면 그냥 추가
-    if (empty($value['id'])) {
-      if (!empty($orderData1[$date])) {
-        foreach ($orderData1[$date] as $k => $v) {
-          if ($set == $v[0]) {
-            $orderData1[$date][$k][1] = $v[1] + $amount;
-            $isInsert = true;
-          }
+    if (!empty($orderData1[$dateKor])) {
+      foreach ($orderData1[$dateKor] as $k => $v) {
+        if ($set == $v[0]) {
+          $orderData1[$dateKor][$k][1] = $v[1] + $amount;
+          $isInsert = true;
         }
       }
+    }
 
-      // 못찾은 경우에는 새로 삽입
-      if ($isInsert == false) {
-        $orderData1[$date][] = [$set, $amount];
-      }
-
-      if (empty($orderInfo[$date]['DB주문 추가'])) {
-        $orderInfo[$date]['DB주문 추가'] = 1;
-      } else {
-        $orderInfo[$date]['DB주문 추가']++;
-      }
-    // , 구분으로 반찬을 변경한 경우
-    } else if (strpos($set, ',') !== false) {
-      if (!empty($orderData1[$date])) {
-        foreach ($orderData1[$date] as $k => $v) {
-          if (substr($set, 0, 4) == substr($v[0], 0, 4)) {
-            $orderData1[$date][$k][1] = $v[1] - $amount;
-
-            // if ($orderData1[$date][$k][1] < 1) {
-            //   unset($orderData1[$date][$k]);
-            // }
-          }
-        }
-      }
-
-      // 변경메뉴는 새로 삽입
-      $orderData1[$date][] = [$set, $amount];
-
-      if (empty($orderInfo[$date]['DB주문 변경'])) {
-        $orderInfo[$date]['DB주문 변경'] = 1;
-      } else {
-        $orderInfo[$date]['DB주문 변경']++;
-      }
-    // 그 밖에는 관리자사이트에서 정보가 들어가기 때문에 PASS
-    } else {
-      if (empty($orderInfo[$date]['DB주문 별도주문추가'])) {
-        $orderInfo[$date]['DB주문 별도주문추가'] = 1;
-      } else {
-        $orderInfo[$date]['DB주문 별도주문추가']++;
-      }
+    // 못찾은 경우에는 새로 삽입
+    if ($isInsert == false) {
+      $orderData1[$dateKor][] = [$set, $amount];
     }
   }
 }
@@ -445,7 +396,7 @@ h2 {
                 <!-- // print_r($orderInfo);
                 // print_r($totalDelevery); -->
                   <thead><tr><th scope="col">
-                    <div><?=$key?> (<?=$total[$key]?>개 / <?=$totalDelevery[$key]?>명)</div>
+                    <div><?=$key?> (<?=$total[$key]?>개 / <?=$totalDelevery[$key]?>명 / <?=ceil($totalDelevery[$key]/3)?>장)</div>
                     <?php if (!empty($orderInfo[$key])) { ?>
                       <?php foreach ($orderInfo[$key] as $k => $v) { ?>
                         <div class="text-secondary"><?=$k?> <?=$v?></div>

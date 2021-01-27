@@ -26,6 +26,16 @@ try {
         $data = json_encode($hanki->getMenu($_POST));
     } else if ($_POST['menu'] == 'order') {
         $data = json_encode($hanki->getOrder($_POST));
+    } else if ($_POST['menu'] == 'search') {
+        $data = json_encode($hanki->getSearch($_POST));
+    } else if ($_POST['menu'] == 'addorder') {
+        if (empty($_POST['data'])) {
+            throw new Exception(null, 400);
+        }
+
+        $data['data'] = $_POST['data'];
+        $data['result'] = $hanki->addOrder($data['data']);
+        $data = json_encode($data);
     } else if ($_POST['menu'] == 'editorder') {
         if (empty($_POST['data'])) {
             throw new Exception(null, 400);
@@ -33,6 +43,14 @@ try {
 
         $data['data'] = $_POST['data'];
         $data['result'] = $hanki->editOrder($data['data']);
+        $data = json_encode($data);
+    } else if ($_POST['menu'] == 'delorder') {
+        if (empty($_POST['data'])) {
+            throw new Exception(null, 400);
+        }
+
+        $data['data'] = $_POST['data'];
+        $data['result'] = $hanki->delOrder($data['data']);
         $data = json_encode($data);
     } else if ($_POST['menu'] == 'saveNew') {
         if (empty($_POST['data'])) {

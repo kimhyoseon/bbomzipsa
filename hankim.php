@@ -1,14 +1,19 @@
 <?php
-ini_set("memory_limit" , -1);
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// DB 정보 조합
+$accountDb = parse_ini_file("./config/db.ini");
+require_once './class/pdo.php';
+$db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
 
-if ($_GET && $_GET['excel'] == 1) {
-  include_once($_SERVER['DOCUMENT_ROOT'].'/class/hanki.php');
-  $hanki = new Hanki();
-  $hanki->excelOption();
-  exit();
-}
+$todayDate = date('Ymd', strtotime('+ 1 days'));
+
+$listDb = $db->query("SELECT * FROM smartstore_order_jshk WHERE date >= ? ORDER BY date ASC", array($todayDate));
+
+$menus = ['1인세트(3개)', '2인세트(6개)', '1.5인세트(5개)', '패밀리세트(8개)'];
+// echo '<pre>';
+// print_r($orderData1);
+// print_r($listDb);
+// echo '</pre>';
+// exit();
 ?>
 
 <!DOCTYPE html>
@@ -16,7 +21,7 @@ if ($_GET && $_GET['excel'] == 1) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>정성한끼 메뉴표</title>
+<title>정성한끼 주문등록</title>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -28,6 +33,11 @@ if ($_GET && $_GET['excel'] == 1) {
 html,
 body {
   height: 100%;
+}
+
+input::placeholder {
+  color: #ddd !important;
+  font-style: italic;
 }
 
 body {
@@ -79,64 +89,303 @@ body {
 
 <body>
     <div class="container-fluid">
-      <div class="container-fluid">
-          <div class="row m-0 mt-2 mb-2">
-              <ul class="list-group list-group-horizontal">
-                  <a href="#" class="list-menu" data-menu="view"><li class="list-group-item">메뉴보기</li></a>
-                  <a href="#" class="list-menu" data-menu="new"><li class="list-group-item">메뉴생성</li></a>
-                  <a href="#" class="option-excel"><li class="list-group-item">옵션다운로드</li></a>
-              </ul>
+      <h3 class="text-center m-2">정성한끼 주문등록</h3>
+      <div class="row m-0 mt-3 mb-2">
+        <form class="needs-validation w-100 mb-10" novalidate>
+          <div class="form-row mb-2">
+            <div class="col-md-2"><input class="form-control" type="text" name="search" placeholder="검색" onkeydown="return event.key != 'Enter';"/></div>
           </div>
-          <div class="form-row">
-            <div class="col">
-              <select name="year" class="form-control form-control-lg">
-                <option value="2021">2021</option>
-              </select>
-            </div>
-            <div class="col">
-            <select name="month" class="form-control form-control-lg">
-              <?php
-              for ($i = 1; $i < 13; $i++) {
-                if ($i == date('n')) echo '<option selected="selected" value="'.$i.'">'.$i.'</option>';
-                else echo '<option value="'.$i.'">'.$i.'</option>';
-              }
-              ?>
-              </select>
-            </div>
-            <div class="col-10">
-            </div>
-          </div>
+        </form>
 
-          <div class="row m-0 mt-3 mb-2">
-              <div class="wrap-chart"></div>
+        <form class="needs-validation w-100 input-form" novalidate>
+          <div class="form-row mb-2">
+            <div class="col-md-2"><input class="form-control" type="text" name="date" placeholder="수령일 (,구분)" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1">
+              <select class="form-control" name="menu">
+                <option value="">- 세트메뉴 -</option>
+                <?php foreach ($menus as $value) { ?>
+                <option value="<?=$value?>"><?=$value?></option>
+                <?php } ?>
+              </select>
+            </div>
+            <div class="col-md-1"><input class="form-control" type="text" name="item_order_no" placeholder="상품주문번호" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input class="form-control" type="text" name="name" placeholder="수취인명" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input class="form-control" type="text" name="quantity" placeholder="수량" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input class="form-control" type="text" name="tel1" placeholder="수취인연락처1" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input class="form-control" type="text" name="tel2" placeholder="수취인연락처2" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input class="form-control" type="text" name="address" placeholder="배송지" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input class="form-control" type="text" name="message" placeholder="배송메세지" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input class="form-control" type="text" name="deposit" placeholder="입금정보" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1">
+              <button class="btn btn-primary mr-1 btn-add">저장</button>
+            </div>
           </div>
+        </form>
       </div>
-    </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">주문수정</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+      <div class="border-top my-3"></div>
+
+      <div class="wrap-chart">
+      <?php
+      if (!empty($listDb)) {
+        foreach ($listDb as $value) {
+          $id = $value['id'];
+          $date = $value['date'];
+          $item_order_no = $value['item_order_no'];
+          $name = $value['name'];
+          $quantity = $value['quantity'];
+          $tel1 = $value['tel1'];
+          $tel2 = $value['tel2'];
+          $address = $value['address'];
+          $message = $value['message'];
+          $meun = $value['menu'];
+      ?>
+        <form class="needs-validation w-100" novalidate>
+          <input type="hidden" name="id" value="<?=$id?>">
+          <div class="form-row mb-2">
+            <div class="col-md-1"><input value="<?=$date?>" class="form-control" type="text" name="date" placeholder="수령일 (,구분)" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1">
+              <select class="form-control" name="menu">
+                <?php foreach ($menus as $value) { ?>
+                <?php $selected = ($value == $meun) ? 'selected="selected"' : ''; ?>
+                <option value="<?=$value?>" <?=$selected?>><?=$value?></option>
+                <?php } ?>
+              </select>
+            </div>
+            <div class="col-md-1"><input value="<?=$item_order_no?>" class="form-control" type="text" name="item_order_no" placeholder="상품주문번호" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input value="<?=$name?>" class="form-control" type="text" name="name" placeholder="수취인명" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input value="<?=$quantity?>" class="form-control" type="text" name="quantity" placeholder="수량" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input value="<?=$tel1?>" class="form-control" type="text" name="tel1" placeholder="수취인연락처1" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input value="<?=$tel2?>" class="form-control" type="text" name="tel2" placeholder="수취인연락처2" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-3"><input value="<?=$address?>" class="form-control" type="text" name="address" placeholder="배송지" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1"><input value="<?=$message?>" class="form-control" type="text" name="message" placeholder="배송메세지" onkeydown="return event.key != 'Enter';"/></div>
+            <div class="col-md-1">
+              <button class="btn btn-primary mr-1 btn-edit">수정</button>
+              <button class="btn btn-danger mr-1 btn-delete">삭제</button>
+            </div>
           </div>
-          <input type="hidden" id="edit-orderdetail-id" />
-          <input type="hidden" id="edit-orderdetail-date" />
-          <div class="modal-body"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary btn-save-edit-orderdetail">Save changes</button>
-          </div>
-        </div>
+        </form>
+      <?php
+        }
+      }
+      ?>
       </div>
     </div>
 </body>
 
 <script>
-  var dataNew = null;
+  var searchOffset = 0;
+
+  $(document).ready(function() {
+    $(document).on('click', '.btn-add', addOrder);
+    $(document).on('click', '.btn-edit', editOrder);
+    $(document).on('click', '.btn-delete', delOrder);
+    $(document).on('keydown', 'input[name=search]', evSearch);
+  });
+
+  function evSearch(e) {
+    if (e.keyCode == 13) {
+      getSearch();
+    } else {
+      searchOffset = 0;
+    }
+  }
+
+  function resetInput() {
+    $('.input-form input').val("");
+    $('.input-form select').val("");
+  }
+
+  function getSearch() {
+    var keyword = $("input[name=search]").val();
+
+    if (!keyword) return false;
+
+    $.ajax({
+        type: 'POST',
+        url: '../api/hanki.php',
+        dataType : 'json',
+        timeout: 5000,
+        data: {
+            menu: 'search',
+            keyword: keyword,
+            offset: searchOffset
+        },
+        success: function (result, textStatus) {
+            console.log(result);
+            console.log(textStatus);
+            searchOffset++;
+
+            if (result == false) {
+              alert('결과를 찾을 수 없습니다.');
+              return false;
+            }
+
+            resetInput();
+
+            for(name in result){
+              if (!result[name]) continue;
+
+              if ($('.input-form input[name="' + name + '"]').length > 0) {
+                $('.input-form input[name="' + name + '"]').val(result[name]);
+              } else if ($('.input-form select[name="' + name + '"]').length > 0) {
+                $('.input-form select[name="' + name + '"]').val(result[name]);
+              }
+
+              console.log(result[name]);
+            };
+        },
+        error: function(result, textStatus, jqXHR) {
+            console.log(result);
+            console.log(textStatus);
+            console.log(jqXHR);
+        },
+        complete: function() {
+        }
+    });
+  }
+
+  function getData(e) {
+    if (!e) return false;
+    var data = {}
+    var form = $(e.currentTarget).closest('form');
+
+    form.find("input").each(function(){
+      var name = $(this).attr("name");
+      var val = $(this).val();
+      console.log(name);
+      console.log(val);
+
+      if (val) {
+        data[name] = val.trim();
+      }
+    });
+
+    // 메뉴
+    data["menu"] = form.find("select[name=menu]").val();
+
+    return data;
+  }
+
+  function addOrder(e) {
+    e.preventDefault();
+
+    if (confirm("저장하시겠습니까?")) {
+        var data = getData(e);
+
+        console.log(data);
+
+        // 필수값 체크
+        if (!data["date"]) return false;
+        if (!data["menu"]) return false;
+
+        $.ajax({
+            type: 'POST',
+            url: '../api/hanki.php',
+            dataType : 'json',
+            timeout: 5000,
+            data: {
+                menu: 'addorder',
+                data: data
+            },
+            success: function (result, textStatus) {
+                console.log(result);
+                console.log(textStatus);
+
+                if (result['result'] == true) {
+                    location.reload();
+                }
+            },
+            error: function(result, textStatus, jqXHR) {
+                console.log(result);
+                console.log(textStatus);
+                console.log(jqXHR);
+            },
+            complete: function() {
+            }
+        });
+    }
+  }
+
+  function editOrder(e) {
+    e.preventDefault();
+
+    if (confirm("수정하시겠습니까?")) {
+        var data = getData(e);
+
+        console.log(data);
+
+        // 필수값 체크
+        if (!data["date"]) return false;
+        if (!data["menu"]) return false;
+        if (!data["id"]) return false;
+
+        $.ajax({
+            type: 'POST',
+            url: '../api/hanki.php',
+            dataType : 'json',
+            timeout: 5000,
+            data: {
+                menu: 'editorder',
+                data: data
+            },
+            success: function (result, textStatus) {
+                console.log(result);
+                console.log(textStatus);
+
+                if (result['result'] == true) {
+                    location.reload();
+                }
+            },
+            error: function(result, textStatus, jqXHR) {
+                console.log(result);
+                console.log(textStatus);
+                console.log(jqXHR);
+            },
+            complete: function() {
+            }
+        });
+    }
+  }
+
+  function delOrder(e) {
+    e.preventDefault();
+
+    if (confirm("삭제하시겠습니까?")) {
+        var data = getData(e);
+        console.log(data);
+
+        if (!data["id"]) return false;
+
+        $.ajax({
+            type: 'POST',
+            url: '../api/hanki.php',
+            dataType : 'json',
+            timeout: 5000,
+            data: {
+                menu: 'delorder',
+                data: data
+            },
+            success: function (result, textStatus) {
+                console.log(result);
+                console.log(textStatus);
+
+                if (result['result'] == true) {
+                    location.reload();
+                }
+            },
+            error: function(result, textStatus, jqXHR) {
+                console.log(result);
+                console.log(textStatus);
+                console.log(jqXHR);
+            },
+            complete: function() {
+            }
+        });
+    }
+  }
+
+  /*var dataNew = null;
   var orderDetail = {};
   var editorJson = null;
 
@@ -500,7 +749,7 @@ body {
     $(document).on('click', '.btn-edit-order', editOrder);
     $(document).on('click', '.btn-edit-order-detail', editOrderDetail);
     $(document).on('click', '.btn-save-edit-orderdetail', saveEditOrderDetail);
-  });
+  });*/
 </script>
 
 </html>
