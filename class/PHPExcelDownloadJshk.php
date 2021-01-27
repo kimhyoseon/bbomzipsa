@@ -1538,4 +1538,308 @@ class PHPExcelDownload {
 
         return $array;
     }
+
+    /**
+     * 엑셀일괄발송 (롯데택배)
+     */
+    public function sendallLotte($filesInput, $filesOutput, $date) {
+        if (empty($filesInput) || empty($filesOutput)) {
+            echo '파일을 첨부해주세요.';
+            return false;
+        }
+
+        if (!empty($filesInput['tmp_name'])) {
+            $inputFile = $filesInput['tmp_name'];
+            $inputFileType = PHPExcel_IOFactory::identify($inputFile);
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+            $objPHPExcel = $objReader->load($inputFile);
+            $objPHPExcel->setActiveSheetIndex(0);
+            $inputSheetData = $objPHPExcel->getActiveSheet()->toArray();
+        // 직접입력
+        } else {
+            $inputSheetData = $filesInput;
+        }
+
+        // 날짜를 옵션과 동일하게 변경
+        $dateKor = date('n월j일', strtotime($date));
+
+        $outputFile = $filesOutput['tmp_name'];
+        $outputFileType = PHPExcel_IOFactory::identify($outputFile);
+        $objReader = PHPExcel_IOFactory::createReader($outputFileType);
+        $objPHPExcel = $objReader->load($outputFile);
+        $objPHPExcel->setActiveSheetIndex(0);
+        $outputSheetData = $objPHPExcel->getActiveSheet()->toArray();
+        $outputSheetDataFilter = array();
+        $outputSheetDataTrash = array();
+
+        $filter = array(
+            '운송장번호' => '송장번호',
+            '수하인명' => '수취인명',
+            '택배사' => '택배사',
+            '옵션정보' => '옵션정보',
+        );
+
+        $filterTmp = array(
+            '상품번호' => '상품번호',
+        );
+
+        $filterMerged = array_merge($filter, $filterTmp);
+
+        $filterArray = array();
+        $filterIndex = array();
+        $filterIndexReverse = array();
+        $body = array();
+
+        if (empty($inputSheetData)) {
+            echo '엑셀 데이터를 확인할 수 없습니다.';
+            return false;
+        }
+
+        foreach ($inputSheetData as $key => $value) {
+            if ($key == 0 || $key == 1) {
+                foreach ($value as $k => $v) {
+                    if (empty($v)) continue;
+
+                    if (!empty($filterMerged[$v])) {
+                        $filterArray[] = $k;
+                        $filterIndex[$v] = $k;
+                        $filterIndexReverse[$k] = $v;
+                    }
+                }
+            } else {
+                $row = array();
+
+                foreach ($value as $k => $v) {
+                    if (empty($v)) continue;
+                    if (in_array($k, $filterArray)) {
+                        $row[$filterMerged[$filterIndexReverse[$k]]] = str_replace('*', '', $v);
+                    }
+                }
+
+                $body[] = $row;
+            }
+        }
+
+        if (empty($body)) {
+            echo '내역이 존재하지 않습니다.';
+            return false;
+        }
+
+        // 출력데이터 생성
+        $filterArray2 = array();
+        $filterIndex2 = array();
+        $body2 = array();
+        $filterIndexReverse2 = array();
+        $filterValues = array_values($filterMerged);
+
+        unset($outputSheetData[0]);
+
+        foreach ($outputSheetData as $key => $value) {
+            if ($key == 1) {
+                foreach ($value as $k => $v) {
+                    if (in_array($v, $filterValues)) {
+                        $filterArray2[] = $k;
+                        $filterIndex2[$v] = $k;
+                        $filterIndexReverse2[$k] = $v;
+                    }
+                }
+            } else {
+                $isTrash = false;
+
+                // 날짜가 지정날짜가 아닌것은 지우자
+                if (strpos($value[$filterIndex2['옵션정보']], $dateKor) === false) $isTrash = true;
+
+                foreach ($body as $kbody => $vbody) {
+                    $isSame = true;
+                    $hanjinNuber = '';
+
+                    foreach ($vbody as $kb => $vb) {
+                        if ($kb == '송장번호') continue;
+                        if ($kb == '택배사') continue;
+                        if ($kb == '우편번호') continue; // CJ 우편번호 최적화로 변경이 될 수 있음
+
+                        // 하나의 항목이라도 다르다면 continue;
+                        $v1 = trim(str_replace('-', '', $value[$filterIndex2[$kb]]));
+                        $v2 = trim(str_replace('-', '', $vb));
+
+                        if (empty($v2)) continue;
+
+                        // 데이터 비교
+                        // echo '<pre>';
+                        // print_r($kb.'/'.$v1.'/'.$v2);
+                        // echo '</pre>';
+
+                        if (strpos($v1, $v2) === false) {                            ;
+                            $isSame = false;
+                        }
+
+                        //if (in_array($value[$filterIndex['상품번호']], array('4324723046', '4529428871', '4530770714', '4318623001'))) continue;
+                    }
+                    //echo '<br/>';
+
+                    if ($isSame) {
+                        $outputSheetData[$key][$filterIndex2['택배사']] = '롯데택배';
+                        $outputSheetData[$key][$filterIndex2['송장번호']] = $vbody['송장번호'];
+                    }
+                }
+
+                // 모두 일치하는 경우
+                if ($isTrash == false) {
+                    // 일치하는 경우만 담는다
+                    $outputSheetDataFilter[] = $outputSheetData[$key];
+                }else {
+                    $outputSheetDatatrash[$outputSheetData[$key][0]] = $outputSheetData[$key];
+                }
+            }
+        }
+
+        // 송장번호가 입력되지 않은 주문건은 삭제
+        $outputSheetDataNew = array();
+        $outputSheetDataNew[1] = $outputSheetData[1];
+        $newIndex = 2;
+        foreach ($outputSheetDataFilter as $key => $value) {
+            if (empty($outputSheetDataFilter[$key][$filterIndex2['송장번호']])) {
+                continue;
+            }
+
+            $outputSheetDataNew[$newIndex] = $value;
+            $newIndex++;
+        }
+
+        $outputSheetData = $outputSheetDataNew;
+
+        // 송장이 입력된 다른 주문들중에 오늘날짜로 변경된 주문이 있는지 확인
+        $orderIds = array();
+
+        foreach ($outputSheetDatatrash as $key => $value) {
+            if (empty($outputSheetDatatrash[$key][$filterIndex2['송장번호']])) {
+                continue;
+            }
+
+            // 상품주문번호만 수집
+            $orderIds[] = $value[0];
+        }
+
+        if (!empty($orderIds)) {
+            $accountDb = parse_ini_file($_SERVER['DOCUMENT_ROOT'].'/config/db.ini');
+            require_once $_SERVER['DOCUMENT_ROOT'].'/class/pdo.php';
+            $db = new Db($accountDb['DB_HOST'], $accountDb['DB_NAME'], $accountDb['DB_USER'], $accountDb['DB_PASSWORD']);
+
+            $orderIdsTxt = implode("','", $orderIds);
+            $orderIdsTxt = "'{$orderIdsTxt}'";
+            $orderFromDb = $db->query("SELECT * FROM smartstore_order_jshk WHERE date='{$date}' AND item_order_no IN ({$orderIdsTxt}) ");
+
+            if (!empty($orderFromDb)) {
+                foreach ($orderFromDb as $value) {
+                    $outputSheetData[] = $outputSheetDatatrash[$value['item_order_no']];
+                }
+            }
+        }
+
+        // echo '<pre>';
+        // print_r($outputSheetData);
+        // echo '</pre>';
+        // exit();
+
+        // echo '<pre>';
+        // print_r($filterArray);
+        // print_r($filterIndexReverse);
+        // print_r($filterValues);
+        // print_r($filterArray2);
+        // print_r($filterIndex2);
+        // print_r($filterIndexReverse2);
+        // print_r($body);
+        // print_r($outputSheetData);
+        // echo '</pre>';
+        // exit();
+
+        $data = $outputSheetData;
+        $cntRow = sizeof($outputSheetData);
+        $lastChar = PHPExcel_Cell::stringFromColumnIndex((count($outputSheetData[1]) - 1));
+
+        $excel = new PHPExcel();
+
+        // 셀 구분선
+        $excel->setActiveSheetIndex(0)->getStyle("A1:{$lastChar}{$cntRow}")->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+
+        // 셀 폭 최적화
+        /*$widths = array(10, 15, 5, 15, 8, 80, 6, 50, 6, 6, 6, 50);
+        foreach ($widths as $i => $w) {
+            $excel->setActiveSheetIndex(0)->getColumnDimension($this->columnChar($i))->setWidth($w);
+        }*/
+
+        // 시트명 변경
+        $excel->setActiveSheetIndex(0)->setTitle('발송처리');
+
+        // 데이터 적용
+        $excel->getActiveSheet()->fromArray($data, NULL, 'A1');
+
+        // 텍스트 포맷 적용
+
+        // echo '<pre>';
+        // print_r($data);
+        // echo '</pre>';
+
+        // format -> text
+        foreach ($data as $key => $value) {
+            // if ($key < 2) continue;
+            if (!empty($value)) {
+                foreach ($value as $k => $v) {
+                    if (is_numeric($v) && strlen($v) > 9) {
+                        $cellPos = PHPExcel_Cell::stringFromColumnIndex($k).$key;
+                        // echo '<pre>';
+                        // print_r($key);
+                        // echo '</pre>';
+                        // echo '<pre>';
+                        // print_r(PHPExcel_Cell::stringFromColumnIndex($k).$key);
+                        // echo '</pre>';
+                        // echo '<pre>';
+                        // print_r($excel->getActiveSheet()->getCell(PHPExcel_Cell::stringFromColumnIndex($k).$key)->getValue());
+                        // echo '</pre>';
+                        // echo '<pre>';
+                        // print_r($v);
+                        // echo '</pre>';
+
+                        // 이전값과 현재값이 같을때만 변경
+                        if ($excel->getActiveSheet()->getCell(PHPExcel_Cell::stringFromColumnIndex($k).$key)->getValue() == $v) {
+                            // echo '<pre>';
+                            // print_r($cellPos);
+                            // echo '</pre>';
+                            // echo '<pre>';
+                            // print_r('changed');
+                            // echo '</pre>';
+                            $excel->setActiveSheetIndex(0)->setCellValueExplicit($cellPos, $v, PHPExcel_Cell_DataType::TYPE_STRING);
+                        }
+                    }
+                }
+            }
+        }
+
+        // exit();
+
+        // 양식 설정
+        ob_end_clean();
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+
+        header('Content-type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="엑셀일괄발송_'.date('Ymd').'.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        // 다운로드
+        $writer->save('php://output');
+        die();
+
+        /*echo '<pre>';
+        print_r($data);
+        print_r($filterArray);
+        print_r($filterIndex);
+        print_r($filterIndexReverse);
+        echo '</pre>';*/
+    }
 }
