@@ -489,7 +489,7 @@ class PHPExcelDownload {
             else if (strpos($value['menu'], '2인') !== false) $menuAmount = 6;
             else if (strpos($value['menu'], '패밀리') !== false) $menuAmount = 8;
 
-            if ($menuAmount == 0) exit($option.'올바르지 않은 옵션입니다.');
+            if ($menuAmount == 0) exit($value['menu'].'올바르지 않은 옵션입니다.');
 
             for ($i=0; $i < $menuAmount; $i++) {
                 if (empty($dailyChan[$date][$i])) exit($i.'번째 메뉴를 찾을 수 없습니다.');
@@ -497,7 +497,7 @@ class PHPExcelDownload {
             }
 
             // 1.5인 메인+국 처리
-            if (strpos($option, '1.5인') !== false) {
+            if (strpos($value['menu'], '1.5인') !== false) {
                 for ($i = 6; $i < 8; $i++) {
                     if (empty($dailyChan[$date][$i])) exit($i.'번째 메뉴를 찾을 수 없습니다.');
                     $menus[] = $dailyChan[$date][$i];
