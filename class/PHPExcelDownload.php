@@ -1287,8 +1287,8 @@ class PHPExcelDownload {
                     $amount *= 2;
                     $newStock2 = $this->setStockUpdateAdd($newStock2, str_replace('분말200포', '분말100포', $title), $amount);
                 } else {
-                    $newStock2 = $this->setStockUpdateAdd($newStock2, str_replace('코세척기+분말100포', '코세척기', $title), $amount);
-                    $newStock2 = $this->setStockUpdateAdd($newStock2, str_replace('코세척기+분말100포', '분말100포', $title), $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, str_replace('코세척기＋분말100포', '코세척기', $title), $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, str_replace('코세척기＋분말100포', '분말100포', $title), $amount);
                 }
             } else if (strpos($title, '귀지압패치') !== false) {
                 $newStock2 = $this->setStockUpdateAdd($newStock2, $title, ($amount * 2));
