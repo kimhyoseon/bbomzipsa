@@ -39,8 +39,8 @@ class PHPExcelDownload {
         '방석' => '도넛방석',
         '짐볼' => '짐볼',
         '루프' => '아이워너 루프밴드',
-        '반찬' => '신선식품',
-        '오늘의국' => '신선식품',
+        '유리창' => '유리창청소',
+        '방충망' => '방충망청소',
     );
 
     public function __construct() {
@@ -1293,6 +1293,14 @@ class PHPExcelDownload {
             } else if (strpos($title, '귀지압패치') !== false) {
                 $newStock2 = $this->setStockUpdateAdd($newStock2, $title, ($amount * 2));
                 $newStock2 = $this->setStockUpdateAdd($newStock2, '귀혈자리지도', $amount);
+            } else if (strpos($title, '유리창청소') !== false) {
+                if (strpos($title, '방충망') !== false) {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, str_replace('유리창청소', '방충망청소', $title), $amount);
+                }
+            } else if (strpos($title, '방충망청소') !== false) {
+                if (strpos($title, '유리창') !== false) {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '유리창청소__5-30mm （단계조절）'), $amount);
+                }
             // 나머지
             } else {
                 $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);
