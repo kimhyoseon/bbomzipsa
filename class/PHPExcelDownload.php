@@ -1299,7 +1299,7 @@ class PHPExcelDownload {
                 }
             } else if (strpos($title, '방충망청소') !== false) {
                 if (strpos($title, '유리창') !== false) {
-                    $newStock2 = $this->setStockUpdateAdd($newStock2, '유리창청소__5-30mm （단계조절）'), $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '유리창청소__5-30mm （단계조절）', $amount);
                 }
             // 나머지
             } else {
