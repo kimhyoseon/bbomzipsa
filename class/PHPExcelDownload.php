@@ -1296,6 +1296,8 @@ class PHPExcelDownload {
             } else if (strpos($title, '유리창청소') !== false) {
                 if (strpos($title, '방충망') !== false) {
                     $newStock2 = $this->setStockUpdateAdd($newStock2, str_replace('유리창청소', '방충망청소', $title), $amount);
+                } else {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);
                 }
             } else if (strpos($title, '방충망청소') !== false) {
                 if (strpos($title, '유리창') !== false) {
