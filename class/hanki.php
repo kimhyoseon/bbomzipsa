@@ -226,8 +226,8 @@ class Hanki {
             //   array_multisort($sort, SORT_ASC, $chans);
             // }
 
-            // 수, 금은 특별식
-            if ($dayOfWeek == 3 || $dayOfWeek == 5) {
+            // 화, 금은 특별식
+            if ($dayOfWeek == 2 || $dayOfWeek == 5) {
                 // array_unshift($chans, $this->jshkDataSoup[0]);
                 // array_unshift($chans, $this->jshkDataSpecial[0]);
                 $chans[] = $this->jshkDataSpecial[0];
@@ -404,33 +404,44 @@ class Hanki {
 
     $zeroChan = array();
 
-    // 후반부에서는 0개인 반찬을 강제로 담아줌
+    // 후반부에서는 선택받지 못한 반찬을 강제로 담아줌
     if (array_sum(array_values($this->chanCount)) > 70) {
-      foreach ($this->chanCount as $k => $v) {
+      // 반찬이 0개인 친구들 먼저 3개 선택
+      $shuffled = $this->shuffle_assoc($this->chanCount);
+
+      foreach ($shuffled as $k => $v) {
         if ($v == 0) {
           $zeroChan[] = $k;
-          if (sizeof($zeroChan) > 1) break;
+          if (sizeof($zeroChan) > 2) break;
         }
       }
 
+      // shuffle($zeroChan);
+
+      // 반찬이 0개인게 모자라면 1개인 친구들로 채워줍니다.
       if (sizeof($zeroChan) < 2) {
-        foreach ($this->chanCount as $k => $v) {
+        foreach ($shuffled as $k => $v) {
           if ($v == 1) {
             $zeroChan[] = $k;
-            if (sizeof($zeroChan) > 1) break;
+            if (sizeof($zeroChan) > 2) break;
           }
         }
       }
-    }
 
-    // echo '<pre>';
-    // print_r($zeroChan);
-    // echo '</pre>';
+      // echo '<pre>';
+      // print_r($zeroChan);
+      // echo '</pre>';
+      // exit();
+    }
 
     while (sizeof($sets) < 6) {
       if (sizeof($zeroChan) > 0) {
         $chan = $zeroChan[0];
         array_shift($zeroChan);
+
+        // echo '<pre>';
+        // print_r($zeroChan);
+        // echo '</pre>';
       } else {
         $chan = $this->jshkDataLots[array_rand($this->jshkDataLots)];
       }
@@ -467,8 +478,8 @@ class Hanki {
       if ($fryTotal > 2 && strpos($chan, '볶음') !== false) continue;
       if ($boilTotal > 2 && strpos($chan, '조림') !== false) continue;
 
-      // 너무 많이 선택된 반찬은 제외 (1반찬당 최대 3회)
-      if ($this->chanCount[$chan] > 2) continue;
+      // 너무 많이 선택된 반찬은 제외 (1반찬당 최대 4회)
+      if ($this->chanCount[$chan] > 3) continue;
 
       // 특정반찬은 횟수제한 (최대 2회)
       if ($chan == '잡채' && $this->chanCount[$chan] > 1) continue;
@@ -685,5 +696,17 @@ class Hanki {
 
     public function columnChar($i) {
         return chr(65 + $i);
+    }
+
+    public function shuffle_assoc($list) {
+      if (!is_array($list)) return $list;
+
+      $keys = array_keys($list);
+      shuffle($keys);
+      $random = array();
+      foreach ($keys as $key) {
+        $random[$key] = $list[$key];
+      }
+      return $random;
     }
 }
