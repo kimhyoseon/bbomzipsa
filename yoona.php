@@ -62,7 +62,7 @@ body {
 var menu = null;
 var chartType = 'LineChart';
 var chartDetail = {};
-var region = '수원';
+var region = '';
 
 function clickMenu(e) {
     menu = $(e.currentTarget).data('menu');

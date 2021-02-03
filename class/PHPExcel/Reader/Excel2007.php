@@ -309,7 +309,7 @@ class PHPExcel_Reader_Excel2007 extends PHPExcel_Reader_Abstract implements PHPE
 
         // Sadly, some 3rd party xlsx generators don't use consistent case for filenaming
         //    so we need to load case-insensitively from the zip file
-        
+
         // Apache POI fixes
         $contents = $archive->getFromIndex(
             $archive->locateName($fileName, ZIPARCHIVE::FL_NOCASE)
@@ -822,6 +822,8 @@ class PHPExcel_Reader_Excel2007 extends PHPExcel_Reader_Abstract implements PHPE
                                             }
                                         }
 
+                                        // echo '<pre>';print_r($c);echo '</pre>';
+
     //                                    echo 'Reading cell ', $coordinates[0], $coordinates[1], PHP_EOL;
     //                                    print_r($c);
     //                                    echo PHP_EOL;
@@ -916,11 +918,17 @@ class PHPExcel_Reader_Excel2007 extends PHPExcel_Reader_Abstract implements PHPE
                                             $cell->setCalculatedValue($calculatedValue);
                                         }
 
+                                        // khs7515 찾았다 요놈!!!!
+                                        // $c["s"] 가 데이터타입을 구분하는 숫자인데 숫자가 없는경우 0을 넣어줘야 맞음
+                                        // 근데 빌어먹을 아래 코드에서 0을 제대로 넣어주지 못해서 이전 셀의 데이터타입 구분 숫자를 넣고 있었음!!!!!!
+
                                         // Style information?
                                         if ($c["s"] && !$this->readDataOnly) {
                                             // no style index means 0, it seems
-                                            $cell->setXfIndex(isset($styles[intval($c["s"])]) ?
-                                                intval($c["s"]) : 0);
+                                            // $cell->setXfIndex(isset($styles[intval($c["s"])]) ? intval($c["s"]) : 0);
+                                            $cell->setXfIndex(isset($styles[intval($c["s"])]) ? intval($c["s"]) : 0);
+                                        } else {
+                                            $cell->setXfIndex(0);
                                         }
                                     }
                                 }

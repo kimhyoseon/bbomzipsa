@@ -2495,8 +2495,14 @@ class PHPExcel_Worksheet implements PHPExcel_IComparable
                             }
                         }
 
+                        // echo '<pre>';print_r($cell);echo '</pre>';
+                        // exit();
+
                         if ($formatData) {
                             $style = $this->parent->getCellXfByIndex($cell->getXfIndex());
+                            // echo '<pre>';print_r('@@@@');echo '</pre>';
+                            // echo '<pre>';print_r($cell->getXfIndex());echo '</pre>';
+                            // echo '<pre>';print_r($style->getNumberFormat());echo '</pre>';
                             $returnValue[$rRef][$cRef] = PHPExcel_Style_NumberFormat::toFormattedString(
                                 $returnValue[$rRef][$cRef],
                                 ($style && $style->getNumberFormat()) ? $style->getNumberFormat()->getFormatCode() : PHPExcel_Style_NumberFormat::FORMAT_GENERAL

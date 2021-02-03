@@ -454,12 +454,12 @@ class PHPExcel_Style_NumberFormat extends PHPExcel_Style_Supervisor implements P
 
     private static function formatAsDate(&$value, &$format)
     {
-        // // 2020-12-18 숫자를 날짜로 착각하는 에러 수정 (날짜는 53493.2139843 이런 형태임)
-        return;
+        // khs7515 2020-12-18 숫자를 날짜로 착각하는 에러 수정 (날짜는 53493.2139843 이런 형태임)
+        // return;
 
-        if (strpos($value, '.') === false) {
-            return;
-        }
+        // if (strpos($value, '.') === false) {
+        //     return;
+        // }
 
         // strip off first part containing e.g. [$-F800] or [$USD-409]
         // general syntax: [$<Currency string>-<language info>]
@@ -585,6 +585,10 @@ class PHPExcel_Style_NumberFormat extends PHPExcel_Style_Supervisor implements P
      */
     public static function toFormattedString($value = '0', $format = PHPExcel_Style_NumberFormat::FORMAT_GENERAL, $callBack = null)
     {
+        // echo '<pre>';print_r('###');echo '</pre>';
+        // echo '<pre>';print_r($value);echo '</pre>';
+        // echo '<pre>';print_r($format);echo '</pre>';
+
         // For now we do not treat strings although section 4 of a format code affects strings
         if (!is_numeric($value)) {
             return $value;

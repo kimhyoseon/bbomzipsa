@@ -480,9 +480,9 @@ class PHPExcelDownload {
                         }
 
                         // 2020-12-24 우편번호 오류
-                        if ($filterIndexReverse[$k] == '우편번호') {
-                            continue;
-                        }
+                        // if ($filterIndexReverse[$k] == '우편번호') {
+                        //     continue;
+                        // }
 
                         if ($filterIndexReverse[$k] == '옵션정보') {
                             if ($row[array_search('상품명', array_keys($filterMerged))] == '신선식품') {

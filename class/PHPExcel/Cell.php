@@ -998,6 +998,8 @@ class PHPExcel_Cell
      */
     public function setXfIndex($pValue = 0)
     {
+        // echo '<pre>';print_r(debug_backtrace());echo '</pre>';
+        // exit('!!!@#!@');
         $this->xfIndex = $pValue;
 
         return $this->notifyCacheController();

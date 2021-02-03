@@ -154,6 +154,8 @@ class PHPExcel_Shared_Date
      */
     public static function ExcelToPHPObject($dateValue = 0)
     {
+        // print_r(debug_backtrace());
+
         $dateTime = self::ExcelToPHP($dateValue);
         $days = floor($dateTime / 86400);
         $time = round((($dateTime / 86400) - $days) * 86400);
@@ -162,7 +164,23 @@ class PHPExcel_Shared_Date
         $seconds = round($time) - ($hours * 3600) - ($minutes * 60);
 
         $dateObj = date_create('1-Jan-1970+'.$days.' days');
-        $dateObj->setTime($hours, $minutes, $seconds);
+
+        // echo '<pre>';print_r('-- start --');echo '</pre>';
+        // echo '<pre>';print_r($dateValue);echo '</pre>';
+        // echo '<pre>';print_r($dateTime);echo '</pre>';
+        // echo '<pre>';print_r($days);echo '</pre>';
+        // echo '<pre>';print_r($time);echo '</pre>';
+        // echo '<pre>';print_r($hours);echo '</pre>';
+        // echo '<pre>';print_r($minutes);echo '</pre>';
+        // echo '<pre>';print_r($seconds);echo '</pre>';
+        // echo '<pre>';print_r($dateObj);echo '</pre>';
+
+        try {
+            $dateObj->setTime($hours, $minutes, $seconds);
+        } catch (\Throwable $th) {
+            // print_r(debug_backtrace());
+            exit('????');
+        }
 
         return $dateObj;
     }
