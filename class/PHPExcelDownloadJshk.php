@@ -178,11 +178,6 @@ class PHPExcelDownload {
         // DB에서 해당 날짜 주문 가져오기
         $orderFromDb = $db->query("SELECT * FROM smartstore_order_jshk WHERE date=? ", array($date));
 
-        // echo '<pre>';
-        // print_r($orderFromDb);
-        // print_r($bodyTrash);
-        // echo '</pre>';
-
         if (!empty($orderFromDb)) {
             foreach ($orderFromDb as $value) {
                 // 주문번호가 있고 동일한 주문번호가 엑셀에도 엑셀의 정보를 가져와서 빈 정보를 채워주자
@@ -193,7 +188,10 @@ class PHPExcelDownload {
                             if ($v['item_order_no'] == $value['item_order_no']) {
                                 $isExist = True;
                                 foreach ($bodyTrash[$value['item_order_no']] as $kk => $vv) {
-                                    if (!empty($vv)) {
+                                    // DB데이터가 우선
+                                    if (!empty($value[$kk])) {
+                                        $body[$k][$kk] = $value[$kk];
+                                    } else if (!empty($vv)) {
                                         $body[$k][$kk] = $vv;
                                     }
                                 }
@@ -201,7 +199,17 @@ class PHPExcelDownload {
                         }
 
                         if ($isExist == false) {
-                            $body[] = $bodyTrash[$value['item_order_no']];
+                            $bodynew = [];
+                            foreach ($bodyTrash[$value['item_order_no']] as $kk => $vv) {
+                                // DB데이터가 우선
+                                if (!empty($value[$kk])) {
+                                    $bodynew[$kk] = $value[$kk];
+                                } else if (!empty($vv)) {
+                                    $bodynew[$kk] = $vv;
+                                }
+                            }
+
+                            $body[] = $bodynew;
                         }
                     }
                 } else {

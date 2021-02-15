@@ -200,8 +200,9 @@ function rendersimri(data) {
                 data['simri'][i][0] = year + '/' + data['simri'][i][0];
             }
 
-            if (year < 8) continue;
-            else if (year == 8 && date[0] < 4) continue;
+            // 이 코드는 대체 뭐지???
+            // if (year < 8) continue;
+            // else if (year == 8 && date[0] < 4) continue;
 
             for (key in chartTitle) {
                 if (!chartData[key]) {
@@ -244,8 +245,8 @@ function rendersimri(data) {
                 data['jeonse'][i][0] = year + '/' + data['jeonse'][i][0];
             }
 
-            if (year < 8) continue;
-            else if (year == 8 && date[0] < 4) continue;
+            // if (year < 8) continue;
+            // else if (year == 8 && date[0] < 4) continue;
 
             for (key in chartTitleJeonse) {
                 if (!chartDataJeonse[key]) {
