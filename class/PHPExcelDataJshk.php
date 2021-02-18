@@ -357,7 +357,7 @@ return array(
         '참기름' => array(1, 'g', false, '국산'),
     ),
     '메추리알조림' => array( // 200g 2019-10-09
-        '_total' => array(170, 'g', false, ''),
+        '_total' => array(150, 'g', false, ''),
         '_expired' => array(4, 'days', false, ''),
         '_regular' => array(2, 3700, 1),
 
