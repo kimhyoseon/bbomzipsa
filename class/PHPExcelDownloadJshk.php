@@ -295,10 +295,10 @@ class PHPExcelDownload {
 
         $db->CloseConnection();
 
-        echo '<pre>';
-        print_r($body);
-        echo '</pre>';
-        exit();
+        // echo '<pre>';
+        // print_r($body);
+        // echo '</pre>';
+        // exit();
 
         return array($filter, $filterMerged, $body);
     }
