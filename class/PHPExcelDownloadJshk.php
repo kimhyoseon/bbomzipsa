@@ -28,7 +28,6 @@ class PHPExcelDownload {
      * 정성한끼 엑셀정보 획득
      */
     public function jshkDataFilter($files, $date) {
-
         if (empty($date)) return false;
 
         // 날짜를 옵션과 동일하게 변경
@@ -48,11 +47,6 @@ class PHPExcelDownload {
             $objPHPExcel = $objReader->load($inputFile);
             $objPHPExcel->setActiveSheetIndex(0);
             $sheetData = $objPHPExcel->getActiveSheet()->toArray();
-
-            // echo '<pre>';
-            // print_r($sheetData);
-            // echo '</pre>';
-            // exit();
 
             $filter = array(
                 '수취인명' => '받으시는분',
@@ -225,11 +219,6 @@ class PHPExcelDownload {
             }
         }
 
-        // echo '<pre>';
-        // print_r($body);
-        // echo '</pre>';
-        // exit();
-
         // 정기배송 메뉴 추출
         if (file_exists($_SERVER['DOCUMENT_ROOT'].'/data/dailychan.json')) {
             $dailyChan = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/data/dailychan.json'), true);
@@ -271,15 +260,16 @@ class PHPExcelDownload {
         $frameNames = array();
 
         foreach ($body as $value) {
-            $sortNames[] = $value['name'];
-            $frameNames[] = $value['name'];
+            $sortNames[] = $value['name'].'/'.$value['item_order_no'];
+            $frameNames[] = $value['name'].'/'.$value['item_order_no'];
         }
 
         array_multisort($sortNames, SORT_ASC, $frameNames);
 
         foreach ($frameNames as $name) {
             foreach ($body as $key => $value) {
-                if ($value['name'] == $name) {
+
+                if ($value['name'].'/'.$value['item_order_no'] == $name) {
                     if (strpos($value['menu'], '1.5인') !== false) {
                         $sortCustomers[] = 7;
                     } else {
@@ -295,7 +285,7 @@ class PHPExcelDownload {
 
         foreach ($frameNames as $name) {
             foreach ($body as $key => $value) {
-                if ($value['name'] == $name) {
+                if ($value['name'].'/'.$value['item_order_no'] == $name) {
                     $customersSorted[] = $value;
                 }
             }
@@ -305,10 +295,10 @@ class PHPExcelDownload {
 
         $db->CloseConnection();
 
-        // echo '<pre>';
-        // print_r($body);
-        // echo '</pre>';
-        // exit();
+        echo '<pre>';
+        print_r($body);
+        echo '</pre>';
+        exit();
 
         return array($filter, $filterMerged, $body);
     }
