@@ -12,6 +12,7 @@ class Hanki {
     public $validDay = array(); // 배송일자
     public $allDay = array(); // 배송X일자
     public $chanCount = array(); // 모든 반찬카운트
+    public $chanBanWeek = array(); // 같은 반찬이 같은 요일에 들어가지 않도록 처리
     public $year = '';
     public $month = '';
     public $try = 1;
@@ -250,11 +251,89 @@ class Hanki {
 
         // 모든 반찬카운트
         // echo '<pre>';
+        // print_r($this->chanBanWeek);
         // print_r($this->chanCount);
+        // print_r($this->allDay);
         // echo '</pre>';
         // exit();
 
         return $this->allDay;
+    }
+
+    /**
+     * 반찬 최적화 (많은 수량의 반찬 대신 적은 수량의 반찬을 늘려준다)
+     */
+    function validChanCount() {
+
+      // 전체 반찬카운트를 돌면서 수량이 많은 반찬은 수량이 적은 반찬으로 대체
+      $adds = array();
+      $minuss = array();
+      foreach ($this->chanCount as $key => $value) {
+        // 수량이 1개 이하라면
+        if ($value < 2) {
+          $adds[] = $key;
+        } else // 수량이 4개 이상이라면
+        if ($value > 3) {
+          $minuss[] = $key;
+        }
+      }
+
+      if (!empty($adds)) {
+        foreach ($adds as $value) {
+          $minus = array_pop($minuss);
+          $this->chanChange($value, $minus);
+        }
+
+        echo '<pre>';
+        print_r('----');
+        print_r($adds);
+        print_r($minuss);
+        print_r('----');
+        echo '</pre>';
+      }
+    }
+
+    function chanChange($add, $minus, $dayOfWeekBan = 0) {
+      $adds = array();
+      $minuss = array();
+
+      foreach ($this->allDay as $key => $value) {
+        if (empty($value)) continue;
+
+        if (empty($adds) && in_array($add, $value)) {
+          $adds[$key] = array_search($add, $value);
+        } else if (empty($minuss) && in_array($minus, $value)) {
+          $minuss[$key] = array_search($minus, $value);
+        }
+
+        // minus를 빼고 add로 변경
+        if ($dayOfWeekBan == 0 && !empty($adds) && !empty($minuss)) {
+          $date = array_key_first($minuss);
+          $dateNum = str_replace("-", " ", $key);
+          $dayOfWeek = date('w', strtotime($dateNum));
+
+          $this->allDay[$date][$minuss[$date]] = $add;
+
+          // 수량 카운트 변경
+          $this->chanCount[$add]++;
+          $this->chanCount[$minus]--;
+          $this->chanBanWeek[$dayOfWeek][$add]++;
+
+          return True;
+
+          echo '<pre>';
+          print_r($adds);
+          print_r($minuss);
+          echo '</pre>';
+          exit();
+        }
+        // 금지 주차가 있다면 금지
+        // if ($dayOfWeekBan > 0) {
+        //   $date = str_replace("-", " ", $key);
+        //   $dayOfWeek = date('w', strtotime($value));
+        //   if ($dayOfWeek == $dayOfWeekBan) continue;
+        // }
+      }
     }
 
     /**
@@ -384,7 +463,12 @@ class Hanki {
       '계란' => array('계란말이', '계란장조림'),
       '무침' => array('더덕무침', '고들빼기무침', '무말랭이무침', '오징어젓갈'),
     );
+
     $bans = array();
+
+    if (empty($this->chanBanWeek[$dayOfWeek])) {
+      $this->chanBanWeek[$dayOfWeek] = array();
+    }
 
     $soyTotal = 0;
     $spicyTotal = 0;
@@ -472,6 +556,10 @@ class Hanki {
         }
       }
 
+      // 같은 요일에 같은 반찬이 1개 이상 들어가지 않도록
+      if (empty($this->chanBanWeek[$dayOfWeek][$chan])) $this->chanBanWeek[$dayOfWeek][$chan] = 0;
+      if ($this->chanBanWeek[$dayOfWeek][$chan] > 0) continue;
+
       // 같은부류반찬처리
       if ($soyTotal > 1 && strpos($chan, '간장') !== false) continue;
       if ($spicyTotal > 1 && strpos($chan, '매콤') !== false) continue;
@@ -543,6 +631,7 @@ class Hanki {
 
     foreach ($sets as $v) {
       $this->chanCount[$v]++;
+      $this->chanBanWeek[$dayOfWeek][$v]++;
     }
 
     shuffle($sets);
