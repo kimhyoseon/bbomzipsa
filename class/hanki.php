@@ -147,6 +147,7 @@ class Hanki {
       if (empty($data['id'])) return false;
       if (empty($data['date'])) return false;
       if (empty($data['menu'])) return false;
+      if (empty($data['item_order_no'])) unset($data['item_order_no']);
 
       $id = $data['id'];
       unset($data['id']);
