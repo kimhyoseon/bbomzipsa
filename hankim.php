@@ -122,6 +122,7 @@ body {
           </div>
         </form>
       </div>
+      <p class="text-danger">상품주문번호 등록 시 수취인명 변경 금지</p>
 
       <div class="border-top my-3"></div>
 
