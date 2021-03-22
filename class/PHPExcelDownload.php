@@ -444,6 +444,7 @@ class PHPExcelDownload {
         $bodyOver = array();
         $stock = array();
         $sort = array();
+        $sortAmount = array();
         $addrMerge = array();
 
         if (empty($sheetData)) {
@@ -722,18 +723,18 @@ class PHPExcelDownload {
 
             $payIndex = array_search('_지불조건', array_keys($filter));
             $bodyOptimized[$key][$payIndex] = '1';
-            $title = explode(' ', $value[$nameIndex]);
 
             // 상품명 줄내림 처리 (2020.01.19)
             // $titleLine = explode('__', $value[$nameIndex]);
             // $bodyOptimized[$key][$nameIndex] = implode(chr(10), $titleLine);
 
-            $sort[] = implode($title);
-
             // 수량 2개인 경우 * 표시
             if ($value[$amountIndex] > 1) {
                 $bodyOptimized[$key][$nameIndex] = '*'.$value[$nameIndex];
             }
+
+            // $title = explode(' ', $value[$nameIndex]);
+            $sort[] = $bodyOptimized[$key][$nameIndex];
         }
 
         // 상품명으로 정렬
