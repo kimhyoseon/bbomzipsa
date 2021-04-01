@@ -75,6 +75,47 @@ body {
   font-size:2.2rem;
 }
 
+.area-3 {
+  width: 98%;
+  background-color: #fefce6;
+}
+
+.box-menu-6 {
+  width: 98%;
+  background-color: #fee7ea;
+}
+
+.box-menu,
+.area-8 {
+  background-color: #e7eff7;
+}
+
+.box-infos {
+  margin-bottom: 10px;
+}
+
+.box-info {
+  margin-right: 10px;
+}
+
+.box-color {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: #fefce6;
+  vertical-align:middle;
+  margin-right:5px;
+  border: 1px solid #ccc;
+}
+
+.color-6 {
+  background-color: #fee7ea;
+}
+
+.color-8 {
+  background-color: #e7eff7;
+}
+
 </style>
 
 <body>
@@ -107,7 +148,7 @@ body {
             </div>
           </div>
 
-          <div class="row m-0 mt-3 mb-2">
+          <div class="row m-0 mt-5 mb-5">
               <div class="wrap-chart"></div>
           </div>
       </div>
@@ -223,6 +264,12 @@ body {
     if (!data) return false;
 
     var html = '';
+    html += '<div class="box-infos">';
+    html += '<span class="box-info"><span class="box-color color-3"></span><span class="txt-info">1인세트(3찬)</span></span>';
+    html += '<span class="box-info"><span class="box-color color-5"></span><span class="box-color color-8"></span><span class="txt-info">1.5인세트(5찬)</span></span>';
+    html += '<span class="box-info"><span class="box-color color-6"></span><span class="txt-info">2인세트(6찬)</span></span>';
+    html += '<span class="box-info"><span class="box-color color-8"></span><span class="txt-info">패밀리세트(8찬)</span></span>';
+    html += '</div>';
     html += '<table class="table print">';
     html += '<thead><tr><th scope="col">화</th><th scope="col">수</th><th scope="col">목</th><th scope="col">금</th><th scope="col"><span class="text-primary">토</span></th></tr></thead>';
     html += '<tbody>';
@@ -269,15 +316,32 @@ body {
             for (var j = 0; j < data[date].length; j++) {
               var txt = data[date][j];
 
-              if (j > 5) {
-                txt = '<b>' + txt + '</b>';
+              // if (j > 5) {
+              //   txt = '<b>' + txt + '</b>';
+              // }
+
+              // if (j < 3) {
+              //   txt = '<span class="text-secondary">' + txt + '</span>';
+              // }
+
+              txt = '<p>' + txt + '</p>';
+
+              if (j == 0) {
+                txt = '<div class="box-menu-6"><div class="area-3">' + txt;
+                if (data[date].length > 6) {
+                  txt = '<div class="box-menu">' + txt;
+                }
+              } else if (j == 3) {
+                txt = '</div><div class="area-6">' + txt;
+              } else if (j == 5) {
+                txt = txt + '</div></div>';
+              } else if (j == 6) {
+                txt = '<div class="area-8">' + txt;
+              } else if (j == 7) {
+                txt = txt + '</div></div>';
               }
 
-              if (j < 3) {
-                txt = '<span class="text-secondary">' + txt + '</span>';
-              }
-
-              menuHtml += '<p>' + txt + '</p>';
+              menuHtml += txt;
 
               // if (j == 2) {
               //   menuHtml += '<div style="border-top:3px dashed #4F9EC4"></div>';

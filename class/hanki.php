@@ -252,9 +252,9 @@ class Hanki {
 
         // 모든 반찬카운트
         // echo '<pre>';
-        // print_r($this->chanBanWeek);
-        // print_r($this->chanCount);
         // print_r($this->allDay);
+        // print_r($this->chanCount);
+        // print_r($this->chanBanWeek);
         // echo '</pre>';
         // exit();
 
@@ -490,7 +490,7 @@ class Hanki {
     $zeroChan = array();
 
     // 후반부에서는 선택받지 못한 반찬을 강제로 담아줌
-    if (array_sum(array_values($this->chanCount)) > 70) {
+    if (array_sum(array_values($this->chanCount)) > 40) {
       // 반찬이 0개인 친구들 먼저 3개 선택
       $shuffled = $this->shuffle_assoc($this->chanCount);
 
@@ -519,7 +519,8 @@ class Hanki {
       // exit();
     }
 
-    while (sizeof($sets) < 6) {
+    // 2021-04-01 반찬 5종 + 쉐프반찬으로 변경
+    while (sizeof($sets) < 5) {
       if (sizeof($zeroChan) > 0) {
         $chan = $zeroChan[0];
         array_shift($zeroChan);
@@ -567,8 +568,8 @@ class Hanki {
       if ($fryTotal > 2 && strpos($chan, '볶음') !== false) continue;
       if ($boilTotal > 2 && strpos($chan, '조림') !== false) continue;
 
-      // 너무 많이 선택된 반찬은 제외 (1반찬당 최대 4회)
-      if ($this->chanCount[$chan] > 3) continue;
+      // 너무 많이 선택된 반찬은 제외 (1반찬당 최대 3회)
+      if ($this->chanCount[$chan] > 2) continue;
 
       // 특정반찬은 횟수제한 (최대 2회)
       if ($chan == '잡채' && $this->chanCount[$chan] > 1) continue;
@@ -646,7 +647,7 @@ class Hanki {
         $lastChars[] = $lastChar;
       // 중복되는 반찬종류인 경우
       } else {
-        for ($j=3; $j<6 ; $j++) {
+        for ($j=3; $j<5 ; $j++) {
           $lastCharBench = mb_substr($sets[$j], -1);
 
           // 다른 반찬들 중 중복되지 않는 반찬이 있다면 순서를 바꿔주자
@@ -660,6 +661,9 @@ class Hanki {
         }
       }
     }
+
+    // 가장 마지막은 항상 오늘의반찬
+    $sets[] = '오늘의반찬';
 
     // echo '<pre>';
     // print_r($sets);

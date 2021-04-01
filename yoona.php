@@ -62,7 +62,7 @@ body {
 var menu = null;
 var chartType = 'LineChart';
 var chartDetail = {};
-var region = '';
+var region = '시흥';
 
 function clickMenu(e) {
     menu = $(e.currentTarget).data('menu');
