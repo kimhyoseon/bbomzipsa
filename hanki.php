@@ -95,14 +95,14 @@ body {
 }
 
 .box-info {
-  margin-right: 20px;
-  font-size:25px;
+  margin-right: 40px;
+  font-size:35px;
 }
 
 .box-color {
   display: inline-block;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   background-color: #fefce6;
   vertical-align:middle;
   margin-right:5px;
