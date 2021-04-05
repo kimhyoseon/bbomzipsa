@@ -107,7 +107,7 @@ if (!empty($listDb)) {
   }
 }
 
-for ($i = 0; $i < 14; $i++) {
+for ($i = 0; $i < sizeof($orderData2); $i++) {
   $tomo = $i + 1;
   $todaystr = "+ {$i} days";
   $tomostr = "+ {$tomo} days";
