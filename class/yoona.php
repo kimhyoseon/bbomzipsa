@@ -202,7 +202,7 @@ class Yoona {
     /**
      * 아파트 랭킹 가져오기
      */
-    public function getAptRank($code) {
+    public function getAptRank($code, $lastDate = null) {
         if (empty($code)) return false;
 
         // 계정
@@ -216,68 +216,124 @@ class Yoona {
 
         $ids = array();
         $apts = array();
+        $aptsRank = array();
 
         foreach ($list as $value) {
             $ids[] = $value['id'];
             $apts[$value['id']] = $value;
             $apts[$value['id']]['detail'] = array();
+            $aptsRank[$value['id']] = array();
         }
 
-        $list = $db->query("SELECT yoona_apt_id, size FROM yoona_apt_deal WHERE yoona_apt_id IN (:ids) GROUP BY yoona_apt_id, size", array('ids' => $ids));
-
+        $list = $db->query("SELECT yoona_apt_id, size FROM yoona_apt_deal WHERE yoona_apt_id IN (:ids) GROUP BY yoona_apt_id, size ORDER BY size ASC", array('ids' => $ids));
 
         if (empty($list)) return false;
 
         foreach ($list as $key => $value) {
-            $row = $db->row("SELECT sale_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND sale_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $value['size']));
-            $row2 = $db->row("SELECT jeonse_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND jeonse_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $value['size']));
-            $values = $db->query("SELECT avg(sale_price) as year_price, year FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND sale_count > 0 GROUP BY yoona_apt_id, size, year", array($value['yoona_apt_id'], $value['size']));
+            // 오피스텔 제거
+            if ($value['size'] < 50) continue;
 
-            if (!empty($values)) {
-                $energies = array();
-                $energyThisYear = 0;
-                foreach ($values as $v) {
-                    if ($v['year'] == date('Y')) {
-                        $energyThisYear = $this->getEnergy($v['year'], $row['sale_price']);
-                        $energies[] = $energyThisYear;
+            // // 대형평수 제거
+            // if ($value['size'] > 100) continue;
 
-                    } else {
-                        $energies[] = $this->getEnergy($v['year'], $v['year_price']);
-                    }
-                }
-
-                $value['values'] = array($energyThisYear, round(array_sum($energies) / count($energies), 1));
+            if (empty($lastDate)) {
+                $row = $db->row("SELECT sale_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND sale_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $value['size']));
+                $row2 = $db->row("SELECT jeonse_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND jeonse_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $value['size']));
+                $values = $db->query("SELECT avg(sale_price) as year_price, year FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND sale_count > 0 GROUP BY yoona_apt_id, size, year", array($value['yoona_apt_id'], $value['size']));
+            } else {
+                $row = $db->row("SELECT sale_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND date <= ? AND size=? AND sale_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $lastDate, $value['size']));
+                $row2 = $db->row("SELECT jeonse_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND date <= ? AND size=? AND jeonse_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $lastDate, $value['size']));
+                $values = $db->query("SELECT avg(sale_price) as year_price, year FROM yoona_apt_deal WHERE yoona_apt_id=? AND date <= ? AND size=? AND sale_count > 0 GROUP BY yoona_apt_id, size, year", array($value['yoona_apt_id'], $lastDate, $value['size']));
             }
 
-            $pyeong = floor(($value['size'] / 3.3) + 10);
-            $pricePerPyeong = floor($row['sale_price'] / $pyeong);
+            // 현재 년도부터 데이터가 있는 마지막 연도까지
+            if (empty($lastDate)) {
+                $lastYear = date('Y');
+            } else {
+                $lastYear = substr($lastDate, 0, 4);
+            }
+
+            $thisYear = $lastYear;
+            $energies = array();
+            $energyThisYear = 0;
+            $valuesData = array();
+
+            foreach ($values as $v) {
+                $valuesData[$v['year']] = $v['year_price'];
+            }
+
+            while (1) {
+                $thisYearPrice = 0;
+
+                // 데이터가 있다면 넣어주고 데이터 삭제
+                if (!empty($valuesData[$thisYear])) {
+                    $thisYearPrice = $valuesData[$thisYear];
+                    unset($valuesData[$thisYear]);
+                // 데이터가 없다면 가장 처음 row의 가격으로 계산
+                } else {
+                    $thisYearPrice = reset($valuesData);
+                }
+
+                // 올해라면 현재 가치를 구함
+                if ($lastYear == $thisYear) {
+                    $energyThisYear = $this->getEnergy($thisYear, $row['sale_price']);
+                }
+
+                $energies[] = $this->getEnergy($thisYear, $thisYearPrice);
+
+                $thisYear = $thisYear - 1;
+
+                // 더이상 리스트가 없으면 종료
+                if (sizeof($valuesData) < 1) break;
+            }
+
+            $value['values'] = array($energyThisYear, round(array_sum($energies) / count($energies), 1));
+
+            $pyeong = floor(($value['size'] / 3.3) + 7.5);
             $value['date'] = max(array($row['date'], $row2['date']));
+            $value['size'] = $value['size'];
             $value['pyeong'] = $pyeong;
+            $value['price_per_pyeong'] = floor($row['sale_price'] / $pyeong);
+            $value['price_per_size'] = floor($row['sale_price'] / $value['size']);
             $value['sale_price'] = $row['sale_price'];
             $value['jeonse_price'] = $row2['jeonse_price'];
             $apts[$value['yoona_apt_id']]['detail'][] = $value;
 
-            if (empty($apts[$value['yoona_apt_id']]['price']) || $apts[$value['yoona_apt_id']]['price'] < $pricePerPyeong) {
-                $apts[$value['yoona_apt_id']]['price'] = $pricePerPyeong;
-                $apts[$value['yoona_apt_id']]['pyeong'] = $pyeong;
-                $apts[$value['yoona_apt_id']]['size'] = $value['size'];
-            }
+            $aptsRank[$value['yoona_apt_id']][$value['size']] = $value['price_per_size'];
         }
 
         $sort = array();
 
-        foreach ($apts as $key => $value) {
-            if (empty($value['price'])) {
+        foreach ($aptsRank as $key => $value) {
+            if (empty($value)) {
                 unset($apts[$key]);
                 continue;
             }
 
-            $sort[] = $value['price'];
+            // 84가 기준가격
+            if (!empty($value[84])) {
+                $priceAvg = ceil($value[84]);
+            } else {
+                foreach ($value as $size => $price) {
+                    $priceAvg = ceil($price);
+                    // 84와 가장 가까운 금액으로 기준가격을 정함
+                    if ($size > 80) break;
+                }
+                // $values = array_values($value);
+                // $priceAvg = ceil(array_sum($values) / count($values));
+            }
+
+            $apts[$key]['price'] = $priceAvg;
+
+            $sort[] = $priceAvg;
         }
 
         array_multisort($sort, SORT_DESC, $apts);
 
         $apts = array_slice($apts, 0, 150);
+
+        // 월별 거래수
+        // SELECT date, sum(sale_count) FROM yoona_apt_deal JOIN yoona_apt ON yoona_apt_deal.yoona_apt_id = yoona_apt.id AND yoona_apt.code_sigoongoo='48310' GROUP BY yoona_apt_deal.date ORDER BY yoona_apt_deal.date;
 
         $db->CloseConnection();
 
@@ -337,7 +393,9 @@ class Yoona {
         else if ($year == '2017') $energy = $price / 60031080;
         else if ($year == '2018') $energy = $price / 61531857;
         else if ($year == '2019') $energy = $price / 63070153;
-        else if ($year == '2020') $energy = $price / 64646907;
+        else if ($year == '2020') $energy = $price / 64331556;
+        else if ($year == '2021') $energy = $price / 65618187;
+        // 2% 매년상승 추정
 
         return round($energy * 10000, 1);
     }

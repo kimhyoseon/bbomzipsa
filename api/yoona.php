@@ -8,7 +8,7 @@ try {
 
     // include_once($_SERVER['DOCUMENT_ROOT'].'/class/yoona.php');
     // $yoona = new Yoona();
-    // $data = json_encode($yoona->getAptRank('44133'));
+    // $data = json_encode($yoona->getAptRank('48310'));
 
     // echo '<pre>';
     // print_r($data);
@@ -17,6 +17,7 @@ try {
 
     define('MENU', (filter_input(INPUT_POST, 'menu', FILTER_SANITIZE_STRING)));
     define('EXTRA', (filter_input(INPUT_POST, 'extra', FILTER_SANITIZE_STRING)));
+    define('EXTRA2', (filter_input(INPUT_POST, 'extra2', FILTER_SANITIZE_STRING)));
 
     if (!MENU) {
         throw new Exception(null, 400);
@@ -72,7 +73,7 @@ try {
     } else if (MENU == 'apt') {
         $data = json_encode($yoona->getAptSigoongoo());
     } else if (MENU == 'apt_rank') {
-        $data = json_encode($yoona->getAptRank(EXTRA));
+        $data = json_encode($yoona->getAptRank(EXTRA, EXTRA2));
     } else if (MENU == 'apt_detail') {
         $data = json_encode($yoona->getAptDetail(EXTRA));
     } else if (MENU == 'azzi') {

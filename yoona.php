@@ -62,7 +62,8 @@ body {
 var menu = null;
 var chartType = 'LineChart';
 var chartDetail = {};
-var region = '시흥';
+var region = '';
+var rankData = null;
 
 function clickMenu(e) {
     menu = $(e.currentTarget).data('menu');
@@ -1145,11 +1146,14 @@ function renderapt(data) {
 // 9-1. 아파트 랭킹 렌더링
 function renderaptSiRank(data) {
     if (!data) return false;
+    var dataOrg = data;
 
     var chartData = [];
+    var chartDataGap = [];
+    var lastDate = 0;
 
     for (var i = 0; i < data.length; i++) {
-        var aptName = data[i]['name_apt'] + ' (' + data[i]['upmyeondong'] + ', ' + data[i]['pyeong'] + '평)';
+        var aptName = data[i]['name_apt'] + ' (' + data[i]['upmyeondong'] + ', ' + data[i]['year_build'] + '년)';
 
         // 추가 데이터
         if (!chartDetail[aptName]) {
@@ -1157,26 +1161,96 @@ function renderaptSiRank(data) {
         }
 
         // 아파트 상세정보
-        var detailText = data[i]['name_apt'] + ' (' + numberWithCommas(data[i]['price']) + ') \n';
-        var isValueColor = true;
+        var detailText = data[i]['name_apt'] + ' (' + data[i]['upmyeondong'] + ', ' + data[i]['year_build'] + '년)\n';
+        var valueGap = [];
+        var maeJeonGap = [];
+        var valueGapAvg = 0;
+        var maeJeonGapAvg = 0;
+
         for (var j = 0; j < data[i]['detail'].length; j++) {
-            detailText += '*' + data[i]['detail'][j]['pyeong'] + '평' + ' (' + data[i]['detail'][j]['date'] + ') ';
-            detailText += numberWithCommas(data[i]['detail'][j]['sale_price']) + '-' + numberWithCommas(data[i]['detail'][j]['jeonse_price']) + '=' + numberWithCommas(parseInt(data[i]['detail'][j]['sale_price']) - parseInt(data[i]['detail'][j]['jeonse_price']));
+            // 84와 가까운 기준평수로 매전갭, 가치를 계산한다.
+            if (data[i]['detail'][j]['price_per_size'] == data[i]['price']) {
+                maeJeonGapAvg = data[i]['detail'][j]['sale_price'] - data[i]['detail'][j]['jeonse_price'];
+                valueGapAvg = data[i]['detail'][j]['values'][1] - data[i]['detail'][j]['values'][0];
+            }
+            if (data[i]['detail'][j]['sale_price'] > 0 && data[i]['detail'][j]['jeonse_price'] > 0) {
+                maeJeonGap.push(data[i]['detail'][j]['sale_price'] - data[i]['detail'][j]['jeonse_price']);
+            }
+            if (data[i]['detail'][j]['price_per_size'] == data[i]['price']) {
+                detailText += '*'
+            }
+            detailText += data[i]['detail'][j]['size'] + '㎡' + ' (' + data[i]['detail'][j]['date'] + ') ';
+            detailText += '매)' + numberWithCommas(data[i]['detail'][j]['sale_price']) + '-전)' + numberWithCommas(data[i]['detail'][j]['jeonse_price']) + '=갭)' + numberWithCommas(parseInt(data[i]['detail'][j]['sale_price']) - parseInt(data[i]['detail'][j]['jeonse_price']));
+
             if (data[i]['detail'][j]['values'] && data[i]['detail'][j]['values'][0] > 0) {
-                detailText +=  ' 가치 (' + data[i]['detail'][j]['values'][0] + '/' + data[i]['detail'][j]['values'][1] + ')';
-                if (data[i]['detail'][j]['values'][0] > data[i]['detail'][j]['values'][1]) {
-                    isValueColor = false;
-                }
+                detailText +=  ' / 가치(' + data[i]['detail'][j]['values'][0] + '/' + data[i]['detail'][j]['values'][1] + ')';
+                valueGap.push(data[i]['detail'][j]['values'][1] - data[i]['detail'][j]['values'][0]);
             }
             detailText += '\n';
+
+            if (lastDate < data[i]['detail'][j]['date']) {
+                lastDate = data[i]['detail'][j]['date'];
+            }
         }
 
-        var valueColor = '';
+        var average = arr => arr.reduce( ( p, c ) => p + c, 0 ) / arr.length;
 
-        if (isValueColor == true) valueColor = 'green';
+        if (valueGapAvg == 0) valueGapAvg = average(valueGap);
+        if (maeJeonGapAvg == 0) maeJeonGapAvg = average(maeJeonGap);
+
+        var valueColor = '#F5B7B1';
+
+        if (valueGapAvg > 5) valueColor = '#0E6251';
+        else if (valueGapAvg > 4) valueColor = '#117864';
+        else if (valueGapAvg > 3) valueColor = '#148F77';
+        else if (valueGapAvg > 2) valueColor = '#17A589';
+        else if (valueGapAvg > 1.5) valueColor = '#1ABC9C';
+        else if (valueGapAvg > 1) valueColor = '#48C9B0';
+        else if (valueGapAvg > 0.5) valueColor = '#76D7C4';
+        else if (valueGapAvg >= 0) valueColor = '#A3E4D7';
+        else if (valueGapAvg < -5) valueColor = '#78281F';
+        else if (valueGapAvg < -4) valueColor = '#943126';
+        else if (valueGapAvg < -3) valueColor = '#B03A2E';
+        else if (valueGapAvg < -2) valueColor = '#CB4335';
+        else if (valueGapAvg < -1.5) valueColor = '#E74C3C';
+        else if (valueGapAvg < -1) valueColor = '#EC7063';
+        else if (valueGapAvg < -0.5) valueColor = '#F1948A';
+        else if (valueGapAvg < -0.2) valueColor = '#F5B7B1';
+
+        var valueColorMae = '#0E6251';
+
+        if (maeJeonGapAvg > 40000) valueColorMae = '#78281F';
+        else if (maeJeonGapAvg > 30000) valueColorMae = '#943126';
+        else if (maeJeonGapAvg > 20000) valueColorMae = '#E74C3C';
+        else if (maeJeonGapAvg > 15000) valueColorMae = '#F5B7B1';
+        else if (maeJeonGapAvg > 10000) valueColorMae = '#48C9B0';
+        else if (maeJeonGapAvg > 6000) valueColorMae = '#76D7C4';
+        else if (maeJeonGapAvg > 3000) valueColorMae = '#1ABC9C';
+        else if (maeJeonGapAvg > 1000) valueColorMae = '#148F77';
 
         chartData.push([aptName, parseInt(data[i]['price']), detailText, valueColor]);
+        chartDataGap.push([aptName, parseInt(maeJeonGapAvg), valueColorMae]);
     }
+
+    // 날짜만들기
+    var startYear = parseInt(lastDate.substring(0, 4));
+    var startMonth = parseInt(lastDate.substring(4, 6)) - 1;
+    var beforeYear = startYear - 3 // 3년전까지
+    var html = '<div class="mt-2 mb-2 col-sm"><select class="form-control" id="apt-date">';
+
+    for (var d = new Date(startYear, startMonth, 1); d >= new Date(beforeYear, startMonth, 1); d.setMonth(d.getMonth() - 1)) {
+        var year = d.getFullYear();
+        var month = d.getMonth() + 1;
+        month = (month > 9 ? '' : '0') + month;
+
+        ym = year + '' + month;
+
+        html += '<option value="' + ym + '">' + ym + '</option>';
+    }
+
+    html += '</select></div>';
+
+    $('.wrap-chart').append(html);
 
     chartType = 'ColumnChart';
 
@@ -1196,6 +1270,182 @@ function renderaptSiRank(data) {
     };
 
     drawChart(data, options);
+
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', '아파트');
+    data.addColumn('number', '매전차액');
+    data.addColumn({type: 'string', role: 'style'});
+    data.addRows(chartDataGap);
+
+    var options = {
+        'title': '매전차액',
+        'legend': 'none',
+        'width': getRowWidth(),
+        'height': 300,
+    };
+
+    drawChart(data, options);
+
+    // 이전
+    if (rankData) {
+        randerRankComp(dataOrg);
+    }
+
+    // 전, 후 비교를 위해 저장해둔다.
+    if (!rankData) {
+        rankData = dataOrg;
+    }
+}
+
+// 9-1. 아파트 랭킹 렌더링
+function randerRankComp(data) {
+    if (!data) return false;
+    if (!rankData) return false;
+
+    var chartData = [];
+    var chartDataGap = [];
+
+    for (var i = 0; i < data.length; i++) {
+        var isFounded = false;
+        var aptName = data[i]['name_apt'] + ' (' + data[i]['upmyeondong'] + ', ' + data[i]['year_build'] + '년)';
+
+        for (var k = 0; k < rankData.length; k++) {
+
+            if (data[i]['id'] != rankData[k]['id']) continue;
+
+            isFounded = true;
+
+            // 추가 데이터
+            if (!chartDetail[aptName]) {
+                chartDetail[aptName] = data[i]['id'];
+            }
+
+            // 아파트 상세정보
+            var detailText = data[i]['name_apt'] + ' (' + data[i]['upmyeondong'] + ', ' + data[i]['year_build'] + '년)\n';
+            var maeJeonGap = [];
+            var maeJeonGapAvg = 0;
+            var priceIncs = [];
+            var priceInc = 0;
+            var priceBuy = 0;
+            var priceSell = 0;
+
+            for (var j = 0; j < data[i]['detail'].length; j++) {
+                // 84와 가까운 기준평수로 매전갭, 가치를 계산한다.
+                if (data[i]['detail'][j]['price_per_size'] == data[i]['price']) {
+                    maeJeonGapAvg = data[i]['detail'][j]['sale_price'] - data[i]['detail'][j]['jeonse_price'];
+                    priceInc = rankData[k]['detail'][j]['sale_price'] - data[i]['detail'][j]['sale_price'];
+                    priceBuy = data[i]['detail'][j]['sale_price'];
+                    priceSell = rankData[k]['detail'][j]['sale_price'];
+                }
+                // 매전갭
+                if (data[i]['detail'][j]['sale_price'] > 0 && data[i]['detail'][j]['jeonse_price'] > 0) {
+                    maeJeonGap.push(data[i]['detail'][j]['sale_price'] - data[i]['detail'][j]['jeonse_price']);
+                    priceIncs.push(rankData[k]['detail'][j]['sale_price'] - data[i]['detail'][j]['sale_price']);
+                    priceIncs.push(rankData[k]['detail'][j]['sale_price'] - data[i]['detail'][j]['sale_price']);
+                }
+                detailText += '*' + data[i]['detail'][j]['size'] + '㎡' + ' (' + rankData[k]['detail'][j]['date'] + ') ';
+                detailText += '현)' + numberWithCommas(rankData[k]['detail'][j]['sale_price']) + '-과)' + numberWithCommas(data[i]['detail'][j]['sale_price']) + '=차액)' + numberWithCommas(parseInt(rankData[k]['detail'][j]['sale_price']) - parseInt(data[i]['detail'][j]['sale_price']));
+                detailText += '\n';
+            }
+
+            var average = arr => arr.reduce( ( p, c ) => p + c, 0 ) / arr.length;
+
+            if (maeJeonGapAvg == 0) {
+                maeJeonGapAvg = average(maeJeonGap);
+            }
+
+            // 매전갭에 기타부대비용 합산
+            chidc = parseInt(priceBuy * 0.011); // 취등록세
+            bokbi1 = parseInt(priceBuy * 0.008); // 매수전세복비
+            bokbi2 = parseInt(priceSell * 0.004); // 매전세복비
+            bubmoo = 60; // 법무사비
+            jaesanse = 100; // 재산세
+
+            maeJeonGapAvg = maeJeonGapAvg + bokbi1 + bokbi2 + bubmoo + jaesanse;
+
+            var priceIncRatio = 0
+
+            if (priceInc == 0) {
+                priceInc = average(priceIncs);
+            }
+
+            if (priceInc != 0 && maeJeonGapAvg != 0) {
+                priceIncRatio = (priceInc / maeJeonGapAvg).toFixed(2);
+            }
+
+            // 최대값 4
+            if (priceIncRatio > 10) priceIncRatio = 10;
+            if (maeJeonGapAvg < 0 && priceIncRatio > 0) priceIncRatio = 10;
+            if (priceIncRatio < 0) priceIncRatio = 0;
+
+            var valueColor = '#A3E4D7';
+
+            if (priceInc > 300) valueColor = '#0E6251';
+            else if (priceInc > 210) valueColor = '#117864';
+            else if (priceInc > 180) valueColor = '#148F77';
+            else if (priceInc > 150) valueColor = '#17A589';
+            else if (priceInc > 120) valueColor = '#1ABC9C';
+            else if (priceInc > 90) valueColor = '#48C9B0';
+            else if (priceInc > 60) valueColor = '#76D7C4';
+            else if (priceInc > 30) valueColor = '#A3E4D7';
+
+
+            var valueColorMae = '#A3E4D7';
+
+            if (priceIncRatio > 5) valueColorMae = '#0E6251';
+            else if (priceIncRatio > 4) valueColorMae = '#117864';
+            else if (priceIncRatio > 3) valueColorMae = '#148F77';
+            else if (priceIncRatio > 2.5) valueColorMae = '#17A589';
+            else if (priceIncRatio > 2) valueColorMae = '#1ABC9C';
+            else if (priceIncRatio > 1.5) valueColorMae = '#48C9B0';
+            else if (priceIncRatio > 1) valueColorMae = '#76D7C4';
+            else if (priceIncRatio > 0.5) valueColorMae = '#A3E4D7';
+
+            chartData.push([aptName, parseInt(priceInc), detailText, valueColor]);
+            chartDataGap.push([aptName, parseFloat(priceIncRatio), valueColorMae]);
+
+            break;
+        }
+
+        if (!isFounded) {
+            chartData.push([aptName, 0, '', '#0E6251']);
+            chartDataGap.push([aptName, 0, '#0E6251']);
+        }
+    }
+
+    chartType = 'ColumnChart';
+
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', '아파트');
+    data.addColumn('number', '상승가격');
+    data.addColumn({type: 'string', role: 'tooltip'});
+    data.addColumn({type: 'string', role: 'style'});
+    data.addRows(chartData);
+
+    var options = {
+        'title': '아파트 상승가격',
+        'legend': 'none',
+        'width': getRowWidth(),
+        'height': 300,
+        // 'focusTarget': 'category'
+    };
+
+    drawChart(data, options);
+
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', '아파트');
+    data.addColumn('number', '투자금대비 상승');
+    data.addColumn({type: 'string', role: 'style'});
+    data.addRows(chartDataGap);
+
+    var options = {
+        'title': '투자금대비 상승',
+        'legend': 'none',
+        'width': getRowWidth(),
+        'height': 300,
+    };
+
+    drawChart(data, options);
 }
 
 // 9-2. 아파트 매매/전세, 가치 렌더링
@@ -1205,6 +1455,7 @@ function renderaptDetail(data) {
     var startYm = data.price[0].date;
     var priceDefault = {};
     var priceDates = {};
+    var vAxisRange = {};
 
     var now = new Date();
     var month = now.getMonth() + 1;
@@ -1227,25 +1478,30 @@ function renderaptDetail(data) {
     // console.log(priceDefault);
 
     var yms = getYmArrayAfterYm(startYm);
+    var countSale = {};
+    var titleCountOrg = data.info.name_apt + ' 거래횟수';
 
     for (var size in priceDefault) {
-        var titlePrice = data.info.name_apt + ' 매매/전세' + '(' + size + ')';
-        var titleCount = data.info.name_apt + ' 거래횟수' + '(' + size + ')';
-        var titleEnergy = data.info.name_apt + ' 가치차트' + '(' + size + ')';
+        var py = Math.floor((size / 3.3) + 7.5);
+        var titlePrice = data.info.name_apt + ' 매매/전세' + '(' + py + '평/' + size + '㎡)';
+        var titleEnergy = data.info.name_apt + ' 가치차트' + '(' + py + '평/' + size + '㎡)';
         var energies = [];
+
         priceDefault[size]['chartData'] = {};
         priceDefault[size]['chartData'][titlePrice] = [];
-        priceDefault[size]['chartData'][titleCount] = [];
         priceDefault[size]['chartData'][titleEnergy] = [];
+        vAxisRange[size] = [99999999999, 0];
 
         for (var i = 0; i < yms.length; i++) {
             if (priceDates[size][yms[i]]) {
                 if (priceDates[size][yms[i]]['jeonse_price'] > 0) priceDefault[size]['jeonse_price'] = priceDates[size][yms[i]]['jeonse_price'];
-                if (priceDates[size][yms[i]]['jeonse_price_max'] > 0) priceDefault[size]['jeonse_price_max'] = priceDates[size][yms[i]]['jeonse_price_max'];
-                if (priceDates[size][yms[i]]['jeonse_price_min'] > 0) priceDefault[size]['jeonse_price_min'] = priceDates[size][yms[i]]['jeonse_price_min'];
                 if (priceDates[size][yms[i]]['sale_price'] > 0) priceDefault[size]['sale_price'] = priceDates[size][yms[i]]['sale_price'];
-                if (priceDates[size][yms[i]]['sale_price_max'] > 0) priceDefault[size]['sale_price_max'] = priceDates[size][yms[i]]['sale_price_max'];
-                if (priceDates[size][yms[i]]['sale_price_min'] > 0) priceDefault[size]['sale_price_min'] = priceDates[size][yms[i]]['sale_price_min'];
+                // if (priceDates[size][yms[i]]['jeonse_price_max'] > 0) priceDefault[size]['jeonse_price_max'] = priceDates[size][yms[i]]['jeonse_price_max'];
+                // if (priceDates[size][yms[i]]['jeonse_price_min'] > 0) priceDefault[size]['jeonse_price_min'] = priceDates[size][yms[i]]['jeonse_price_min'];
+                // if (priceDates[size][yms[i]]['sale_price_max'] > 0) priceDefault[size]['sale_price_max'] = priceDates[size][yms[i]]['sale_price_max'];
+                // if (priceDates[size][yms[i]]['sale_price_min'] > 0) priceDefault[size]['sale_price_min'] = priceDates[size][yms[i]]['sale_price_min'];
+                if (vAxisRange[size][0] > priceDefault[size]['jeonse_price']) vAxisRange[size][0] = priceDefault[size]['jeonse_price'];
+                if (vAxisRange[size][1] < priceDefault[size]['sale_price']) vAxisRange[size][1] = priceDefault[size]['sale_price'];
             }
 
             priceDefault[size]['chartData'][titlePrice].push([
@@ -1256,14 +1512,12 @@ function renderaptDetail(data) {
                 parseInt(priceDefault[size]['jeonse_price']),
                 // parseInt(priceDefault[size]['jeonse_price_max']),
                 // parseInt(priceDefault[size]['jeonse_price_min']),
-                (parseInt(priceDefault[size]['sale_price']) - parseInt(priceDefault[size]['jeonse_price'])),
+                // (parseInt(priceDefault[size]['sale_price']) - parseInt(priceDefault[size]['jeonse_price'])),
             ]);
 
-            priceDefault[size]['chartData'][titleCount].push([
-                yms[i],
-                parseInt((priceDates[size][yms[i]] && priceDates[size][yms[i]]['sale_count'] || 0)),
-                parseInt((priceDates[size][yms[i]] && priceDates[size][yms[i]]['jeonse_count'] || 0)),
-            ]);
+            if (!countSale[yms[i]]) countSale[yms[i]] = [0, 0];
+            countSale[yms[i]][0] = countSale[yms[i]][0] + parseInt((priceDates[size][yms[i]] && priceDates[size][yms[i]]['sale_count'] || 0));
+            countSale[yms[i]][1] = countSale[yms[i]][1] + parseInt((priceDates[size][yms[i]] && priceDates[size][yms[i]]['jeonse_count'] || 0));
 
             // 이번 달과 같다면 가격 추출
             if (yms[i].substring(4, 6) == month) {
@@ -1304,25 +1558,8 @@ function renderaptDetail(data) {
         console.log(priceDefault[size]);
         for (var title in priceDefault[size]['chartData']) {
             console.log(priceDefault[size]['chartData'][title]);
-            // 거래빈도
-            if (title.indexOf('거래횟수') != -1) {
-                chartType = 'ColumnChart';
 
-                var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Date');
-                data.addColumn('number', '매매거래');
-                data.addColumn('number', '전세거래');
-                data.addRows(priceDefault[size]['chartData'][title]);
-
-                var options = {
-                    'title': title,
-                    'width': getRowWidth(),
-                    'height': 300,
-                };
-
-                drawChart(data, options);
-            // 매매/전세
-            } else if (title.indexOf('매매/전세') != -1) {
+            if (title.indexOf('매매/전세') != -1) {
                 chartType = 'LineChart';
 
                 var data = new google.visualization.DataTable();
@@ -1333,20 +1570,29 @@ function renderaptDetail(data) {
                 data.addColumn('number', '전세평균');
                 // data.addColumn('number', '전세상위');
                 // data.addColumn('number', '전세하위');
-                data.addColumn('number', '갭');
+                // data.addColumn('number', '갭');
                 data.addRows(priceDefault[size]['chartData'][title]);
 
                 var options = {
                     'title': title,
                     'width': getRowWidth(),
                     'height': 300,
-                    'series': {
-                        2: {
-                            'targetAxisIndex': 1,
-                            'lineDashStyle': [1, 3]
+                    // 'series': {
+                    //     2: {
+                    //         'targetAxisIndex': 1,
+                    //         'lineDashStyle': [1, 3]
+                    //     }
+                    // },
+                    'vAxis': {
+                        viewWindow:{
+                            min: parseInt(vAxisRange[size][0]) - 1000,
+                            max: parseInt(vAxisRange[size][1]) + 1000,
                         }
                     },
+                    'curveType': 'function',
                 };
+
+                console.log(options);
 
                 drawChart(data, options);
             // 가치
@@ -1371,6 +1617,33 @@ function renderaptDetail(data) {
             index++;
         }
     }
+
+    countSales = [];
+
+    for (key in countSale) {
+        countSales.push([
+            key,
+            parseInt(countSale[key][0]),
+            parseInt(countSale[key][1]),
+        ]);
+    }
+
+    // 거래빈도
+    chartType = 'ColumnChart';
+
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Date');
+    data.addColumn('number', '매매거래');
+    data.addColumn('number', '전세거래');
+    data.addRows(countSales);
+
+    var options = {
+        'title': titleCountOrg,
+        'width': getRowWidth(),
+        'height': 300,
+    };
+
+    drawChart(data, options);
 }
 
 // 10. 아찌
@@ -1385,6 +1658,7 @@ function renderazzi(data) {
         // 초기화
         chartData[apt] = {};
         chartData[apt][apt + ' 거래량'] = []
+        chartData[apt][apt + ' 평균가격'] = []
         beforePrice[apt] = {};
 
         // 날짜별로 정렬
@@ -1402,10 +1676,13 @@ function renderazzi(data) {
             var sizeAll2 = Object.keys(data[apt][date]['jeonses']);
             var sizeAll = sizeAll1.concat(sizeAll2.filter((item) => sizeAll1.indexOf(item) < 0));
 
+            var zeroDataTotal = [];
+
             for (var i = 0; i < sizeAll.length; i++) {
                 // 초기화
-                var title1 = apt + ' 매매 ' + sizeAll[i] + '㎡';
-                var title2 = apt + ' 전세 ' + sizeAll[i] + '㎡';
+                var py = Math.floor(sizeAll[i] / 3.3);
+                var title1 = apt + ' 매매 ' + '(' + py + '평/' + sizeAll[i] + '㎡)';
+                var title2 = apt + ' 전세 ' + '(' + py + '평/' + sizeAll[i] + '㎡)';
 
                 if (!chartData[apt][title1]) {
                     chartData[apt][title1] = [];
@@ -1428,6 +1705,10 @@ function renderazzi(data) {
                     zeroData1[3] = parseFloat(data[apt][date]['prices'][sizeAll[i]][2]);
 
                     beforePrice[apt][title1] = zeroData1[2];
+
+                    if (zeroData1[2] > 0) {
+                        zeroDataTotal.push((zeroData1[2] / py));
+                    }
                 }
 
                 if (data[apt][date]['jeonses'][sizeAll[i]]) {
@@ -1459,6 +1740,14 @@ function renderazzi(data) {
                     zeroData2[3],
                 ]);
             }
+
+            var average = arr => arr.reduce( ( p, c ) => p + c, 0 ) / arr.length;
+            var zeroDataTotalPrice = parseInt(average(zeroDataTotal));
+
+            chartData[apt][apt + ' 평균가격'].push([
+                date,
+                zeroDataTotalPrice
+            ]);
         }
 
         // break;
@@ -1477,6 +1766,22 @@ function renderazzi(data) {
                 data.addColumn('number', '매물(전세)');
                 data.addColumn('number', '거래완료(매매)');
                 data.addColumn('number', '거래완료(전세)');
+                data.addRows(chartData[apt][title]);
+
+                var options = {
+                    'title': title,
+                    'width': getRowWidth(),
+                    'height': 300,
+                };
+
+                drawChart(data, options);
+            // 평균매매가격
+            } else if (title.indexOf('평균가격') != -1) {
+                chartType = 'LineChart';
+
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Date');
+                data.addColumn('number', '평균매매가격');
                 data.addRows(chartData[apt][title]);
 
                 var options = {
@@ -1650,7 +1955,8 @@ function getEnergy(year, price) {
     else if (year == '2017') energy = price / 60031080;
     else if (year == '2018') energy = price / 61531857;
     else if (year == '2019') energy = price / 63070153;
-    else if (year == '2020') energy = price / 64646907;
+    else if (year == '2020') energy = price / 64331556;
+    else if (year == '2021') energy = price / 65618187;
 
     return (energy * 10000).toFixed(1)
 }
@@ -1687,6 +1993,12 @@ $(document).ready(function() {
         var code = $(this).val();
         if (!code) return false;
         callApi({menu: 'apt_rank', extra: code}, renderaptSiRank);
+    });
+    $(document).on('change', '#apt-date', function (){
+        var date = $(this).val();
+        var code = $("#apt-sigoongoo").val();
+        if (!date) return false;
+        callApi({menu: 'apt_rank', extra: code, extra2: date}, renderaptSiRank);
     });
     // $('.list-menu').on('click', clickMenu);
 

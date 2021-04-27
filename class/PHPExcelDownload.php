@@ -1230,7 +1230,8 @@ class PHPExcelDownload {
                     $newStock2 = $this->setStockUpdateAdd($newStock2, '가정용대야__벚꽃색', $amount);
                     $newStock2 = $this->setStockUpdateAdd($newStock2, '가정용대야__실리콘마개', $amount);
                 } else {
-                    $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '가정용대야__벚꽃색', $amount);
+                    // $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);
                 }
             } else if (strpos($title, '심리스의류') !== false) {
                 // 심리스의류__XL(95)/골고루 4개, XL(95)/스킨 4개
