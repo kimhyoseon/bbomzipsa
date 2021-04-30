@@ -1305,6 +1305,12 @@ class PHPExcelDownload {
                 if (strpos($title, '유리창') !== false) {
                     $newStock2 = $this->setStockUpdateAdd($newStock2, '유리창청소__5-30mm （단계조절）', $amount);
                 }
+            } else if (strpos($title, '바른자세밴드') !== false) {
+                if (strpos($title, 'L') !== false) {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, 'L', $amount);
+                } else {
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, 'M', $amount);
+                }
             // 나머지
             } else {
                 $newStock2 = $this->setStockUpdateAdd($newStock2, $title, $amount);

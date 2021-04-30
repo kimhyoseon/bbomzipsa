@@ -217,6 +217,7 @@ class Yoona {
         $ids = array();
         $apts = array();
         $aptsRank = array();
+        $before3Month = date('Ym', strtotime('-6 months'));
 
         foreach ($list as $value) {
             $ids[] = $value['id'];
@@ -240,10 +241,15 @@ class Yoona {
                 $row = $db->row("SELECT sale_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND sale_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $value['size']));
                 $row2 = $db->row("SELECT jeonse_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND jeonse_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $value['size']));
                 $values = $db->query("SELECT avg(sale_price) as year_price, year FROM yoona_apt_deal WHERE yoona_apt_id=? AND size=? AND sale_count > 0 GROUP BY yoona_apt_id, size, year", array($value['yoona_apt_id'], $value['size']));
+
+                $row_before = $db->row("SELECT sale_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND date <= ? AND size=? AND sale_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $before3Month, $value['size']));
             } else {
                 $row = $db->row("SELECT sale_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND date <= ? AND size=? AND sale_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $lastDate, $value['size']));
                 $row2 = $db->row("SELECT jeonse_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND date <= ? AND size=? AND jeonse_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $lastDate, $value['size']));
                 $values = $db->query("SELECT avg(sale_price) as year_price, year FROM yoona_apt_deal WHERE yoona_apt_id=? AND date <= ? AND size=? AND sale_count > 0 GROUP BY yoona_apt_id, size, year", array($value['yoona_apt_id'], $lastDate, $value['size']));
+
+                $before3Month = date('Ym', strtotime('-6 months', strtotime($lastDate.'01')));
+                $row_before = $db->row("SELECT sale_price, date FROM yoona_apt_deal WHERE yoona_apt_id=? AND date <= ? AND size=? AND sale_count > 0 ORDER BY date DESC", array($value['yoona_apt_id'], $before3Month, $value['size']));
             }
 
             // 현재 년도부터 데이터가 있는 마지막 연도까지
@@ -296,10 +302,12 @@ class Yoona {
             $value['price_per_pyeong'] = floor($row['sale_price'] / $pyeong);
             $value['price_per_size'] = floor($row['sale_price'] / $value['size']);
             $value['sale_price'] = $row['sale_price'];
+            $value['sale_price_before'] = $row_before['sale_price'];
+            $value['price_per_size_before'] = floor($row_before['sale_price'] / $value['size']);
             $value['jeonse_price'] = $row2['jeonse_price'];
             $apts[$value['yoona_apt_id']]['detail'][] = $value;
 
-            $aptsRank[$value['yoona_apt_id']][$value['size']] = $value['price_per_size'];
+            $aptsRank[$value['yoona_apt_id']][$value['size']] = array($value['price_per_size'], $value['price_per_size_before']);
         }
 
         $sort = array();
@@ -311,11 +319,13 @@ class Yoona {
             }
 
             // 84가 기준가격
-            if (!empty($value[84])) {
-                $priceAvg = ceil($value[84]);
+            if (!empty($value[84][0])) {
+                $priceAvg = ceil($value[84][0]);
+                $priceAvgBefore = ceil($value[84][1]);
             } else {
-                foreach ($value as $size => $price) {
-                    $priceAvg = ceil($price);
+                foreach ($value as $size => $prices) {
+                    $priceAvg = ceil($prices[0]);
+                    $priceAvgBefore = ceil($prices[1]);
                     // 84와 가장 가까운 금액으로 기준가격을 정함
                     if ($size > 80) break;
                 }
@@ -324,6 +334,7 @@ class Yoona {
             }
 
             $apts[$key]['price'] = $priceAvg;
+            $apts[$key]['price_before'] = $priceAvgBefore;
 
             $sort[] = $priceAvg;
         }

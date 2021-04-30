@@ -667,9 +667,24 @@ function renderchoongjeon(data) {
 
             var jeonse = parseFloat(data['jeonse'][i][key]);
             var maemae = parseFloat(data['maemae'][i][key]);
-            var jeonse = parseFloat(jeonse.toFixed(2));
-            var maemae = parseFloat(maemae.toFixed(2));
+            jeonse = parseFloat(jeonse.toFixed(2));
+            maemae = parseFloat(maemae.toFixed(2));
             var choongjeon = parseFloat((jeonse - maemae).toFixed(2));
+
+            // // 내가 생각하는 충전
+            // var choongjeon = 0;
+            // if (chartData[key].length > 0) {
+            //     var lastElement = chartData[key][chartData[key].length - 1];
+
+            //     maemarInc = (lastElement[2] - maemae);
+            //     jeonseInc = (jeonse - lastElement[1]);
+
+            //     if (maemarInc < 0) {
+            //         choongjeon = lastElement[3] + maemarInc;
+            //     } else {
+            //         choongjeon = lastElement[3] + maemarInc + jeonseInc;
+            //     }
+            // }
 
             chartData[key].push([data['jeonse'][i][0], jeonse, maemae, choongjeon]);
         }
@@ -680,8 +695,13 @@ function renderchoongjeon(data) {
     // return false;
 
     chartType = 'LineChart';
+    var cnt = 0;
 
     for (key in chartTitle) {
+        // cnt++;
+        // if (cnt < 100) continue;
+        // if (cnt > 110) break;
+
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Date');
         data.addColumn('number', '전세');
@@ -1228,7 +1248,7 @@ function renderaptSiRank(data) {
         else if (maeJeonGapAvg > 3000) valueColorMae = '#1ABC9C';
         else if (maeJeonGapAvg > 1000) valueColorMae = '#148F77';
 
-        chartData.push([aptName, parseInt(data[i]['price']), detailText, valueColor]);
+        chartData.push([aptName, parseInt(data[i]['price_before']), detailText, valueColor, parseInt(data[i]['price'] - data[i]['price_before']), detailText, valueColor]);
         chartDataGap.push([aptName, parseInt(maeJeonGapAvg), valueColorMae]);
     }
 
@@ -1256,7 +1276,10 @@ function renderaptSiRank(data) {
 
     var data = new google.visualization.DataTable();
     data.addColumn('string', '아파트');
-    data.addColumn('number', '평당가격');
+    data.addColumn('number', '이전가격');
+    data.addColumn({type: 'string', role: 'tooltip'});
+    data.addColumn({type: 'string', role: 'style'});
+    data.addColumn('number', '오른가격');
     data.addColumn({type: 'string', role: 'tooltip'});
     data.addColumn({type: 'string', role: 'style'});
     data.addRows(chartData);
@@ -1266,6 +1289,7 @@ function renderaptSiRank(data) {
         'legend': 'none',
         'width': getRowWidth(),
         'height': 300,
+        'isStacked': true,
         // 'focusTarget': 'category'
     };
 
@@ -1992,6 +2016,7 @@ $(document).ready(function() {
     $(document).on('change', '#apt-sigoongoo', function (){
         var code = $(this).val();
         if (!code) return false;
+        rankData = null;
         callApi({menu: 'apt_rank', extra: code}, renderaptSiRank);
     });
     $(document).on('change', '#apt-date', function (){
