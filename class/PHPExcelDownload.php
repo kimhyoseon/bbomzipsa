@@ -1307,9 +1307,9 @@ class PHPExcelDownload {
                 }
             } else if (strpos($title, '바른자세밴드') !== false) {
                 if (strpos($title, 'L') !== false) {
-                    $newStock2 = $this->setStockUpdateAdd($newStock2, 'L', $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '바른자세밴드__L', $amount);
                 } else {
-                    $newStock2 = $this->setStockUpdateAdd($newStock2, 'M', $amount);
+                    $newStock2 = $this->setStockUpdateAdd($newStock2, '바른자세밴드__M', $amount);
                 }
             // 나머지
             } else {

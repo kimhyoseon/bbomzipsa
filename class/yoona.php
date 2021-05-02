@@ -448,6 +448,7 @@ class Yoona {
         $queryParams .= '&' . urlencode('_type') . '=' . urlencode('json'); /*타입*/
 
         // print_r($url.$queryParams);
+        // exit();
 
         curl_setopt($ch, CURLOPT_URL, $url . $queryParams);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
